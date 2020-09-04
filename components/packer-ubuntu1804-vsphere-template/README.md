@@ -1,4 +1,4 @@
-### packer-ubuntu-vsphere template
+### packer-ubuntu1804-vsphere-template
 
 use packer to build a customized ubuntu 18.04 image on vsphere
 
