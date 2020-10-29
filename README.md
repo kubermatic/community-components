@@ -3,22 +3,13 @@
 Check [the following wiki page](https://app.nuclino.com/Loodse/02-Engineering/Open-sourcing-projects-646a5b93-27d5-4245-83bc-cf10a5b9ad3d) for instructions how to setup everything needed to open source the project. Once you're done, make sure to delete this TODO part.
 
 ## Overview
+This repository serves as an entry-point for multiple community-maintained components in the Kubermatic ecosystem. Feedback is highly encouraged 👍 
 
-TODO
+## Components 
 
-## Installation
-
-We strongly recommend that you use an [official release][3] of XXX. The tarballs for each release contain the
-command-line client **and** version-specific sample YAML files for deploying XXX to your cluster.
-Follow the instructions under the **Install** section of [our documentation][21] to get started.
-
-_The code and sample YAML files in the master branch of the XXX repository are under active development and are not guaranteed to be stable. Use them at your own risk!_
-
-## More information
-
-[The documentation][21] provides a getting started guide, plus information about building from source, architecture, extending XXX, and more.
-
-Please use the version selector at the top of the site to ensure you are using the appropriate documentation for your version of XXX.
+Name|Description
+---|---
+[kubeone-tool-container](./components/kubeone-tool-container)|A docker container with various tools to work with KubeOne and Kubernetes
 
 ## Troubleshooting
 
