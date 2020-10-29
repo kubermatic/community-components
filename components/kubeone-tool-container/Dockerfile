@@ -30,11 +30,10 @@ RUN apt-get update && apt-get install -y \
 ENV GO111MODULE on
 ENV USER root
 
+# Install Terraform
 ENV TERRAFORM_VERSION "0.13.3"
 RUN curl -fL https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_amd64.zip | funzip >/usr/local/bin/terraform
 RUN chmod +x /usr/local/bin/terraform
-
-ENV GO111MODULE=on
 
 # Install Kubectl
 RUN curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
@@ -61,7 +60,7 @@ RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2
 unzip awscliv2.zip && \
 ./aws/install
 
-#install azure CLI
+# Install Azure CLI
 RUN curl -sL https://packages.microsoft.com/keys/microsoft.asc | \
          gpg --dearmor | \
           tee /etc/apt/trusted.gpg.d/microsoft.gpg > /dev/null  && \
@@ -71,11 +70,12 @@ RUN curl -sL https://packages.microsoft.com/keys/microsoft.asc | \
          apt-get update -y && \
          apt-get install azure-cli -y
 
-#install GCP CLI
+# Install GCP CLI
 RUN echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] http://packages.cloud.google.com/apt cloud-sdk main" | tee -a /etc/apt/sources.list.d/google-cloud-sdk.list &&  \
     curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key --keyring /usr/share/keyrings/cloud.google.gpg  add - &&  \
     apt-get update -y && \
     apt-get install google-cloud-sdk -y
+
 RUN kubectl completion bash >> /etc/bash_completion.d/kubectl
 RUN echo "source <(kubeone completion bash)" >> ~/.bashrc
 RUN echo 'source <(kubectl completion bash)' >> ~/.bashrc
