@@ -1,6 +1,13 @@
 ## Overview
 
-TODO
+This repository serves as an entry-point for multiple community-maintained components in the Kubermatic ecosystem. Feedback is highly encouraged 👍
+
+## Components
+
+Name|Description
+---|---
+[packer-ubuntu1804-vsphere-template](./components/packer-ubuntu1804-vsphere-template)|A packer template to customize an ubuntu 18.04 cloud-image on vSphere
+
 
 ## Troubleshooting
 
@@ -34,5 +41,3 @@ See [the list of releases][3] to find out about feature changes.
 [12]: https://kubermatic.slack.com/messages/kubermatic
 [13]: https://github.com/kubermatic-labs/community-components/blob/master/Zenhub.md
 [15]: http://slack.kubermatic.io/
-
-[21]: https://kubermatic.github.io/XXX/

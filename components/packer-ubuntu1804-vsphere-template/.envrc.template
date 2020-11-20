@@ -1,0 +1,31 @@
+# Copyright 2020 The Kubermatic Authors.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# shellcheck shell=bash
+
+export VSPHERE_SERVER=vcenter.example.com
+export VSPHERE_USER=administrator@vsphere.local
+export VSPHERE_PASSWORD='supers3cret!'
+
+# this is for govc use (makes developing templates easier)
+export GOVC_URL="$VSPHERE_SERVER"
+export GOVC_USERNAME="$VSPHERE_USER"
+export GOVC_PASSWORD="$VSPHERE_PASSWORD"
+# export GOVC_INSECURE=true
+
+# set secret packer vars
+# pls make sure to wrap string variables in quotes!
+export PKR_VAR_vcenter_server="\"$VSPHERE_SERVER\""
+export PKR_VAR_vcenter_user="\"$VSPHERE_USER\""
+export PKR_VAR_vcenter_password="\"$VSPHERE_PASSWORD\""
