@@ -71,7 +71,7 @@ By making a contribution to this project, I certify that:
 
 ## Email and Chat
 
-The XXX project currently uses the general Kubermatic email list and Slack channel:
+The Kubermatic project currently uses the general Kubermatic email list and Slack channel:
 - Email: [kubermatic-dev](https://groups.google.com/forum/#!forum/kubermatic-dev)
 - Slack: #[Slack](http://slack.kubermatic.io/) on Slack
 

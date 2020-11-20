@@ -12,17 +12,26 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# presubmits:
-#   - name: pre-PROJECT-verify-boilerplate
-#     always_run: true
-#     decorate: true
-#     clone_uri: "ssh://git@github.com/OWNER/PROJECT.git"
-#     spec:
-#       containers:
-#         - image: quay.io/kubermatic-labs/boilerplate:v0.1.1
-#           command:
-#             - ./hack/verify-boilerplate.sh
-#           resources:
-#             requests:
-#               cpu: 200m
-#               memory: 256Mi
+variable "vcenter_server" {
+  description = "vCenter server to build the VM on"
+}
+
+variable "vcenter_user" {
+  description = "Username to authenticate to vCenter"
+}
+
+variable "vcenter_password" {
+  description = "Password to authenticate to vCenter"
+}
+
+variable "vcenter_insecure" {
+  default = true
+}
+
+variable "vcenter_template" {}
+variable "vcenter_datacenter" {}
+variable "vcenter_cluster" {}
+variable "vcenter_datastore" {}
+variable "vcenter_network" {}
+variable "output_vm_folder" {}
+variable "output_vm_name" {}

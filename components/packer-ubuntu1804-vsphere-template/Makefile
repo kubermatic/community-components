@@ -12,17 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# presubmits:
-#   - name: pre-PROJECT-verify-boilerplate
-#     always_run: true
-#     decorate: true
-#     clone_uri: "ssh://git@github.com/OWNER/PROJECT.git"
-#     spec:
-#       containers:
-#         - image: quay.io/kubermatic-labs/boilerplate:v0.1.1
-#           command:
-#             - ./hack/verify-boilerplate.sh
-#           resources:
-#             requests:
-#               cpu: 200m
-#               memory: 256Mi
+.PHONY: build
+build:
+	packer build --var-file=override.vars.hcl .

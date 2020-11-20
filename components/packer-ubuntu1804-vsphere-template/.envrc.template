@@ -12,17 +12,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# presubmits:
-#   - name: pre-PROJECT-verify-boilerplate
-#     always_run: true
-#     decorate: true
-#     clone_uri: "ssh://git@github.com/OWNER/PROJECT.git"
-#     spec:
-#       containers:
-#         - image: quay.io/kubermatic-labs/boilerplate:v0.1.1
-#           command:
-#             - ./hack/verify-boilerplate.sh
-#           resources:
-#             requests:
-#               cpu: 200m
-#               memory: 256Mi
+# shellcheck shell=bash
+
+export VSPHERE_SERVER=vcenter.example.com
+export VSPHERE_USER=administrator@vsphere.local
+export VSPHERE_PASSWORD='supers3cret!'
+
+# this is for govc use (makes developing templates easier)
+export GOVC_URL="$VSPHERE_SERVER"
+export GOVC_USERNAME="$VSPHERE_USER"
+export GOVC_PASSWORD="$VSPHERE_PASSWORD"
+# export GOVC_INSECURE=true
+
+# set secret packer vars
+# pls make sure to wrap string variables in quotes!
+export PKR_VAR_vcenter_server="\"$VSPHERE_SERVER\""
+export PKR_VAR_vcenter_user="\"$VSPHERE_USER\""
+export PKR_VAR_vcenter_password="\"$VSPHERE_PASSWORD\""
