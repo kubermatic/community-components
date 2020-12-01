@@ -1,0 +1,39 @@
+apiVersion: kubeone.io/v1beta1
+kind: KubeOneCluster
+versions:
+  kubernetes: 1.18.9
+cloudProvider:
+  vsphere: {}
+  cloudConfig: |+
+    [Global]
+    secret-name       = "vsphere-ccm-credentials"
+    secret-namespace  = "kube-system"
+    port              = "443"
+    insecure-flag     = false
+    working-dir       = "working dir"
+    datacenter        = "datacenter"
+    datastore         = "datastore"
+    server            = "vsphere server"
+
+    [Disk]
+    scsicontrollertype = "pvscsi"
+
+    [Workspace]
+    server            = "vsphere server"
+    datacenter        = "datacenter"
+    folder            = "/datacenter/vm/folder"
+    default-datastore = "datastore"
+    resourcepool-path = ""
+
+    [Network]
+    public-network = "Your default Public Network"
+
+# features:
+  # Enables PodSecurityPolicy admission plugin in API server, as well as creates
+  # default 'privileged' PodSecurityPolicy, plus RBAC rules to authorize
+  # 'kube-system' namespace pods to 'use' it.
+#  podSecurityPolicy:
+#    enable: true
+addons:
+  enable: true
+  path: "./addons" #l always apply

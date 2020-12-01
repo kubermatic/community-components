@@ -1,0 +1,55 @@
+apiVersion: kubermatic.k8s.io/v1
+kind: KubermaticSetting
+metadata:
+  name: globalsettings
+spec:
+  cleanupOptions:
+    Enabled: true
+    Enforced: true
+  clusterTypeOptions: 0
+  customLinks:
+  - icon: ""
+    label: API
+    location: default
+    url: https://yourdomain.io/rest-api
+  - icon: ""
+    label: Prometheus (admins)
+    location: default
+    url: https://prometheus.yourdomain.io/
+  - icon: ""
+    label: Grafana (admins)
+    location: default
+    url: https://grafana.yourdomain.io/
+  - icon: ""
+    label: Kibana (admins)
+    location: default
+    url: https://kibana.yourdomain.io/
+  - icon: ""
+    label: Documentation
+    location: default
+    url: https://docs.kubermatic.com/kubermatic/master/
+  - icon: ""
+    label: Forum
+    location: default
+    url: https://forum.kubermatic.com/
+  - icon: ""
+    label: GitHub
+    location: default
+    url: https://github.com/kubermatic
+  - icon: ""
+    label: Twitter
+    location: default
+    url: https://twitter.com/kubermatic
+  - icon: ""
+    label: Slack
+    location: default
+    url: http://slack.kubermatic.io/
+
+  defaultNodeCount: 1
+  displayAPIDocs: true
+  displayDemoInfo: true
+  displayTermsOfService: true
+  enableDashboard: true
+  enableOIDCKubeconfig: false
+  restrictProjectCreation: false
+  userProjectsLimit: 5

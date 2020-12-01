@@ -1,0 +1,74 @@
+# Copyright 2020 The Kubermatic Kubernetes Platform contributors.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# Dex Is the OpenID Provider for Kubermatic.
+dex:
+  ingress:
+    # configure your base domain, under which the Kubermatic dashboard shall be available
+    host: yourdomain.io
+
+  clients:
+  # The "kubermatic" client is used for logging into the Kubermatic dashboard. It always
+  # needs to be configured.
+  - id: kubermatic
+    name: Kubermatic
+    # Generate a secure secret key
+    # Those can be generated on the shell using:
+    # cat /dev/urandom | tr -dc A-Za-z0-9 | head -c32
+    secret:
+    RedirectURIs:
+    # ensure the URLs below use the dex.ingress.host configured above
+    - https://yourdomain.io
+    - https://yourdomain.io/projects
+
+  # Depending on your chosen login method, you need to configure either an OAuth provider like
+  # Google or GitHub, or configure a set of static passwords. Check the `charts/oauth/values.yaml`
+  # for an overview over all available connectors.
+
+  # For testing purposes, we configure a single static user/password combination.
+  staticPasswords:
+  - email: kubermatic@example.com
+    # bcrypt hash of the string "password", can be created using recent versions of htpasswd:
+    # `htpasswd -bnBC 10 "" PASSWORD_HERE | tr -d ':\n' | sed 's/$2y/$2a/'`
+    hash: A-PASSWORD-HASH
+
+    # these are used within Kubermatic to identify the user
+    username: admin
+    userID: A-USER-ID
+
+  # the cert-manager Issuer (or ClusterIssuer) responsible for managing the certificates
+  certIssuer:
+    # For generating a certificate signed by a trusted root authority replace
+    # with "letsencrypt-prod".
+    name: ca-prod
+    kind: ClusterIssuer
+kubermaticOperator:
+  # insert the Docker authentication JSON provided by Kubermatic here
+  ### KUBERMATIC PS Testing
+  imagePullSecret: |
+    {
+      "auths": {
+        "quay.io": {
+        }
+      }
+    }
+
+
+minio:
+  storeSize: '100Gi'
+  storageClass: kubermatic-backup
+  credentials:
+    ### random key
+    accessKey: 'randomkey'
+    secretKey: 'secretkey' # 64 byte long
