@@ -8,6 +8,16 @@ Name|Description
 [packer-ubuntu1804-vsphere-template](./components/packer-ubuntu1804-vsphere-template)|A packer template to customize an ubuntu 18.04 cloud-image on vSphere
 [kubeone-tool-container](./components/kubeone-tool-container)|A docker container with various tools to work with KubeOne and Kubernetes
 
+## Knowledge Base
+Helpful how-tos and detailed documentation:
+
+Name | Description
+--- | ---
+[setup-checklist](./knowledge-base/setup-checklist) | Detailed requirement documentation to setup kubermatic at different environments
+[how-to-convert-to-docx](./knowledge-base/how-to-convert-to-docx.md) | Commands to convert markdown to docx
+[migrate-helm2-to-helm3](./knowledge-base/migrate-helm2-to-helm3.md) | This document shows you how to migrate Heml releases from using Helm version 2.x with Tiller to being managed by Helm version 3.x in place.
+[node-health-check](knowledge-base/node-health-check.md)| This doc describes how Kubermatic node health checks works
+[offline-setup](knowledge-base/offline-setup.md) | How to run kubermatic in offline environments
 
 ## Troubleshooting
 
