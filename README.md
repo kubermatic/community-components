@@ -2,11 +2,29 @@
 This repository serves as an entry-point for multiple community-maintained components in the Kubermatic ecosystem. Feedback is highly encouraged 👍 
 
 ## Components
+Dedicated components for customer purposes. 
 
 Name|Description
 ---|---
 [packer-ubuntu1804-vsphere-template](./components/packer-ubuntu1804-vsphere-template)|A packer template to customize an ubuntu 18.04 cloud-image on vSphere
+
+## Helper
+List of helper scripts and tools
+
+Name|Description
+---|---
+[git-crypt](./helper/git-crypt)| [git-crypt](https://github.com/AGWA/git-crypt) is a tooling to encrypt git repositories based GPG keys
 [kubeone-tool-container](./components/kubeone-tool-container)|A docker container with various tools to work with KubeOne and Kubernetes
+[kubermatic-installer-script](helper/kubermatic-installer-script) | Contains a standalone usage of [kubermatic - deploy.sh](https://github.com/kubermatic/kubermatic/blob/master/hack/ci/deploy.sh) repo installation script for own installations.
+[ssh-debug](helper/ssh-debug) | SSH Debug Client for quickly ssh to nodes in an internal network
+[vault-k8s-mapper](helper/vault-k8s-mapper) | Maps Vault secret as native Kubernetes secret into a defined namespace/secret.
+[delete-evicted-pods-all-ns.sh](helper/delete-evicted-pods-all-ns.sh) | Deletes pods in state `evicted` 
+[headless.vnc.test.container.yaml](helper/headless.vnc.test.container.yaml) | [docker-headless-vnc-container](https://github.com/ConSol/docker-headless-vnc-container) container containing Linux UI exposed via webvnc for testing e.g. dashboards from internal cluster view 
+[kill-kube-ns.sh](helper/kill-kube-ns.sh) | kills a pending kubernetes namespace
+[kubeconfig-kubermatic-serviceaccount.sh](/helper/kubeconfig-kubermatic-serviceaccount.sh) | creates an `kubermatic` service account at an seed cluster
+[machinedeployment-patch.gce.sh](helper/machinedeployment-patch.gce.sh) | Scripts patches some specification of an Cluster API `MachineDeployment` object.
+[set-build-tags-to-image.sh](helper/set-build-tags-to-image.sh) | Set dedicated build tags to the [Kubermatic Charts](https://github.com/kubermatic/kubermatic/tree/master/charts)
+[untaint_master.sh](helper/untaint_master.sh) | untaints all master nodes, to be able to schedule workload
 
 ## Knowledge Base
 Helpful how-tos and detailed documentation:
