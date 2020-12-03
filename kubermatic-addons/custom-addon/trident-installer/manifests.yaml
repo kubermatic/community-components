@@ -1,0 +1,90 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: trident-installer
+  namespace: trident
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: trident-installer
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cluster-admin
+subjects:
+- kind: ServiceAccount
+  name: trident-installer
+  namespace: trident
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: trident-installer
+  namespace: trident
+spec:
+  template:
+    spec:
+      serviceAccountName: trident-installer
+      containers:
+        - name: trident-installer
+          image: '{{ Registry "quay.io" }}/kubermatic-labs/trident-installer:20.04.0'
+          volumeMounts:
+            - name: manifests
+              mountPath: /manifests
+            - name: backend
+              mountPath: /backend
+          command: ["/bin/sh"]
+          args: ["/manifests/install.sh"]
+      restartPolicy: OnFailure
+      volumes:
+        - name: manifests
+          configMap:
+            name: trident-installer
+        - name: backend
+          secret:
+            secretName: trident-installer-backend
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: trident-installer-backend
+  namespace: trident
+stringData:
+  backend.json: "{{ .Variables.backend | nindent 4 }}"
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: trident-installer
+  namespace: trident
+data:
+  storage_class_trident.yaml: |-
+    apiVersion: storage.k8s.io/v1
+    kind: StorageClass
+    metadata:
+      name: trident
+      annotations:
+        storageclass.kubernetes.io/is-default-class: "true"
+    provisioner: netapp.io/trident
+    parameters: "{{ .Variables.storageClassParameters | nindent 6 }}"
+############example
+#    parameters:
+#        backendType: "ontap-nas"
+#      allowVolumeExpansion: True
+  install.sh: |-
+    set -ex
+    kubectl apply -f /opt/trident-installer/deploy/crds/trident.netapp.io_tridentprovisioners_crd_post1.16.yaml
+    kubectl apply -f /opt/trident-installer/deploy/bundle.yaml
+    kubectl apply -f /opt/trident-installer/deploy/crds/tridentprovisioner_cr.yaml
+    sleep 5
+    i="0"
+    until kubectl describe tprov trident -n trident | grep "Status:.*Installed"
+    do
+      sleep 10
+      if [ ! $i -lt 30 ]; then
+        exit 1
+      fi
+    done
+    /opt/trident-installer/tridentctl -n trident create backend -f /backend/backend.json
+    kubectl apply -f /manifests/storage_class_trident.yaml

@@ -17,6 +17,22 @@ down worker nodes during non work hours and weekends.
 [logging/audit/static-audit-log](components/logging/audit/static-audit-log) | Description how static audit logging could get configured
 [vm-images/packer-ubuntu1804-vsphere-template](./components/vm-images/packer-ubuntu1804-vsphere-template)|A packer template to customize an ubuntu 18.04 cloud-image on vSphere
 
+## Kubermatic Addons
+
+Configuration and tooling for common used [Kubermatic Addons](https://docs.kubermatic.com/kubermatic/master/advanced/addons/) for user cluster customization.
+
+Name|Description
+---|---
+[Makefile](kubermatic-addons/Makefile) | Wrapper for building KKP addons for a dedicated version
+[addon-manifests](kubermatic-addons/addon-manifests) | Holding the `AddonConfig` custom resource specifications for a set of addons to configure KKP UI
+[custom-addon/dns-resolve-overwrite](kubermatic-addons/custom-addon/dns-resolve-overwrite) | A DaemonSet with privileged permissions to overwrite the host DNS at the kubernetes nodes
+[custom-addon/echoserver](kubermatic-addons/custom-addon/echoserver) - Simple echo server application as an example workload deployment with ingress config
+[custom-addon/helm-operator](kubermatic-addons/custom-addon/helm-operator) | Deploys the [FluxCD - Helm Operator](https://github.com/fluxcd/helm-operator) for managing additional deployment trough Helm by CRD
+[kubermatic-addons/custom-addon/ingress-nginx](kubermatic-addons/custom-addon/ingress-nginx) | Deploys the [Ingress Nginx Controller](https://github.com/kubernetes/ingress-nginx) to the user cluster
+[custom-addon/loki-stack](kubermatic-addons/custom-addon/loki-stack) | (Requires Helm Operator) Add Grafana Loki stack based on [Grafana Loki Charts](https://grafana.github.io/loki/charts)
+[custom-addon/metallb](kubermatic-addons/custom-addon/metallb) - MetalLB cluster addon for on-premise user cluster without native LB support
+[custom-addon/trident-installer](kubermatic-addons/custom-addon/trident-installer)- Addon for [NetApp Trident](https://github.com/NetApp/trident) storage support into a user cluster
+
 ## Helper
 List of helper scripts and tools
 
