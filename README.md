@@ -1,5 +1,5 @@
 ## Overview
-This repository serves as an entry-point for multiple community-maintained components in the Kubermatic ecosystem. Feedback is highly encouraged 👍 
+This repository serves as an entry-point for multiple community-maintained components in the Kubermatic ecosystem. Feedback is highly encouraged 👍
 
 ## Components
 Dedicated components for customer purposes. 
@@ -7,11 +7,10 @@ Dedicated components for customer purposes.
 Name|Description
 ---|---
 [certificates/self-signed-ca](components/certificates/self-signed-ca) | How to create and managed self-signed CA at KKP
-[controllers/aws-private-ip-enforce-controller](components/controllers/aws-private-ip-enforce-controller)
+[controllers/aws-private-ip-enforce-controller](components/controllers/aws-private-ip-enforce-controller) | Enforces the `assignPublicIP: false` flag on all user cluster machine deployments
 [controllers/component-override-controller](components/controllers/component-override-controller) | This bash-controller watches over Cluster objects and controls part of the spec.componentOverride.
 [controllers/pod-cidr-controller](components/controllers/pod-cidr-controller) | This bash-controller watches over Cluster objects and patches spec.clusterNetwork.pods.cidrBlocks
-[cron-jobs/scale-down](components/cron-jobs/scale-down) | running a cron job that scales
-down worker nodes during non work hours and weekends.
+[cron-jobs/scale-down](components/cron-jobs/scale-down) | running a cron job that scales down worker nodes during non work hours and weekends.
 [id-management/active-directory](components/id-management/active-directory) | Example how to configure KKP with Active Directory
 [loadbalancers/metallb](components/loadbalancers/metallb) | Example config for MetalLB what aims to redress this imbalance by offering a Network LB implementation that integrates with standard network equipment
 [logging/audit/static-audit-log](components/logging/audit/static-audit-log) | Description how static audit logging could get configured
@@ -26,12 +25,12 @@ Name|Description
 [Makefile](kubermatic-addons/Makefile) | Wrapper for building KKP addons for a dedicated version
 [addon-manifests](kubermatic-addons/addon-manifests) | Holding the `AddonConfig` custom resource specifications for a set of addons to configure KKP UI
 [custom-addon/dns-resolve-overwrite](kubermatic-addons/custom-addon/dns-resolve-overwrite) | A DaemonSet with privileged permissions to overwrite the host DNS at the kubernetes nodes
-[custom-addon/echoserver](kubermatic-addons/custom-addon/echoserver) - Simple echo server application as an example workload deployment with ingress config
+[custom-addon/echoserver](kubermatic-addons/custom-addon/echoserver) | Simple echo server application as an example workload deployment with ingress config
 [custom-addon/helm-operator](kubermatic-addons/custom-addon/helm-operator) | Deploys the [FluxCD - Helm Operator](https://github.com/fluxcd/helm-operator) for managing additional deployment trough Helm by CRD
 [kubermatic-addons/custom-addon/ingress-nginx](kubermatic-addons/custom-addon/ingress-nginx) | Deploys the [Ingress Nginx Controller](https://github.com/kubernetes/ingress-nginx) to the user cluster
 [custom-addon/loki-stack](kubermatic-addons/custom-addon/loki-stack) | (Requires Helm Operator) Add Grafana Loki stack based on [Grafana Loki Charts](https://grafana.github.io/loki/charts)
-[custom-addon/metallb](kubermatic-addons/custom-addon/metallb) - MetalLB cluster addon for on-premise user cluster without native LB support
-[custom-addon/trident-installer](kubermatic-addons/custom-addon/trident-installer)- Addon for [NetApp Trident](https://github.com/NetApp/trident) storage support into a user cluster
+[custom-addon/metallb](kubermatic-addons/custom-addon/metallb) | MetalLB cluster addon for on-premise user cluster without native LB support
+[custom-addon/trident-installer](kubermatic-addons/custom-addon/trident-installer)| Addon for [NetApp Trident](https://github.com/NetApp/trident) storage support into a user cluster
 
 ## Helper
 List of helper scripts and tools
@@ -60,6 +59,7 @@ Name | Description
 [how-to-convert-to-docx](./knowledge-base/how-to-convert-to-docx.md) | Commands to convert markdown to docx
 [migrate-helm2-to-helm3](./knowledge-base/migrate-helm2-to-helm3.md) | This document shows you how to migrate Heml releases from using Helm version 2.x with Tiller to being managed by Helm version 3.x in place.
 [node-health-check](knowledge-base/node-health-check.md)| This doc describes how Kubermatic node health checks works
+[nvidia-gpu-operator](knowledge-base/nvidia-gpu-operator.md) | How to enable GPU support for KKP clusters by [NVIDIA - GPU Operator](https://github.com/NVIDIA/gpu-operator/)
 [offline-setup](knowledge-base/offline-setup.md) | How to run kubermatic in offline environments
 
 ## Troubleshooting
