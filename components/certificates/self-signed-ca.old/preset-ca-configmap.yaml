@@ -1,0 +1,14 @@
+kind: PodPreset
+apiVersion: settings.k8s.io/v1alpha1
+metadata:
+  name: replace-root-cas
+spec:
+  selector:
+    matchLabels: {}
+  volumeMounts:
+    - mountPath: /etc/ssl/certs
+      name: root-cas
+  volumes:
+    - name: root-cas
+      configMap:
+        name: root-cas

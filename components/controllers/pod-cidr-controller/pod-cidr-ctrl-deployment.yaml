@@ -1,0 +1,58 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: pod-cidr-controller
+  name: pod-cidr-controller
+  namespace: kubermatic
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: pod-cidr-controller
+  template:
+    metadata:
+      labels:
+        app: pod-cidr-controller
+    spec:
+      serviceAccountName: kubermatic
+      containers:
+      - name: controller
+        env:
+        - name: DESIRED_POD_CIDR
+          value: 172.26.0.0/16
+        image: quay.io/kubermatic/util:1.2.0
+        command:
+        - bash
+        - -c
+        - |
+          ltmp=$(mktemp -d) ; trap "rm -rv $ltmp" EXIT
+
+          # syncrun POD_CIDR
+          syncrun() {
+            pod_cidr="$1"; shift
+            kubectl get -o json clusters \
+              | jq -r '.items[]|select(.spec.clusterNetwork.pods.cidrBlocks[0]!="'$pod_cidr'") .metadata.name' \
+              > $ltmp/clusters
+
+            for cluster in $(< $ltmp/clusters ); do
+              echo "Found cluster $cluster with undesired pod cidr."
+
+              kubectl patch cluster $cluster \
+                --type=json \
+                -p='[{"op": "replace", "path": "/spec/clusterNetwork/pods/cidrBlocks", "value":[ '$pod_cidr' ]}]'
+            done
+          }
+
+          while true; do
+            syncrun "${DESIRED_POD_CIDR:-192.0.2.0/24}"
+            sleep 2
+          done
+        resources:
+          requests:
+            cpu: 5m
+            memory: 20M
+          limits:
+            cpu: 20m
+            memory: 200M

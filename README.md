@@ -6,7 +6,16 @@ Dedicated components for customer purposes.
 
 Name|Description
 ---|---
-[packer-ubuntu1804-vsphere-template](./components/packer-ubuntu1804-vsphere-template)|A packer template to customize an ubuntu 18.04 cloud-image on vSphere
+[certificates/self-signed-ca](components/certificates/self-signed-ca) | How to create and managed self-signed CA at KKP
+[controllers/aws-private-ip-enforce-controller](components/controllers/aws-private-ip-enforce-controller)
+[controllers/component-override-controller](components/controllers/component-override-controller) | This bash-controller watches over Cluster objects and controls part of the spec.componentOverride.
+[controllers/pod-cidr-controller](components/controllers/pod-cidr-controller) | This bash-controller watches over Cluster objects and patches spec.clusterNetwork.pods.cidrBlocks
+[cron-jobs/scale-down](components/cron-jobs/scale-down) | running a cron job that scales
+down worker nodes during non work hours and weekends.
+[id-management/active-directory](components/id-management/active-directory) | Example how to configure KKP with Active Directory
+[loadbalancers/metallb](components/loadbalancers/metallb) | Example config for MetalLB what aims to redress this imbalance by offering a Network LB implementation that integrates with standard network equipment
+[logging/audit/static-audit-log](components/logging/audit/static-audit-log) | Description how static audit logging could get configured
+[vm-images/packer-ubuntu1804-vsphere-template](./components/vm-images/packer-ubuntu1804-vsphere-template)|A packer template to customize an ubuntu 18.04 cloud-image on vSphere
 
 ## Helper
 List of helper scripts and tools
