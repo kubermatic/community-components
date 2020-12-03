@@ -1,0 +1,101 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  annotations:
+  labels:
+    cronjob: timed-worker-node-scale-down
+  name: timed-worker-node-scale-down
+  namespace: cron-scaler
+spec:
+  concurrencyPolicy: Forbid
+  failedJobsHistoryLimit: 48
+  jobTemplate:
+    spec:
+      template:
+        metadata:
+          annotations:
+            prometheus.io/scrape: "false"
+          labels:
+            cronjob: timed-worker-node-scale-down
+        spec:
+          containers:
+          - args: ["/var/run/scale-down.sh"]
+            command:
+            - /bin/sh
+            - -c
+            image: gcr.io/google_containers/hyperkube-amd64:v1.13.2
+            imagePullPolicy: IfNotPresent
+            name: scale-down
+            volumeMounts:
+              - name: scale-down
+                mountPath: "/var/run/"
+          nodeSelector:
+            node-role.kubernetes.io/master: ""
+          tolerations:
+            - key: "node-role.kubernetes.io/master"
+              operator: "Exists"
+              effect: "NoSchedule"
+          restartPolicy: Never
+          serviceAccount: timed-worker-node-scale-down
+          serviceAccountName: timed-worker-node-scale-down
+          terminationGracePeriodSeconds: 30
+          volumes:
+            - name: scale-down
+              configMap:
+                name: scale-down
+                defaultMode: 0700
+  # Run from hourly between 4pm to 6am UTC everyday.
+  # That is from 6pm to 8am CEST (March-October) and from 5pm to 7am CET (October-March).
+  schedule: "0 0-6,16-23 * * *"
+  startingDeadlineSeconds: 30
+  successfulJobsHistoryLimit: 48
+  suspend: false
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  labels:
+    app: timed-worker-node-scale-down
+  name: timed-worker-node-scale-down
+  namespace: cron-scaler
+rules:
+  - apiGroups:
+    - ""
+    - apps
+    resources:
+    - nodes
+    - deployments
+    verbs:
+    - get
+    - list
+    - watch
+  - apiGroups:
+    - cluster.k8s.io
+    resources:
+    - "*"
+    verbs:
+    - get
+    - list
+    - watch
+    - update
+    - patch
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: timed-worker-node-scale-down
+  namespace: cron-scaler
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: timed-worker-node-scale-down
+  namespace: cron-scaler
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: timed-worker-node-scale-down
+subjects:
+- kind: ServiceAccount
+  name: timed-worker-node-scale-down
+  namespace: cron-scaler

@@ -1,0 +1,12 @@
+# Mapping in the form `<k8s secret name>=<vault secret name>`. Multiple mappings may be specified if they separated by whitespace.
+mappings: "k8ssecretname=vault/path/to/secret/but/dont/include/fields/here many=chickens/yesyes"
+# Namespace that is being deployed into.
+namespace: lol
+# Vault role to use.
+role: role-inside-kubernetes-auth-method
+# Pull secret name (you must create this manually).
+imagesecret: psssst-secret
+# Image to use.
+image: change
+# URI to reach the vault by.
+vaultAddr: https//example.com

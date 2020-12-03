@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: ssh-debug
+  name: ssh-debug
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ssh-debug
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: ssh-debug
+    spec:
+      terminationGracePeriodSeconds: 1
+      containers:
+      - image: quay.io/kubermatic/util:1.3.4
+        name: util
+        # use kubectl exec -it to login to container, and connect to the nodes ip's of the kvirt vmi's
+        # ssh ubuntu@INTERNAL-IP
+        command:
+          - bash
+          - -c
+          - |
+             mkdir -p /root/.ssh && \
+             cp /tmp/.ssh/id_rsa /root/.ssh/id_rsa && \
+             chmod 0600 /root/.ssh/id_rsa && \
+             tail -f /etc/os-release
+        resources: {}
+        volumeMounts:
+          - mountPath: /tmp/.ssh
+            name: ssh-key
+            readOnly: true
+      volumes:
+        - name: ssh-key
+          secret:
+            secretName: ssh-key
+            items:
+              - key: id_rsa
+                path: id_rsa
+---

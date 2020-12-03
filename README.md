@@ -1,13 +1,66 @@
 ## Overview
-This repository serves as an entry-point for multiple community-maintained components in the Kubermatic ecosystem. Feedback is highly encouraged 👍 
+This repository serves as an entry-point for multiple community-maintained components in the Kubermatic ecosystem. Feedback is highly encouraged 👍
 
 ## Components
+Dedicated components for customer purposes. 
 
 Name|Description
 ---|---
-[packer-ubuntu1804-vsphere-template](./components/packer-ubuntu1804-vsphere-template)|A packer template to customize an ubuntu 18.04 cloud-image on vSphere
-[kubeone-tool-container](./components/kubeone-tool-container)|A docker container with various tools to work with KubeOne and Kubernetes
+[certificates/self-signed-ca](components/certificates/self-signed-ca) | How to create and managed self-signed CA at KKP
+[controllers/aws-private-ip-enforce-controller](components/controllers/aws-private-ip-enforce-controller) | Enforces the `assignPublicIP: false` flag on all user cluster machine deployments
+[controllers/component-override-controller](components/controllers/component-override-controller) | This bash-controller watches over Cluster objects and controls part of the spec.componentOverride.
+[controllers/pod-cidr-controller](components/controllers/pod-cidr-controller) | This bash-controller watches over Cluster objects and patches spec.clusterNetwork.pods.cidrBlocks
+[cron-jobs/scale-down](components/cron-jobs/scale-down) | running a cron job that scales down worker nodes during non work hours and weekends.
+[id-management/active-directory](components/id-management/active-directory) | Example how to configure KKP with Active Directory
+[loadbalancers/metallb](components/loadbalancers/metallb) | Example config for MetalLB what aims to redress this imbalance by offering a Network LB implementation that integrates with standard network equipment
+[logging/audit/static-audit-log](components/logging/audit/static-audit-log) | Description how static audit logging could get configured
+[vm-images/packer-ubuntu1804-vsphere-template](./components/vm-images/packer-ubuntu1804-vsphere-template)|A packer template to customize an ubuntu 18.04 cloud-image on vSphere
 
+## Kubermatic Addons
+
+Configuration and tooling for common used [Kubermatic Addons](https://docs.kubermatic.com/kubermatic/master/advanced/addons/) for user cluster customization.
+
+Name|Description
+---|---
+[Makefile](kubermatic-addons/Makefile) | Wrapper for building KKP addons for a dedicated version
+[addon-manifests](kubermatic-addons/addon-manifests) | Holding the `AddonConfig` custom resource specifications for a set of addons to configure KKP UI
+[custom-addon/dns-resolve-overwrite](kubermatic-addons/custom-addon/dns-resolve-overwrite) | A DaemonSet with privileged permissions to overwrite the host DNS at the kubernetes nodes
+[custom-addon/echoserver](kubermatic-addons/custom-addon/echoserver) | Simple echo server application as an example workload deployment with ingress config
+[custom-addon/helm-operator](kubermatic-addons/custom-addon/helm-operator) | Deploys the [FluxCD - Helm Operator](https://github.com/fluxcd/helm-operator) for managing additional deployment trough Helm by CRD
+[kubermatic-addons/custom-addon/ingress-nginx](kubermatic-addons/custom-addon/ingress-nginx) | Deploys the [Ingress Nginx Controller](https://github.com/kubernetes/ingress-nginx) to the user cluster
+[custom-addon/loki-stack](kubermatic-addons/custom-addon/loki-stack) | (Requires Helm Operator) Add Grafana Loki stack based on [Grafana Loki Charts](https://grafana.github.io/loki/charts)
+[custom-addon/metallb](kubermatic-addons/custom-addon/metallb) | MetalLB cluster addon for on-premise user cluster without native LB support
+[custom-addon/trident-installer](kubermatic-addons/custom-addon/trident-installer)| Addon for [NetApp Trident](https://github.com/NetApp/trident) storage support into a user cluster
+
+## Helper
+List of helper scripts and tools
+
+Name|Description
+---|---
+[git-crypt](./helper/git-crypt)| [git-crypt](https://github.com/AGWA/git-crypt) is a tooling to encrypt git repositories based GPG keys
+[kubeone-tool-container](./components/kubeone-tool-container)|A docker container with various tools to work with KubeOne and Kubernetes
+[kubermatic-installer-script](helper/kubermatic-installer-script) | Contains a standalone usage of [kubermatic - deploy.sh](https://github.com/kubermatic/kubermatic/blob/master/hack/ci/deploy.sh) repo installation script for own installations.
+[ssh-debug](helper/ssh-debug) | SSH Debug Client for quickly ssh to nodes in an internal network
+[vault-k8s-mapper](helper/vault-k8s-mapper) | Maps Vault secret as native Kubernetes secret into a defined namespace/secret.
+[delete-evicted-pods-all-ns.sh](helper/delete-evicted-pods-all-ns.sh) | Deletes pods in state `evicted` 
+[headless.vnc.test.container.yaml](helper/headless.vnc.test.container.yaml) | [docker-headless-vnc-container](https://github.com/ConSol/docker-headless-vnc-container) container containing Linux UI exposed via webvnc for testing e.g. dashboards from internal cluster view 
+[kill-kube-ns.sh](helper/kill-kube-ns.sh) | kills a pending kubernetes namespace
+[kubeconfig-kubermatic-serviceaccount.sh](/helper/kubeconfig-kubermatic-serviceaccount.sh) | creates an `kubermatic` service account at an seed cluster
+[machinedeployment-patch.gce.sh](helper/machinedeployment-patch.gce.sh) | Scripts patches some specification of an Cluster API `MachineDeployment` object.
+[set-build-tags-to-image.sh](helper/set-build-tags-to-image.sh) | Set dedicated build tags to the [Kubermatic Charts](https://github.com/kubermatic/kubermatic/tree/master/charts)
+[untaint_master.sh](helper/untaint_master.sh) | untaints all master nodes, to be able to schedule workload
+
+## Knowledge Base
+Helpful how-tos and detailed documentation:
+
+Name | Description
+--- | ---
+[setup-checklist](./knowledge-base/setup-checklist) | Detailed requirement documentation to setup kubermatic at different environments
+[how-to-convert-to-docx](./knowledge-base/how-to-convert-to-docx.md) | Commands to convert markdown to docx
+[migrate-helm2-to-helm3](./knowledge-base/migrate-helm2-to-helm3.md) | This document shows you how to migrate Heml releases from using Helm version 2.x with Tiller to being managed by Helm version 3.x in place.
+[node-health-check](knowledge-base/node-health-check.md)| This doc describes how Kubermatic node health checks works
+[nvidia-gpu-operator](knowledge-base/nvidia-gpu-operator.md) | How to enable GPU support for KKP clusters by [NVIDIA - GPU Operator](https://github.com/NVIDIA/gpu-operator/)
+[offline-setup](knowledge-base/offline-setup.md) | How to run kubermatic in offline environments
 
 ## Troubleshooting
 

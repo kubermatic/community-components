@@ -1,0 +1,11 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: mapsecrets
+subjects:
+- kind: ServiceAccount
+  name: mapsecrets
+roleRef:
+  kind: Role
+  name: mapsecrets
+  apiGroup: rbac.authorization.k8s.io

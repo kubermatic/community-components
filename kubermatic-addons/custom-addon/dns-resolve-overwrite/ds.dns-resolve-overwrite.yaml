@@ -1,0 +1,100 @@
+{{ if .Cluster.Spec.Cloud.Kubevirt }}
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: host-dns-resolve-overwrite
+  namespace: kube-system
+  labels:
+    k8s-app: host-dns-resolve-overwrite
+spec:
+  selector:
+    matchLabels:
+      name: host-dns-resolve-overwrite
+  template:
+    metadata:
+      labels:
+        name: host-dns-resolve-overwrite
+    spec:
+      tolerations:
+        # this toleration is to have the daemonset runnable on master nodes
+        # remove it if your masters can't run pods
+        - key: node-role.kubernetes.io/master
+          effect: NoSchedule
+      hostPID: true
+      hostNetwork: true
+      containers:
+        - name: host-dns-resolve-overwrite
+          image: quay.io/kubermatic/util:1.1.0
+          securityContext:
+            privileged: true
+          env:
+            #swisscom DNS
+#            - name: DNS_SERVER_1
+#              value: 138.187.111.84
+#            - name: DNS_SERVER_2
+#              value: 138.187.111.116
+            #google DNS
+            - name: DNS_SERVER_1
+              value: 8.8.8.8
+            - name: DNS_SERVER_2
+              value: 8.8.4.4
+          command:
+          - /bin/bash
+          - -c
+          - |
+            #!/usr/bin/env bash
+            file=/etc/systemd/resolved.conf.d/custom_dns.conf
+            rm -f $file
+
+            function stop-systemd-resolve() {
+              echo ".... stop systemd-resolved on host"
+              nsenter -t 1 -m -u -i -n -p -- systemctl stop systemd-resolved
+            }
+            function cleanup() {
+              echo "...cleanup"
+              rm -fv $file
+              nsenter -t 1 -m -u -i -n -p -- systemctl restart systemd-resolved
+              trap - SIGINT SIGTERM
+              exit
+            }
+
+            trap cleanup SIGINT SIGTERM
+            while true; do
+              if [ ! -f "$file" ]; then
+                mkdir -p /etc/systemd/resolved.conf.d
+                echo '[Resolve]' > $file
+                echo "DNS=${DNS_SERVER_1} ${DNS_SERVER_2}" >> $file
+                echo "created file: $file:"
+                cat $file
+
+                #enforce the usage
+                rm -fv /etc/resolv.conf
+                echo "nameserver ${DNS_SERVER_1}" > /etc/resolv.conf
+                echo "nameserver ${DNS_SERVER_2}" >> /etc/resolv.conf
+                echo "nameserver ${DNS_SERVER_1}" > /run/systemd/resolve/resolv.conf
+                echo "nameserver ${DNS_SERVER_2}" >> /run/systemd/resolve/resolv.conf
+                stop-systemd-resolve
+                echo "/etc/resolv.conf:"
+                cat /etc/resolv.conf
+                echo "/run/systemd/resolve/resolv.conf"
+                cat /run/systemd/resolve/resolv.conf
+                echo "..done"
+              else
+                echo "DNS is up to date: ${DNS_SERVER_1} ${DNS_SERVER_2}"
+              fi
+              sleep 10
+            done
+          volumeMounts:
+            - name: varetc
+              mountPath: /etc
+            - name: varrun
+              mountPath: /run
+      terminationGracePeriodSeconds: 30
+      volumes:
+        - name: varetc
+          hostPath:
+            path: /etc
+        - name: varrun
+          hostPath:
+            path: /run
+{{ end }}
