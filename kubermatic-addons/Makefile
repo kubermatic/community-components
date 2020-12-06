@@ -3,7 +3,7 @@
 KUBERMATIC_VERSION ?= v2.15.0-rc.3
 ADDON_CUSTOM_REPO ?= 'quay.io/kubermatic/ps-addons'
 ADDON_CUSTOM_REPO_OS ?= ${ADDON_CUSTOM_REPO}
-TAG ?= ${KUBERMATIC_VERSION}
+TAG ?= ${KUBERMATIC_VERSION}-1
 OSTAG = openshift-${TAG}
 
 .PHONY: docker-release docker-build
@@ -50,3 +50,16 @@ sync-helm-operator-manifests:
 	curl -L https://raw.githubusercontent.com/fluxcd/helm-operator/${HELM_OPERATOR_VERSION}/deploy/deployment.yaml \
 		| sed 's/# - --enabled-helm-versions=v3/- --enabled-helm-versions=v3/' \
 		> custom-addon/helm-operator/deployment.yaml
+
+
+############## THEIA-IDE ADDON
+THEIA_REPO ?= 'quay.io/kubermatic-labs/theia-ide'
+THEIA_TAG = $(shell date -I)
+.PHONY: theia-docker-build
+theia-docker-build:
+	docker build -t ${THEIA_REPO}:${THEIA_TAG} custom-addon/theia-ide
+
+.PHONY: theia-docker-release
+theia-docker-release: theia-docker-build
+	docker push ${THEIA_REPO}:${THEIA_TAG}
+
