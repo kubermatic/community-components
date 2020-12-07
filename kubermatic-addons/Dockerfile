@@ -5,3 +5,4 @@ FROM quay.io/kubermatic/addons:$KUBERMATIC_VERSION
 LABEL maintainer="ps@loodse.com"
 
 ADD ./custom-addon/ /addons/
+RUN echo "Delete non *.yaml files:" && find /addons/*/ -type f -not -name '*.yaml' -print -delete

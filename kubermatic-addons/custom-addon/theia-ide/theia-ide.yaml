@@ -5,6 +5,7 @@ metadata:
   labels:
     app: theia-ide
 
+# TODO secure behind IAP or ingress
 #---
 #apiVersion: networking.k8s.io/v1beta1
 #kind: Ingress
@@ -21,6 +22,7 @@ metadata:
 #          - backend:
 #              serviceName: theia-next
 #              servicePort: 80
+
 ---
 apiVersion: v1
 kind: Service
