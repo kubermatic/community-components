@@ -2,6 +2,9 @@ apiVersion: v1
 kind: Namespace
 metadata:
   name: theia-ide
+  labels:
+    app: theia-ide
+
 #---
 #apiVersion: networking.k8s.io/v1beta1
 #kind: Ingress
@@ -54,7 +57,7 @@ spec:
         runAsGroup: 1001
         fsGroup: 1001
       containers:
-        - image: quay.io/kubermatic-labs/theia-ide:2020-12-06
+        - image: quay.io/kubermatic-labs/theia-ide:2020-12-07
           #image: theiaide/theia-go:next
           imagePullPolicy: Always
           name: theia-next

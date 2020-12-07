@@ -13,10 +13,12 @@ RUN apt-get update && \
     curl -s https://baltocdn.com/helm/signing.asc | sudo apt-key add - && \
     echo "deb https://baltocdn.com/helm/stable/debian/ all main" | tee  -a /etc/apt/sources.list.d/helm-stable-debian.list && \
     apt-get update && \
-    apt-get install -y kubectl helm && \
+    apt-get install -y kubectl helm jq vim bash-completion fonts-powerline && \
     apt-get clean
 
-#install kubernetes plugin
+USER theia
+
+#install THEIA kubernetes plugin
 RUN curl -Ls https://open-vsx.org/api/ms-kubernetes-tools/vscode-kubernetes-tools/1.2.1/file/ms-kubernetes-tools.vscode-kubernetes-tools-1.2.1.vsix -o vs-kubernetes.vsix && \
     mkdir plugins/vscode-kubernetes-tools && cd plugins/vscode-kubernetes-tools && \
     unzip ../../vs-kubernetes.vsix && \
@@ -24,15 +26,28 @@ RUN curl -Ls https://open-vsx.org/api/ms-kubernetes-tools/vscode-kubernetes-tool
     sed -i "`head -n -2 package.json | wc -l`i\\"'        "vscode-kubernetes-tools": "https://open-vsx.org/api/ms-kubernetes-tools/vscode-kubernetes-tools/1.2.1/file/ms-kubernetes-tools.vscode-kubernetes-tools-1.2.1.vsix",'"\\" package.json && \
     cat package.json
 
-#RUN yarn --pure-lockfile && \
-#    NODE_OPTIONS="--max_old_space_size=4096" yarn theia build && \
-#    yarn theia download:plugins && \
-#    yarn --production && \
-#    yarn autoclean --init && \
-#    echo *.ts >> .yarnclean && \
-#    echo *.ts.map >> .yarnclean && \
-#    echo *.spec.* >> .yarnclean && \
-#    yarn autoclean --force && \
-#    yarn cache clean
+### INSTALL helper
+RUN mkdir /home/theia/bin && cd /home/theia/bin && \
+    # fzf
+    wget https://github.com/junegunn/fzf/releases/download/0.24.4/fzf-0.24.4-linux_amd64.tar.gz -O- | tar -xz && \
+    # krew
+    set -x; cd "$(mktemp -d)" && \
+    curl -fsSLO "https://github.com/kubernetes-sigs/krew/releases/latest/download/krew.tar.gz" && \
+    tar zxvf krew.tar.gz && \
+    KREW=./krew-"$(uname | tr '[:upper:]' '[:lower:]')_$(uname -m | sed -e 's/x86_64/amd64/' -e 's/arm.*$/arm/')" && \
+    "$KREW" install krew && \
+    rm -rf * && \
+    # fubctl
+    wget https://rawgit.com/kubermatic/fubectl/master/fubectl.source -O /home/theia/bin/fubectl.source && \
+    # powerline go
+    wget https://github.com/justjanne/powerline-go/releases/latest/download/powerline-go-linux-amd64 -O /home/theia/bin/powerline-go && \
+    chmod +x /home/theia/bin/powerline-go && \
+    # needed to set right font for theia
+    mkdir /home/theia/.theia && \
+    echo "{\"terminal.integrated.fontFamily\": \"'PowerlineSymbols', 'Droid Sans Mono Slashed', 'monospace', monospace, 'Droid Sans Fallback'\"" \
+    > /home/theia/.theia/settings.json
 
-USER theia
+COPY ./.bashrc /home/theia/
+# install fubectl depedencies
+RUN bash -ic 'kinstall'
+

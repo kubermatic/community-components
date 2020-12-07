@@ -3,7 +3,7 @@
 KUBERMATIC_VERSION ?= v2.15.0-rc.3
 ADDON_CUSTOM_REPO ?= 'quay.io/kubermatic/ps-addons'
 ADDON_CUSTOM_REPO_OS ?= ${ADDON_CUSTOM_REPO}
-TAG ?= ${KUBERMATIC_VERSION}-1
+TAG ?= ${KUBERMATIC_VERSION}-4
 OSTAG = openshift-${TAG}
 
 .PHONY: docker-release docker-build
