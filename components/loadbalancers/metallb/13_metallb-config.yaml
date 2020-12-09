@@ -1,0 +1,25 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  namespace: metallb-system
+  name: config
+data:
+  config: |
+    address-pools:
+    - name: default
+      protocol: layer2
+      addresses:
+      - 172.19.2.10-172.19.2.30
+    - name: kubermatic-ingress
+      protocol: layer2
+      addresses:
+      - 172.19.2.1/32
+#    - name: kubermatic-nodeport
+#      protocol: layer2
+#      addresses:
+#      - 192.168.150.101/32
+
+####### DNS mapping ###########
+#### 172.19.2.1
+# kubermatic.wacker.corp.
+# *.kubermatic.wacker.corp.

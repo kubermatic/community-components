@@ -1,0 +1,28 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: mapsecrets
+spec:
+  schedule: "*/15 * * * *"
+  concurrencyPolicy: Replace
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: mapsecrets
+            image: {{ .Values.image }}
+            env:
+            - name: MAPPER_MAPPINGS
+              value: "{{ .Values.mappings }}"
+            - name: VAULT_ADDR
+              value: "{{ .Values.vaultAddr }}"
+            - name: MAPPER_NAMESPACE
+              value: {{ .Values.namespace }}
+            - name: MAPPER_ROLE
+              value: {{ .Values.role }}
+            imagePullPolicy: Always
+          serviceAccountName: mapsecrets
+          restartPolicy: Never
+          imagePullSecrets:
+          - name: {{ .Values.imagesecret }}

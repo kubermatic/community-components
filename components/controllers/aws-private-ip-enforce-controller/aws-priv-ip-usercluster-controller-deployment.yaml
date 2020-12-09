@@ -1,0 +1,72 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: aws-priv-ip-enforce-user-cluster-controller
+  name: aws-priv-ip-enforce-user-cluster-controller
+  namespace: kubermatic
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: aws-priv-ip-enforce-user-cluster-controller
+  strategy: {}
+  template:
+    metadata:
+      labels:
+        app: aws-priv-ip-enforce-user-cluster-controller
+    spec:
+      serviceAccountName: kubermatic
+      terminationGracePeriodSeconds: 5
+      containers:
+      - image: quay.io/kubermatic/util:1.1.2
+        name: util
+        command:
+        - bash
+        - -c
+        - |
+          ltmp=$(mktemp -d) ; trap "rm -rv $ltmp" EXIT
+
+          # patch single cluster machinedeployment
+          patch_md() {
+            clusterid="$1"
+            kcfg=$ltmp/cl-kubeconfig
+
+            kubectl get secret admin-kubeconfig -n cluster-${clusterid} -o jsonpath='{.data.kubeconfig}' | base64 -d > $kcfg
+
+            kubectl get --kubeconfig $kcfg -n kube-system -o json machinedeployments \
+               | jq -r '.items[]|select(.spec.template.spec.providerSpec.value.cloudProviderSpec.assignPublicIP != false) .metadata.name' \
+              > $ltmp/machinedeployments
+
+            while read -r md; do
+              echo "Found machinedeployment $md with assignment of public IP's. Setting 'assignPublicIP=false'"
+
+              kubectl patch --kubeconfig $kcfg -n kube-system machinedeployment $md --type=json -p='
+              - op: replace
+                path: /spec/template/spec/providerSpec/value/cloudProviderSpec/assignPublicIP
+                value: false
+              '
+              done < $ltmp/machinedeployments
+              rm $kcfg
+          }
+
+          # syncrun to get all cluster of seed
+          syncrun() {
+            echo "start syncrun: $(date)"
+            kubectl get clusters -o json | jq -r '.items[]|select(.spec.pause == false) .metadata.name' > $ltmp/cluters
+            while read -r cl; do
+               patch_md "$cl"
+            done < $ltmp/cluters
+          }
+
+          while true; do
+          syncrun
+          sleep 5
+          done
+        resources:
+          requests:
+            cpu: 10m
+            memory: 200M
+          limits:
+            cpu: 50m
