@@ -1,0 +1,10 @@
+---
+#cluster-issuer
+apiVersion: cert-manager.io/v1alpha2
+kind: ClusterIssuer
+metadata:
+  name: ca-prod
+spec:
+  ca:
+    secretName: ca-key-pair
+    secretNameSpace: cert-manager

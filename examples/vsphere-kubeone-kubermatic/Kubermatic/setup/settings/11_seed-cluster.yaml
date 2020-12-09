@@ -1,0 +1,58 @@
+apiVersion: kubermatic.k8s.io/v1
+kind: Seed
+metadata:
+  name: kubermatic
+  namespace: kubermatic
+spec:
+  # Optional: Country of the seed as ISO-3166 two-letter code, e.g. DE or UK.
+  # For informational purposes in the Kubermatic dashboard only.
+  country: "DE"
+  # Datacenters contains a map of the possible datacenters (DCs) in this seed.
+  # Each DC must have a globally unique identifier (i.e. names must be unique
+  # across all seeds).
+  datacenters:
+########### Vsphere
+    vsphere_office:
+      # Optional: Country of the seed as ISO-3166 two-letter code, e.g. DE or UK.
+      # For informational purposes in the Kubermatic dashboard only.
+      country: "DE"
+      location: "Hamburg"
+      spec:
+        vsphere:
+          allow_insecure: false
+          cluster: "ClusterName"
+          datacenter: "DataCenterName"
+          datastore: "DatastoreName"
+          endpoint: "https://vcenter.yourdomain.io"
+          root_path: "/your/vm/path"
+          templates:
+            centos: "centos.ova"
+            ubuntu: "ubuntu.ova"
+            flatcar: "flatcar.ova"
+
+  # A reference to the Kubeconfig of this cluster. The Kubeconfig must
+  # have cluster-admin privileges. This field is mandatory for every
+  # seed, even if there are no datacenters defined yet.
+  kubeconfig:
+    apiVersion: v1
+    kind: "Secret"
+    name: "seed-kubeconfig"
+    fieldPath: "kubeconfig"
+    namespace: "kubermatic"
+  # Optional: Detailed location of the cluster, like "Hamburg" or "Datacenter 7".
+  # For informational purposes in the Kubermatic dashboard only.
+  location: "HAM office"
+  # Optional: ProxySettings can be used to configure HTTP proxy settings on the
+  # worker nodes in user clusters. However, proxy settings on nodes take precedence.
+  proxy_settings:
+    # Optional: If set, this proxy will be configured for both HTTP and HTTPS.
+    http_proxy: ""
+    # Optional: If set this will be set as NO_PROXY environment variable on the node;
+    # The value must be a comma-separated list of domains for which no proxy
+    # should be used, e.g. "*.example.com,internal.dev".
+    # Note that the in-cluster apiserver URL will be automatically prepended
+    # to this value.
+    no_proxy: ""
+  # Optional: This can be used to override the DNS name used for this seed.
+  # By default the seed name is used.
+  seed_dns_overwrite: ""

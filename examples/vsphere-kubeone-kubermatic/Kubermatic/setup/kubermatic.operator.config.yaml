@@ -1,0 +1,82 @@
+# Copyright 2020 The Kubermatic Kubernetes Platform contributors.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+apiVersion: operator.kubermatic.io/v1alpha1
+kind: KubermaticConfiguration
+metadata:
+  name: kubermatic
+  namespace: kubermatic
+spec:
+  # insert the Docker authentication JSON provided by Kubermatic here
+  ### KUBERMATIC PS Testing
+  imagePullSecret: |
+    {
+        "auths": {
+           "quay.io": {
+
+           }
+         }
+    }
+
+  ingress:
+    # Domain is the base domain where the dashboard shall be available. Even with
+    # a disabled Ingress, this must always be a valid hostname.
+    # this domain must match what you configured as dex.ingress.host
+    # in the values.yaml
+    domain: yourdomain.io
+    certificateIssuer:
+      # APIGroup is the group for the resource being referenced.
+      # If APIGroup is not specified, the specified Kind must be in the core API group.
+      # For any other third-party types, APIGroup is required.
+      apiGroup: null
+      # Kind is the type of resource being referenced
+      kind: ClusterIssuer
+      # Name is the name of resource being referenced
+      # For generating a certificate signed by a trusted root authority replace
+      # with "letsencrypt-prod".
+      name: ca-prod
+  exposeStrategy: NodePort
+  # These secret keys configure the way components commmunicate with Dex.
+  auth:
+    caBundle: |+
+      -----BEGIN CERTIFICATE-----
+      CA CERTIFICATE
+      -----END CERTIFICATE-----
+    clientID: kubermatic
+    issuerClientID: kubermaticIssuer
+    # When using letsencrypt-prod replace with "false"
+    skipTokenIssuerTLSVerify: true
+    tokenIssuer: https://yourdomain.io/dex
+
+    # this must match the secret configured for the kubermatic client from
+    # the values.yaml.
+    issuerClientSecret: SAME_SECRET_AS_IN_VALUES.YAML
+
+    # these need to be randomly generated. Those can be generated on the
+    # shell using:
+    # cat /dev/urandom | tr -dc A-Za-z0-9 | head -c32
+    issuerCookieKey:
+    serviceAccountKey:
+    issuerRedirectURL: https://yourdomain.io/api/v1/kubeconfig
+  featureGates:
+    OIDCKubeCfgEndpoint:
+      enabled: true
+    OpenIDAuthPlugin:
+      enabled: true
+
+  ### prevent pod distribution budget lock
+  seedController:
+    replicas: 2
+  masterController:
+    replicas: 2

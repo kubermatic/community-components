@@ -16,6 +16,12 @@ Name|Description
 [logging/audit/static-audit-log](components/logging/audit/static-audit-log) | Description how static audit logging could get configured
 [vm-images/packer-ubuntu1804-vsphere-template](./components/vm-images/packer-ubuntu1804-vsphere-template)|A packer template to customize an ubuntu 18.04 cloud-image on vSphere
 
+## Kubermatic Example Setups
+
+Name|Description
+---|---
+[vSphere kubeOne / Kubermatic demo](./examples/vsphere-kubeone-kubermatic)| an example for running kubermatic on vSphere with kubeOne to install the 
+
 ## Kubermatic Addons
 
 Configuration and tooling for common used [Kubermatic Addons](https://docs.kubermatic.com/kubermatic/master/advanced/addons/) for user cluster customization.

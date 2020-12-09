@@ -1,0 +1,8 @@
+apiVersion: kubermatic.k8s.io/v1
+kind: Preset
+metadata:
+  name: demo-preset
+spec:
+  vsphere:
+    username: vspherecustomeruser
+    password: vspherecustomerpassword
