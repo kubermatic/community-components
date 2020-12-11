@@ -9,7 +9,7 @@ The current [`Dockerfile`](./Dockerfile) is based on [theiaide/theia-go](https:/
 ```
 docker build -t local/theia . && docker run -it --init -p 3000:3000  local/theia
 ```
-To include a local filesystem a folder can get mounted:
+To include a local filesystem a folder can be mounted:
 ```
 docker build -t local/theia . && docker run -it --init -p 3000:3000 -v `pwd`:/home/project/ local/theia
 ```
@@ -19,4 +19,3 @@ docker build -t local/theia . && docker run -it --init -p 3000:3000 -v `pwd`:/ho
 - add authentication layer: IAP as used for KKP monitoring
     - pot. alternative: https://github.com/theia-ide/theia-apps/tree/master/theia-https-docker
 - potential integrate to kubeone / KKP native
-
