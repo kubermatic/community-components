@@ -9,6 +9,7 @@ Name|Description
 [certificates/self-signed-ca](components/certificates/self-signed-ca) | How to create and managed self-signed CA at KKP
 [controllers/aws-private-ip-enforce-controller](components/controllers/aws-private-ip-enforce-controller) | Enforces the `assignPublicIP: false` flag on all user cluster machine deployments
 [controllers/component-override-controller](components/controllers/component-override-controller) | This bash-controller watches over Cluster objects and controls part of the spec.componentOverride.
+[controllers/external-dns-route53](components/controllers/external-dns-route53) | [external-dns](https://github.com/kubernetes-sigs/external-dns) is a controller that automatically creates dns records for your ingresses and loadbalancer services. This is a chart that deploys an opinionated configuration for working with AWS Route 53
 [controllers/pod-cidr-controller](components/controllers/pod-cidr-controller) | This bash-controller watches over Cluster objects and patches spec.clusterNetwork.pods.cidrBlocks
 [cron-jobs/scale-down](components/cron-jobs/scale-down) | running a cron job that scales down worker nodes during non work hours and weekends.
 [id-management/active-directory](components/id-management/active-directory) | Example how to configure KKP with Active Directory
