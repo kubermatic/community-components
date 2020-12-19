@@ -1,0 +1,96 @@
+# Copyright 2020 The Kubermatic Authors.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ .Release.Name }}-external-dns
+---
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRole
+metadata:
+  name: {{ .Release.Name }}-external-dns
+rules:
+- apiGroups: [""]
+  resources: ["services","endpoints","pods"]
+  verbs: ["get","watch","list"]
+- apiGroups: ["extensions"]
+  resources: ["ingresses"]
+  verbs: ["get","watch","list"]
+- apiGroups: [""]
+  resources: ["nodes"]
+  verbs: ["list"]
+---
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRoleBinding
+metadata:
+  name: {{ .Release.Name }}-external-dns-viewer
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: {{ .Release.Name }}-external-dns
+subjects:
+- kind: ServiceAccount
+  name: {{ .Release.Name }}-external-dns
+  namespace: {{ .Release.Namespace }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-external-dns
+spec:
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: {{ .Release.Name }}-external-dns
+  template:
+    metadata:
+      labels:
+        app: {{ .Release.Name }}-external-dns
+    spec:
+      serviceAccountName: {{ .Release.Name }}-external-dns
+      containers:
+      - name: external-dns
+        image: "{{ .Values.externalDNS.image.repo }}:{{ .Values.externalDNS.image.tag }}"
+        args:
+        - --source=ingress
+        - --source=service
+        - --registry=txt
+        - --txt-owner-id={{ .Values.externalDNS.ownerID }}
+        - --provider=aws
+        - --domain-filter={{ .Values.externalDNS.domain }}
+        env:
+        - name: AWS_ACCESS_KEY_ID
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Release.Name }}-external-dns-route53-access-key
+              key: access-key-id
+        - name: AWS_SECRET_ACCESS_KEY
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Release.Name }}-external-dns-route53-access-key
+              key: secret-access-key
+      securityContext:
+        fsGroup: 65534 # For ExternalDNS to be able to read Kubernetes and AWS token files
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ .Release.Name }}-external-dns-route53-access-key
+  labels:
+    app: {{ .Release.Name }}-external-dns
+data:
+  access-key-id: {{ .Values.externalDNS.aws.accessKeyId | b64enc }}
+  secret-access-key: {{ .Values.externalDNS.aws.secretAccessKey | b64enc }}
