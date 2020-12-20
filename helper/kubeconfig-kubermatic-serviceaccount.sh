@@ -10,7 +10,9 @@
 set -euo pipefail
 
 if [ "$#" -lt 1 ] || [ "${1}" == "--help" ]; then
-  echo "Usage: $(basename $0) <kubeconfig file>"
+  echo "Usage: $(basename $0) <output-kubeconfig file>  [--master-seed]"
+  echo "kubectl access needs to be already provided"
+  echo -e "\n [--master-seed] ONLY for combined master/seed setup: use in cluster service 'https://kubernetes.default.svc.cluster.local:443'"
   exit 0
 fi
 
@@ -20,100 +22,144 @@ if ! [ -x "$(command -v jq)" ]; then
   exit 1
 fi
 
-if ! [ -x "$(command -v yq)" ]; then
-  echo "Please install yq(1) to parse/write YAML."
-  echo "See https://github.com/mikefarah/yq"
-  exit 1
-fi
+output_kubeconfig="$1"
+output_kubeconfig_yaml="${output_kubeconfig}.secret.yaml"
 
-kubeconfig="$1"
-accountname="kubermatic-seed-account"
-namespace="kubermatic"
-tmpconfig="$(mktemp kubermatic.XXXX)"
-swapfile="$(mktemp kubermatic.XXXX)"
+#############
+# script was taken from https://gist.github.com/xtavras/98c6a2625079a78054a907219c976e2b
+SERVICE_ACCOUNT_NAME="kubermatic-seed-sa"
+NAMESPACE="kubermatic"
+TMP_FOLDER=$(mktemp -d -t kube-sa-XXXXXXXXXX)
+KUBECFG_FILE_NAME="${TMP_FOLDER}/${SERVICE_ACCOUNT_NAME}-${NAMESPACE}-kubeconfig"
+
+# Colors
+BLUE="\e[01;34m"
+COLOROFF="\e[00m"
 
 clean_up () {
     echo "> clean_up"
-    rm -rf $tmpconfig
-    rm -rf $swapfile
+#    rm -rf $TMP_FOLDER
 }
 trap clean_up EXIT
 
-# configure kubeconfig to JSON
-yq read -j "$kubeconfig" > "$tmpconfig"
+create_service_account() {
+    echo -e "\\Check namespace ${NAMESPACE} exist."
+    kubectl create ns ${NAMESPACE} || echo "... done"
+    echo -e "\\nCreating a service account in ${NAMESPACE} namespace: ${SERVICE_ACCOUNT_NAME}"
+    kubectl create sa "${SERVICE_ACCOUNT_NAME}" --namespace "${NAMESPACE}"
+}
+get_secret_name_from_service_account() {
+    echo -e "\\nGetting secret of service account ${SERVICE_ACCOUNT_NAME} on ${NAMESPACE}"
+    SECRET_NAME=$(kubectl get sa "${SERVICE_ACCOUNT_NAME}" --namespace="${NAMESPACE}" -o json | jq -r .secrets[].name)
+    echo "Secret name: ${SECRET_NAME}"
+}
 
-# find all clusters
-clusters="$(jq -r '.clusters[].name' "$tmpconfig")"
+extract_ca_crt_from_secret() {
+    echo -e -n "\\nExtracting ca.crt from secret..."
+    kubectl get secret --namespace "${NAMESPACE}" "${SECRET_NAME}" -o json | jq \
+    -r '.data["ca.crt"]' | base64 --decode  > "${TMP_FOLDER}/ca.crt"
+    printf "done"
+}
 
-for cluster in $clusters; do
-  echo "Cluster: $cluster"
+get_user_token_from_secret() {
+    echo -e -n "\\nGetting user token from secret..."
+    USER_TOKEN=$(kubectl get secret --namespace "${NAMESPACE}" "${SECRET_NAME}" -o json | jq -r '.data["token"]' | base64 --decode)
+    printf "done"
+}
 
-  # find the first context for this cluster
-  context="$(jq -r "first(.contexts[] | select(.context.cluster == \"$cluster\")) | .name" "$tmpconfig")"
-  if [ -z "$context" ]; then
-    echo " ! warning, no matching context found"
-    echo ""
-    continue
-  fi
+set_kube_config_values() {
+    context=$(kubectl config current-context)
+    echo -e "\\nSetting current context to: $context"
 
-  echo " > context: $context"
+    CLUSTER_NAME=$(kubectl config get-contexts "$context" | awk '{print $3}' | tail -n 1)
+    echo "Cluster name: ${CLUSTER_NAME}"
 
-  # create the service account
-  echo " > creating service account $accountname ..."
-  kubectl --kubeconfig "$kubeconfig" --context "$context" apply -f - > /dev/null <<YAML
-apiVersion: v1
-kind: ServiceAccount
-metadata:
-  name: $accountname
-  namespace: $namespace
-YAML
+    if [ ! -v ENDPOINT ]; then
+      ENDPOINT=$(kubectl config view \
+    -o jsonpath="{.clusters[?(@.name == \"${CLUSTER_NAME}\")].cluster.server}")
+    echo -e ${BLUE} "Endpoint: ${ENDPOINT} ${COLOROFF}"
+    fi
 
-  # give admin permissions
-  clusterrole="$accountname-cluster-role"
-  echo " > assigning cluster role $clusterrole ..."
-  kubectl --kubeconfig "$kubeconfig" --context "$context" apply -f - > /dev/null <<YAML
+    # Set up the config
+    echo -e "\\nPreparing k8s-${SERVICE_ACCOUNT_NAME}-${NAMESPACE}-conf"
+    echo -n "Setting a cluster entry in kubeconfig..."
+    kubectl config set-cluster "${CLUSTER_NAME}" \
+    --kubeconfig="${KUBECFG_FILE_NAME}" \
+    --server="${ENDPOINT}" \
+    --certificate-authority="${TMP_FOLDER}/ca.crt" \
+    --embed-certs=true
+
+    echo -n "Setting token credentials entry in kubeconfig..."
+    kubectl config set-credentials \
+    "${SERVICE_ACCOUNT_NAME}" \
+    --kubeconfig="${KUBECFG_FILE_NAME}" \
+    --token="${USER_TOKEN}"
+
+    echo -n "Setting a context entry in kubeconfig..."
+    kubectl config set-context \
+    "${SERVICE_ACCOUNT_NAME}" \
+    --kubeconfig="${KUBECFG_FILE_NAME}" \
+    --cluster="${CLUSTER_NAME}" \
+    --user="${SERVICE_ACCOUNT_NAME}" \
+    --namespace="${NAMESPACE}"
+
+    echo -n "Setting the current-context in the kubeconfig file..."
+    kubectl config use-context "${SERVICE_ACCOUNT_NAME}" \
+    --kubeconfig="${KUBECFG_FILE_NAME}"
+}
+
+apply_rbac() {
+    echo -e -n "\\nApplying RBAC permissions..."
+    # give admin permissions
+    clusterrole="${SERVICE_ACCOUNT_NAME}-cluster-admin"
+    echo " > assigning cluster role $clusterrole ..."
+    kubectl apply -f - > /dev/null <<YAML
 kind: ClusterRoleBinding
 apiVersion: rbac.authorization.k8s.io/v1beta1
 metadata:
   name: $clusterrole
 subjects:
 - kind: ServiceAccount
-  name: $accountname
-  namespace: $namespace
+  name: ${SERVICE_ACCOUNT_NAME}
+  namespace: ${NAMESPACE}
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
   name: cluster-admin
 YAML
+}
+create_output_file(){
+    echo "temp file to target: ${KUBECFG_FILE_NAME} -> ${output_kubeconfig}"
+    cp ${KUBECFG_FILE_NAME} ${output_kubeconfig}
 
-  # read auth token
-  echo " > reading auth token..."
-  servicename="$(kubectl --kubeconfig "$kubeconfig" --context "$context" get serviceaccount "$accountname" -n $namespace -o jsonpath='{.secrets[0].name}')"
-  token="$(kubectl --kubeconfig "$kubeconfig" --context "$context" get secret "$servicename" -n $namespace -o jsonpath='{.data.token}' | base64 -d)"
+    kubectl create secret generic seed-kubeconfig -n $NAMESPACE --from-file kubeconfig="${output_kubeconfig}" --dry-run=client -o yaml > ${output_kubeconfig_yaml}
 
-  # update kubeconfig
-  username="$cluster-kubermatic-service-account"
-  echo " > adding user $username ..."
+    echo -e "\n\n............................................."
+    echo "${output_kubeconfig}:"
+    cat ${output_kubeconfig}
+    echo -e "\n\n............................................."
+    echo "${output_kubeconfig_yaml}:"
+    cat ${output_kubeconfig_yaml}
+}
 
-  if [ -z "$(jq ".users[] | select(.name == \"$username\")" "$tmpconfig")" ]; then
-    # account does not yet exist
-    jq ".users |= . + [{\"name\":\"$username\",\"user\":{\"token\":\"\"}}]" "$tmpconfig" > "$swapfile"
-    cp "$swapfile" "$tmpconfig"
-  fi
+create_local_endpoint_conf(){
+  local output_kubeconfig="${output_kubeconfig}-local"
+  local output_kubeconfig_yaml="${output_kubeconfig}.secret.yaml"
+  local ENDPOINT="https://kubernetes.default.svc.cluster.local:443"
+  set_kube_config_values
+  create_output_file
+}
 
-  # insert token into config
-  jq "(.users[] | select(.name == \"$username\") | .user.token) |= \"$token\"" "$tmpconfig" > "$swapfile"
-  cp "$swapfile" "$tmpconfig"
+create_service_account
+get_secret_name_from_service_account
+extract_ca_crt_from_secret
+get_user_token_from_secret
+set_kube_config_values
+apply_rbac
+create_output_file
 
-  # update context username
-  echo " > updating cluster context..."
-  jq "(.contexts[] | select(.name == \"$context\") | .context.user) |= \"$username\"" "$tmpconfig" > "$swapfile"
-  cp "$swapfile" "$tmpconfig"
+if [[ "${2}" == "--master-seed" ]]; then
+ create_local_endpoint_conf
+fi
 
-  echo " > kubeconfig updated"
-  echo ""
-done
-
-# JSON to YAML
-yq read "$tmpconfig" > "$kubeconfig"
-kubectl create secret generic seed-kubeconfig -n $namespace --from-file kubeconfig="$kubeconfig" --dry-run=client -o yaml > "$kubeconfig".secret.yaml
+echo -e "\n... SUCCESS!"
