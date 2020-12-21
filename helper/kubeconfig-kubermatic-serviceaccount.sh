@@ -38,7 +38,7 @@ COLOROFF="\e[00m"
 
 clean_up () {
     echo "> clean_up"
-#    rm -rf $TMP_FOLDER
+    rm -rf $TMP_FOLDER
 }
 trap clean_up EXIT
 
@@ -150,13 +150,14 @@ create_local_endpoint_conf(){
   create_output_file
 }
 
+echo "TMP_FOLDER: $TMP_FOLDER"
 create_service_account
 get_secret_name_from_service_account
 extract_ca_crt_from_secret
 get_user_token_from_secret
 set_kube_config_values
-apply_rbac
 create_output_file
+apply_rbac
 
 if [[ "${2}" == "--master-seed" ]]; then
  create_local_endpoint_conf
