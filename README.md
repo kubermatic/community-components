@@ -49,7 +49,8 @@ Name|Description
 [kubeone-tool-container](./components/kubeone-tool-container)|A docker container with various tools to work with KubeOne and Kubernetes
 [kubermatic-installer-script](helper/kubermatic-installer-script) | Contains a standalone usage of [kubermatic - deploy.sh](https://github.com/kubermatic/kubermatic/blob/master/hack/ci/deploy.sh) repo installation script for own installations.
 [ssh-debug](helper/ssh-debug) | SSH Debug Client for quickly ssh to nodes in an internal network
-[vault-k8s-mapper](helper/vault-k8s-mapper) | Maps Vault secret as native Kubernetes secret into a defined namespace/secret.
+[vault/vault-k8s-mapper](helper/vault/vault-k8s-mapper) | Maps Vault secret as native Kubernetes secret into a defined namespace/secret.
+[vault/vault-kv-management.sh](helper/vault/vault-kv-management.sh) | Management script to up/download secrets to a vault secret kv store.
 [delete-evicted-pods-all-ns.sh](helper/delete-evicted-pods-all-ns.sh) | Deletes pods in state `evicted` 
 [headless.vnc.test.container.yaml](helper/headless.vnc.test.container.yaml) | [docker-headless-vnc-container](https://github.com/ConSol/docker-headless-vnc-container) container containing Linux UI exposed via webvnc for testing e.g. dashboards from internal cluster view 
 [kill-kube-ns.sh](helper/kill-kube-ns.sh) | kills a pending kubernetes namespace
