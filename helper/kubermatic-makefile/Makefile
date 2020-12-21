@@ -20,7 +20,7 @@ DEPLOY_SCRIPT ?= "../kubermatic-installer-script/kubermatic-deploy.sh"
 CLUSTER_TYPE = "master"
 VALUE_FILE ?= "./values.yaml"
 KUBERMATIC_CONFIG ?="./kubermatic.operator.config.yaml"
-KUBERMATIC_SECRET_MANIFEST="../secrets"
+KUBERMATIC_SECRET_MANIFESTS="../secrets"
 KUBERMATIC_ADDON_FOLDER="../../kubermatic/kubermatic-addons"
 KUBERMATIC_ADDON_MANIFEST=${KUBERMATIC_ADDON_FOLDER}/addon-manifests
 KUBERMATIC_PRE_OPERATOR_MANIFEST="./pre-operator"
@@ -41,13 +41,14 @@ k8c-deployment-core:
 	kubectl apply -f ${KUBERMATIC_PRE_OPERATOR_MANIFEST}
 	${K8C_INSTALL_FILES}/kubermatic-installer --verbose --charts-directory ${CHARTS} deploy --config ${KUBERMATIC_CONFIG} --helm-values ${VALUE_FILE} --force
 	echo ... && sleep 10
+	${DEPLOY_SCRIPT} ${CLUSTER_TYPE} ${VALUE_FILE} ${CHARTS} cert-manager
 	kubectl get pod,svc -n cert-manager
 	kubectl get pod,svc -n nginx-ingress-controller
 	kubectl get pod,svc -n oauth
 	kubectl get pod,svc -n kubermatic
 
 k8c-apply-settings:
-	test -f ${KUBERMATIC_SECRET_MANIFEST} && kubectl apply -f ${KUBERMATIC_SECRET_MANIFEST} && echo "applied " || echo "SECRET manifest files ..."
+	test -d ${KUBERMATIC_SECRET_MANIFESTS} && kubectl apply -f ${KUBERMATIC_SECRET_MANIFESTS} && echo "applied " || echo "SECRET manifest files ..."
 	test -f ${KUBERMATIC_CONFIG} && kubectl apply -f ${KUBERMATIC_CONFIG} && echo "applied " || echo "settings files ..."
 	test -d ${K8C_SETTINGS_FILE_FOLDER} && kubectl apply -f ${K8C_SETTINGS_FILE_FOLDER} && echo "applied " || echo "settings files ..."
 	test -d ${KUBERMATIC_ADDON_MANIFEST} && kubectl apply -f ${KUBERMATIC_ADDON_MANIFEST} && echo "applied " || echo "addon manifest files ..."

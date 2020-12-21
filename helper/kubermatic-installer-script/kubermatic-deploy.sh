@@ -111,7 +111,13 @@ function deployBackup() {
       deploy    s3-exporter kube-system s3-exporter/
     fi
 }
-
+function deployCertManager() {
+    if [[ -v DEPLOY_CERTMANAGER ]]; then
+      #### CERT-MANAGER
+      kubectl apply -f "$CHART_FOLDER/cert-manager/crd"
+      deploy    cert-manager cert-manager cert-manager/
+    fi
+}
 function deployIAP() {
     # We might have not configured IAP which results in nothing being deployed. This triggers https://github.com/helm/helm/issues/4295 and marks this as failed
     # We hack around this by grepping for a string that is mandatory in the values file of IAP
@@ -157,12 +163,7 @@ case "$DEPLOY_STACK" in
   kubermatic)
     if [[ "$DEPLOY_TYPE" == master ]]; then
       deploy nginx-ingress-controller nginx-ingress-controller nginx-ingress-controller/
-
-      if [[ -v DEPLOY_CERTMANAGER ]]; then
-        #### CERT-MANAGER
-        kubectl apply -f "$CHART_FOLDER/cert-manager/crd"
-        deploy    cert-manager cert-manager cert-manager/
-      fi
+      deployCertManager
       deploy    oauth oauth oauth/
     fi
     deployBackup
@@ -172,7 +173,9 @@ case "$DEPLOY_STACK" in
   kubermatic-deployment-only)
     deployKubermaticOperator
     ;;
-
+  cert-manager)
+    deployCertManager
+    ;;
   backup)
     deployBackup
     ;;
