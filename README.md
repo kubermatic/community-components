@@ -48,6 +48,7 @@ Name|Description
 [git-crypt](./helper/git-crypt)| [git-crypt](https://github.com/AGWA/git-crypt) is a tooling to encrypt git repositories based GPG keys
 [kubeone-tool-container](./components/kubeone-tool-container)|A docker container with various tools to work with KubeOne and Kubernetes
 [kubermatic-installer-script](helper/kubermatic-installer-script) | Contains a standalone usage of [kubermatic - deploy.sh](https://github.com/kubermatic/kubermatic/blob/master/hack/ci/deploy.sh) repo installation script for own installations.
+[kubermatic-makefile](helper/kubermatic-makefile/Makefile) | Contains a template `Makefile` to manage kubermatic deployments
 [ssh-debug](helper/ssh-debug) | SSH Debug Client for quickly ssh to nodes in an internal network
 [vault/vault-k8s-mapper](helper/vault/vault-k8s-mapper) | Maps Vault secret as native Kubernetes secret into a defined namespace/secret.
 [vault/vault-kv-management.sh](helper/vault/vault-kv-management.sh) | Management script to up/download secrets to a vault secret kv store.
