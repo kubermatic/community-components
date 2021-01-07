@@ -1,0 +1,26 @@
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  annotations:
+    storageclass.beta.kubernetes.io/is-default-class: "true"
+    cas.openebs.io/config: |
+      - name: ReplicaCount
+        value: "3"
+      - name: StoragePool
+        value: default
+      #- name: TargetResourceLimits
+      #  value: |-
+      #      memory: 1Gi
+      #      cpu: 100m
+      #- name: AuxResourceLimits
+      #  value: |-
+      #      memory: 0.5Gi
+      #      cpu: 50m
+      #- name: ReplicaResourceLimits
+      #  value: |-
+      #      memory: 2Gi
+    openebs.io/cas-type: jiva
+  name: openebs-jiva-default
+provisioner: openebs.io/provisioner-iscsi
+reclaimPolicy: Delete
+volumeBindingMode: Immediate
