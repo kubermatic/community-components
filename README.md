@@ -2,7 +2,7 @@
 This repository serves as an entry-point for multiple community-maintained components in the Kubermatic ecosystem. Feedback is highly encouraged 👍
 
 ## Components
-Dedicated components for customer purposes. 
+Dedicated components for customer purposes.
 
 Name|Description
 ---|---
@@ -21,7 +21,7 @@ Name|Description
 
 Name|Description
 ---|---
-[vSphere kubeOne / Kubermatic demo](./examples/vsphere-kubeone-kubermatic)| an example for running kubermatic on vSphere with kubeOne to install the 
+[vSphere kubeOne / Kubermatic demo](./examples/vsphere-kubeone-kubermatic)| an example for running kubermatic on vSphere with kubeOne to install the
 
 ## Kubermatic Addons
 
@@ -39,6 +39,7 @@ Name|Description
 [custom-addon/metallb](kubermatic-addons/custom-addon/metallb) | MetalLB cluster addon for on-premise user cluster without native LB support
 [custom-addon/theia-ide](kubermatic-addons/custom-addon/theia-ide) | Customized KKP addon for quickly using [Eclipse Theia IDE](https://theia-ide.org/) at your Kubernetes cluster.
 [custom-addon/trident-installer](kubermatic-addons/custom-addon/trident-installer)| Addon for [NetApp Trident](https://github.com/NetApp/trident) storage support into a user cluster
+[custom-addon/openebs](kubermatic-addons/customer-addons/openebs) | [OpenEBS](https://openebs.io/) addon for on-premise users without distributed storage
 
 ## Helper
 List of helper scripts and tools
@@ -50,8 +51,8 @@ Name|Description
 [kubermatic-installer-script](helper/kubermatic-installer-script) | Contains a standalone usage of [kubermatic - deploy.sh](https://github.com/kubermatic/kubermatic/blob/master/hack/ci/deploy.sh) repo installation script for own installations.
 [ssh-debug](helper/ssh-debug) | SSH Debug Client for quickly ssh to nodes in an internal network
 [vault-k8s-mapper](helper/vault-k8s-mapper) | Maps Vault secret as native Kubernetes secret into a defined namespace/secret.
-[delete-evicted-pods-all-ns.sh](helper/delete-evicted-pods-all-ns.sh) | Deletes pods in state `evicted` 
-[headless.vnc.test.container.yaml](helper/headless.vnc.test.container.yaml) | [docker-headless-vnc-container](https://github.com/ConSol/docker-headless-vnc-container) container containing Linux UI exposed via webvnc for testing e.g. dashboards from internal cluster view 
+[delete-evicted-pods-all-ns.sh](helper/delete-evicted-pods-all-ns.sh) | Deletes pods in state `evicted`
+[headless.vnc.test.container.yaml](helper/headless.vnc.test.container.yaml) | [docker-headless-vnc-container](https://github.com/ConSol/docker-headless-vnc-container) container containing Linux UI exposed via webvnc for testing e.g. dashboards from internal cluster view
 [kill-kube-ns.sh](helper/kill-kube-ns.sh) | kills a pending kubernetes namespace
 [kubeconfig-kubermatic-serviceaccount.sh](/helper/kubeconfig-kubermatic-serviceaccount.sh) | creates an `kubermatic` service account at an seed cluster
 [machinedeployment-patch.gce.sh](helper/machinedeployment-patch.gce.sh) | Scripts patches some specification of an Cluster API `MachineDeployment` object.
