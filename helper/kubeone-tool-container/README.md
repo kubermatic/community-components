@@ -33,8 +33,8 @@ kex | kubectl exec -i -t
 
 ### usage:
 
-`` 
+```
 docker build -t kubeone-tool-container .
 docker run  --name  kubeone-tool-container -t -d kubeone-tool-container
 docker exec -it kubeone-tool-container /bin/bash
-``
+```
