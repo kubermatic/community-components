@@ -39,7 +39,8 @@ Name|Description
 [custom-addon/metallb](kubermatic-addons/custom-addon/metallb) | MetalLB cluster addon for on-premise user cluster without native LB support
 [custom-addon/theia-ide](kubermatic-addons/custom-addon/theia-ide) | Customized KKP addon for quickly using [Eclipse Theia IDE](https://theia-ide.org/) at your Kubernetes cluster.
 [custom-addon/trident-installer](kubermatic-addons/custom-addon/trident-installer)| Addon for [NetApp Trident](https://github.com/NetApp/trident) storage support into a user cluster
-[custom-addon/openebs](kubermatic-addons/customer-addons/openebs) | [OpenEBS](https://openebs.io/) addon for on-premise users without distributed storage
+[custom-addon/openebs](kubermatic-addons/custom-addons/openebs) | [OpenEBS](https://openebs.io/) addon for on-premise users without distributed storage
+[custom-addon/amd-gpu](kubermatic-addons/custom-addons/amd-gpu) | [AMD-GPU](https://github.com/RadeonOpenCompute/k8s-device-plugin) device plugin addon
 
 ## Helper
 List of helper scripts and tools
