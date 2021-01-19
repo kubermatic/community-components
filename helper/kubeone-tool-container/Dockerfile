@@ -88,7 +88,7 @@ RUN ( set -x; cd "$(mktemp -d)" && \
 RUN echo 'export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"' >> ~/.bashrc
 
 # Install fubectl
-RUN wget https://rawgit.com/kubermatic/fubectl/master/fubectl.source -O /bin/fubectl.source
+RUN wget https://rawgit.com/kubermatic/fubectl/master/fubectl.source -O /etc/bash_completion.d/fubectl
 
 RUN /bin/bash -ic 'kubectl krew install tree'
 RUN /bin/bash -ic 'kubectl krew install view-secret'
@@ -104,20 +104,6 @@ RUN rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 
 RUN kubectl completion bash >> /etc/bash_completion.d/kubectl
-#RUN echo "source <(kubeone completion bash)" >> ~/.bashrc
-#RUN echo 'source <(kubectl completion bash)' >> ~/.bashrc
-#RUN echo 'alias k="kubectl"'  >> ~/.bashrc
-#RUN echo 'alias kg="kubectl get"' >> ~/.bashrc
-#RUN echo 'alias kgpo="kubectl get pods"' >> ~/.bashrc
-#RUN echo 'alias kgpoojson="kubectl get pods -o=json"' >> ~/.bashrc
-#RUN echo 'alias kgpon="kubectl get pods --namespace"' >> ~/.bashrc
-#RUN echo 'alias ksysgpooyamll="kubectl --namespace=kube-system get pods -o=yaml -l"' >> ~/.bashrc
-#RUN echo 'alias krm="kubectl delete"' >> ~/.bashrc
-#RUN echo 'alias krmf="kubectl delete -f"' >> ~/.bashrc
-#RUN echo 'alias krming="kubectl delete ingress"' >> ~/.bashrc
-#RUN echo 'alias krmingl="kubectl delete ingress -l"' >> ~/.bashrc
-#RUN echo 'alias krmingall="kubectl delete ingress --all-namespaces"' >> ~/.bashrc
-#RUN echo 'alias ka="kubectl apply -f"' >> ~/.bashrc
-#RUN echo 'alias klo="kubectl logs -f"' >> ~/.bashrc
-#RUN echo 'alias kex="kubectl exec -i -t"' >> ~/.bashrc
-CMD /bin/bash -c "source /root/.bashrc && source /bin/fubectl.source && /bin/bash"
+RUN kubeone completion bash >> /etc/bash_completion.d/kubeone
+RUN echo "if [ -f /etc/bash_completion ]; then source /etc/bash_completion; fi" >> /root/.bashrc
+CMD ["/bin/bash", "--rcfile", "/root/.bashrc"]
