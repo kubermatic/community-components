@@ -12,24 +12,8 @@ a docker container based on [golang:1.15](https://hub.docker.com/_/golang) with 
 - [AWS CLI 2](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html)
 - [Azure CLI](https://docs.microsoft.com/en-us/cli/azure/?view=azure-cli-latest)
 - [GCloud SDK](https://cloud.google.com/sdk/docs)
-
-### alias for kubectl
-Alias|Description
----|---
-k | kubectl
-kg | kubectl get
-kgpo | kubectl get pods
-kgpoojson | kubectl get pods -o=json
-kgpon | kubectl get pods --namespace
-ksysgpooyamll | kubectl --namespace=kube-system get pods -o=yaml -l
-krm | kubectl delete
-krmf | kubectl delete -f
-krming | kubectl delete ingress
-krmingl | kubectl delete ingress -l
-krmingall | kubectl delete ingress --all-namespaces
-ka | kubectl apply -f
-klo | kubectl logs -f
-kex | kubectl exec -i -t
+- [fubectl](https://github.com/kubermatic/fubectl)
+- [govc](https://github.com/vmware/govmomi/tree/master/govc)
 
 ### usage:
 
