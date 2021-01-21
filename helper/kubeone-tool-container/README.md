@@ -22,3 +22,8 @@ docker build -t kubeone-tool-container .
 docker run  --name  kubeone-tool-container -t -d kubeone-tool-container
 docker exec -it kubeone-tool-container /bin/bash
 ```
+
+Image is currently NOT updated automatically at [quay.io > kubermatic-labs > kubeone-tooling](https://quay.io/repository/kubermatic-labs/kubeone-tooling?tab=tags), but you find the latest version at:
+```
+docker run --name  kubeone-tool-container -it quay.io/kubermatic-labs/kubeone-tooling
+```

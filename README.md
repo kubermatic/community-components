@@ -48,7 +48,7 @@ List of helper scripts and tools
 Name|Description
 ---|---
 [git-crypt](./helper/git-crypt)| [git-crypt](https://github.com/AGWA/git-crypt) is a tooling to encrypt git repositories based GPG keys
-[kubeone-tool-container](./components/kubeone-tool-container)|A docker container with various tools to work with KubeOne and Kubernetes
+[kubeone-tool-container](./helper/kubeone-tool-container)|A docker container with various tools to work with KubeOne and Kubernetes
 [kubermatic-installer-script](helper/kubermatic-installer-script) | Contains a standalone usage of [kubermatic - deploy.sh](https://github.com/kubermatic/kubermatic/blob/master/hack/ci/deploy.sh) repo installation script for own installations.
 [kubermatic-makefile](helper/kubermatic-makefile/Makefile) | Contains a template `Makefile` to manage kubermatic deployments
 [ssh-debug](helper/ssh-debug) | SSH Debug Client for quickly ssh to nodes in an internal network
@@ -67,7 +67,8 @@ Helpful how-tos and detailed documentation:
 
 Name | Description
 --- | ---
-[setup-checklist](./knowledge-base/setup-checklist) | Detailed requirement documentation to setup kubermatic at different environments
+[setup-checklist/kkp](./knowledge-base/setup-checklist/kkp) | Detailed requirement documentation to setup Kubermatic KKP at different environments
+[setup-checklist/kubeone](./knowledge-base/setup-checklist/kubeone) | Detailed requirement documentation to setup KubeOne at different environments
 [how-to-convert-to-docx](./knowledge-base/how-to-convert-to-docx.md) | Commands to convert markdown to docx
 [migrate-helm2-to-helm3](./knowledge-base/migrate-helm2-to-helm3.md) | This document shows you how to migrate Heml releases from using Helm version 2.x with Tiller to being managed by Helm version 3.x in place.
 [node-health-check](knowledge-base/node-health-check.md)| This doc describes how Kubermatic node health checks works
