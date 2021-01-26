@@ -14,6 +14,7 @@
 
 
 FROM golang:1.15
+ARG kubeone_version=1.10
 
 RUN apt-get update && apt-get install -y \
     bash-completion \
@@ -50,9 +51,13 @@ RUN RELEASE_URL=$(curl -Ls -o /dev/null -w %{url_effective} https://github.com/m
 RUN curl -fL https://releases.hashicorp.com/terraform/$(curl -s https://checkpoint-api.hashicorp.com/v1/check/terraform | jq -r -M '.current_version')/terraform_$(curl -s https://checkpoint-api.hashicorp.com/v1/check/terraform | jq -r -M '.current_version')_linux_amd64.zip | funzip >/usr/local/bin/terraform
 RUN chmod +x /usr/local/bin/terraform
 
+RUN mkdir -p $HOME/.terraform.d/plugins/linux_amd64
+COPY terraform_libraries.tf .
+RUN terraform init -input=false
+RUN mv .terraform/providers $HOME/.terraform.d/plugins/linux_amd64/
 
 # Install KubeOne
-RUN VERSION=$(curl -w '%{url_effective}' -I -L -s -S https://github.com/kubermatic/kubeone/releases/latest -o /dev/null | sed -e 's|.*/v||') && \
+RUN VERSION=$kubeone_version && \
  curl -LO "https://github.com/kubermatic/kubeone/releases/download/v${VERSION}/kubeone_${VERSION}_linux_amd64.zip" && \
  unzip kubeone_${VERSION}_linux_amd64.zip -d kubeone_${VERSION}_linux_amd64 && \
  mv kubeone_${VERSION}_linux_amd64/kubeone /usr/local/bin
