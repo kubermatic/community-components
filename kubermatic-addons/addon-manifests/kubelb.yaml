@@ -1,0 +1,15 @@
+apiVersion: kubermatic.k8s.io/v1
+kind: AddonConfig
+metadata:
+  name: kubelb
+spec:
+  description: Kubelb-Agent dynamically creates load balancers and external ingress controller implementation.
+  formSpec:
+    - displayName: Base64 encoded Kubeconf to access the kubelb cluster
+      internalName: kubeconf
+      required: text
+      type: string
+    - displayName: Clustername or namespace to be used inside kubelb cluster
+      internalName: clustername
+      required: true
+      type: text
