@@ -41,6 +41,7 @@ Name|Description
 [custom-addon/trident-installer](kubermatic-addons/custom-addon/trident-installer)| Addon for [NetApp Trident](https://github.com/NetApp/trident) storage support into a user cluster
 [custom-addon/openebs](kubermatic-addons/custom-addons/openebs) | [OpenEBS](https://openebs.io/) addon for on-premise users without distributed storage
 [custom-addon/amd-gpu](kubermatic-addons/custom-addons/amd-gpu) | [AMD-GPU](https://github.com/RadeonOpenCompute/k8s-device-plugin) device plugin addon
+[custom-addon/kubeflow](kubermatic-addons/custom-addons/kubeflow) | [Kubeflow](https://github.com/kubermatic/flowmatic) Machine Learning Toolkit
 
 ## Helper
 List of helper scripts and tools
