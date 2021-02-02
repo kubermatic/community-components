@@ -50,7 +50,7 @@ The Kubernetes API LB will be consumed as well from the target cloud environment
 If needed or wished to use other load balancer solutions we strongly recommend load balancers what can interact dynamically with Kubernetes to provide updates for service type `LoadBalancer` or Ingress objects. For more detail see [Kubernetes - Services, Load Balancing, and Networking](https://kubernetes.io/docs/concepts/services-networking/service/#loadbalancer). 
 
 ## DHCP / Network
-* DHCP for worker nodes is recommended
+* DHCP for worker nodes is required (for provisioning nodes by [Kubermatic machine-controller](https://github.com/kubermatic/machine-controller))
 * (if MetalLB is used) fixed IPs for Load Balancer need to be reserved in the target network DHCP settings. 
 * Direct Node-to-Node communication is needed based on generic Kubernetes requirements: [Kubernetes - Cluster Networking](https://kubernetes.io/docs/concepts/cluster-administration/networking/)
 

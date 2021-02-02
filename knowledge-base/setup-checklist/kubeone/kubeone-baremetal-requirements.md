@@ -4,7 +4,7 @@
 
 1. Access by SSH via VPN or JumpHost to the dedicated bare metal host
 2. The provided ssh user needs to have sudo rights to set up kubernetes
-3. List of IP addresses, to provision the target environment 
+3. List of bare-metal hosts for the Kubernetes cluster provisioning at your target environment
 
 **NOTE:** Dynamic provisioning is currently in Development. Alternative approaches are to use a virtualized [kubevirt](https://github.com/kubermatic/machine-controller/blob/master/docs/cloud-provider.md#kubevirt) based setup at Kubermatic KKP. 
 
@@ -18,7 +18,7 @@ In-cluster multitenancy is manageable by dedicated RBAC configuration, see [Kube
 
 ## Routable virtual IPs (for metalLB)
 
-To set up Kubermatic behind [MetalLB](https://metallb.universe.tf/), we need a few routable, not distributed IP address. This could be sliced into one CIDR. The virtual IPs should be routed to the target network, but not used for machines. 
+To set up Kubermatic behind [MetalLB](https://metallb.universe.tf/), we need a few routable, not DHCP managed IP addresses. This could be sliced into one CIDR. The virtual IPs should be routed to the target network, but not used for machines. 
 
 ### user workload
 Depending on the concept how application workload get exposed, IP's need to get reserved for exposing the workload at the user cluster side. As recommendation at least one virtual IP need is needed for e.g. an MetalLB user cluster load balancing addon + NGINX ingress. 
@@ -32,7 +32,7 @@ In bare-metal environment mostly no default Kubernetes storage classes, is avail
   - [NetApp Trident](https://netapp-trident.readthedocs.io/)
   - [PSO - PureStorage Orchestrator](https://github.com/purestorage/pso-csi)
 - Software defined storage solutions:
-  - [OpenEBS](https://docs.openebs.io/) (recommended)
+  - [OpenEBS](https://docs.openebs.io/)
   - [Rook](https://rook.io/docs)
 
 The environment specific storage class can be easily added as addon, see [KubeOne Documentation > Advanced > Addons](https://docs.kubermatic.com/kubeone/master/advanced/addons/).
