@@ -1,0 +1,309 @@
+# Copyright 2021 The Flowmatic Authors.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: kubeflow
+  labels:
+    control-plane: kubeflow
+    istio-injection: enabled
+---
+apiVersion: apiextensions.k8s.io/v1beta1
+kind: CustomResourceDefinition
+metadata:
+  name: kfdefs.kfdef.apps.kubeflow.org
+spec:
+  group: kfdef.apps.kubeflow.org
+  names:
+    kind: KfDef
+    listKind: KfDefList
+    plural: kfdefs
+    singular: kfdef
+  scope: Namespaced
+  subresources:
+    status: {}
+  validation:
+    openAPIV3Schema:
+      description: KfDef is the Schema for the kfdefs API
+      properties:
+        apiVersion:
+          description: 'APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#resources'
+          type: string
+        kind:
+          description: 'Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds'
+          type: string
+        metadata:
+          type: object
+        spec:
+          description: KfDefSpec defines the desired state of KfDef
+          type: object
+        status:
+          description: KfDefStatus defines the observed state of KfDef
+          type: object
+      type: object
+  version: v1
+  versions:
+  - name: v1
+    served: true
+    storage: true
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: kubeflow-operator
+  namespace: kubeflow
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  annotations:
+    rbac.authorization.kubernetes.io/autoupdate: "true"
+  creationTimestamp: null
+  labels:
+    kubernetes.io/bootstrapping: rbac-defaults
+  name: kubeflow-operator
+rules:
+- apiGroups:
+  - '*'
+  resources:
+  - '*'
+  verbs:
+  - '*'
+- nonResourceURLs:
+  - '*'
+  verbs:
+  - '*'
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: kubeflow-operator
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cluster-admin
+subjects:
+- kind: ServiceAccount
+  name: kubeflow-operator
+  namespace: kubeflow
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kubeflow-operator
+  namespace: kubeflow
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: kubeflow-operator
+  template:
+    metadata:
+      labels:
+        name: kubeflow-operator
+    spec:
+      containers:
+      - command:
+        - kfctl
+        env:
+        - name: WATCH_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: OPERATOR_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        image: quay.io/kubermatic/kubeflow-operator:latest
+        imagePullPolicy: Always
+        name: kubeflow-operator
+      serviceAccountName: kubeflow-operator
+---
+apiVersion: kfdef.apps.kubeflow.org/v1
+kind: KfDef
+metadata:
+  name: flowmatic
+  namespace: kubeflow
+spec:
+  applications:
+  - kustomizeConfig:
+      repoRef:
+        name: manifests
+        path: manifests/kubeflow-manifests/namespaces/base
+    name: namespaces
+  - kustomizeConfig:
+      repoRef:
+        name: manifests
+        path: manifests/kubeflow-manifests/application/v3
+    name: application
+  - kustomizeConfig:
+      parameters:
+{{ if .Variables.ExposeLoadBalancer }}
+      - name: serviceType
+        value: LoadBalancer
+{{ else }}
+      - name: serviceType
+        value: NodePort
+{{ end }}
+      repoRef:
+        name: manifests
+        path: manifests/istio/istio-1-3-1-stack
+    name: istio-stack
+  - kustomizeConfig:
+      repoRef:
+        name: manifests
+        path: manifests/kubeflow-manifests/stacks/kubernetes/application/cluster-local-gateway-1-3-1
+    name: cluster-local-gateway
+  - kustomizeConfig:
+      parameters:
+{{ if .Variables.EnableIstioRBAC }}
+      - name: clusterRbacConfig
+        value: "ON_WITH_EXCLUSION"
+{{ else }}
+      - name: clusterRbacConfig
+        value: "OFF"
+{{ end }}
+      - name: gatewaySelector
+        value: ingressgateway
+      repoRef:
+        name: manifests
+{{ if and .Variables.EnableTLS .Variables.DomainName }}
+        path: manifests/istio/istio/base
+{{ else }}
+        path: manifests/kubeflow-manifests/istio/istio/base
+{{ end }}
+    name: istio
+  - kustomizeConfig:
+      repoRef:
+        name: manifests
+        path: manifests/kubeflow-manifests/stacks/kubernetes/application/cert-manager-crds
+    name: cert-manager-crds
+  - kustomizeConfig:
+      repoRef:
+        name: manifests
+        path: manifests/kubeflow-manifests/stacks/kubernetes/application/cert-manager-kube-system-resources
+    name: cert-manager-kube-system-resources
+  - kustomizeConfig:
+      repoRef:
+        name: manifests
+        path: manifests/kubeflow-manifests/stacks/kubernetes/application/cert-manager
+    name: cert-manager
+{{ if and .Variables.EnableTLS .Variables.DomainName }}
+  - kustomizeConfig:
+      parameters:
+      - name: email
+        value: {{ .Cluster.OwnerEmail }}
+      - name: acmeUrl
+        value: https://acme-v02.api.letsencrypt.org/directory
+      - name: domain
+        value: {{ .Variables.DomainName }}
+      repoRef:
+        name: manifests
+        path: manifests/istio/ingressgateway-acme-cert/base
+    name: ingressgateway-acme-cert
+{{ end }}
+  - kustomizeConfig:
+      repoRef:
+        name: manifests
+        path: manifests/kubeflow-manifests/metacontroller/base
+    name: metacontroller
+{{ if and .Variables.OIDCProviderURL .Variables.DomainName }}
+  - kustomizeConfig:
+      parameters:
+        - name: userid-header
+          value: kubeflow-userid
+        - name: oidc_provider
+          value: {{ .Variables.OIDCProviderURL }}
+        - name: oidc_auth_url
+          value: {{ .Variables.OIDCProviderURL }}/auth
+        - name: oidc_redirect_uri
+          value: http{{ if .Variables.EnableTLS }}s{{ end }}://{{ .Variables.DomainName }}/login/oidc
+        - name: client_id
+          value: kubeflow-oidc-authservice
+        {{ if .Variables.EnableTLS }}
+        - name: skip_auth_uri
+          value: "/.well-known"
+        {{ end }}
+      {{ if .Variables.OIDCSecret }}
+        - name: application_secret
+          value: {{ .Variables.OIDCSecret }}
+      {{ end }}
+      repoRef:
+        name: manifests
+        path: manifests/oidc-authservice
+    name: oidc-authservice
+{{ else }}
+  - kustomizeConfig:
+      parameters:
+        - name: userid-header
+          value: kubeflow-userid
+        - name: oidc_provider
+          value: http://dex.auth.svc.cluster.local:5556/dex
+        - name: oidc_redirect_uri
+          value: /login/oidc
+        - name: oidc_auth_url
+          value: /dex/auth
+        {{ if .Variables.EnableTLS }}
+        - name: skip_auth_uri
+          value: "/dex /.well-known"
+        {{ end }}
+        - name: application_secret
+          value: pUBnBOY80SnXgjibTYM9ZWNzY2xreNGQok
+      repoRef:
+        name: manifests
+        path: manifests/oidc-authservice
+    name: oidc-authservice
+  - kustomizeConfig:
+      repoRef:
+        name: manifests
+        path: manifests/kubeflow-manifests/stacks/kubernetes/application/dex-auth
+    name: dex
+  {{ end }}
+  - kustomizeConfig:
+      repoRef:
+        name: manifests
+        path: manifests/kubeflow-manifests/admission-webhook/bootstrap/overlays/application
+    name: bootstrap
+  - kustomizeConfig:
+      repoRef:
+        name: manifests
+        path: manifests/kubeflow-manifests/spark/spark-operator/overlays/application
+    name: spark-operator
+  - kustomizeConfig:
+      parameters:
+        - name: admin
+          value: "{{ .Cluster.OwnerEmail }}"
+      repoRef:
+        name: manifests
+        path: manifests/stacks/kubernetes
+    name: kubeflow-apps
+  - kustomizeConfig:
+      repoRef:
+        name: manifests
+        path: manifests/kubeflow-manifests/knative/installs/generic
+    name: knative
+  - kustomizeConfig:
+      repoRef:
+        name: manifests
+        path: manifests/kubeflow-manifests/kfserving/installs/generic
+    name: kfserving
+  repos:
+    - name: manifests
+      uri: github.com/kubermatic/flowmatic?ref=master
+  version: v1.2-branch

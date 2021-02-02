@@ -1,6 +1,6 @@
 ## kubeone-tool-container
 
-a docker container based on [golang:1.15](https://hub.docker.com/_/golang) with tools included to work with kubeOne and kuberntes
+a docker container based on the latest ubuntu with tools included to work with kubeOne and kubernetes
 
 ### included packages:
 
@@ -19,8 +19,17 @@ a docker container based on [golang:1.15](https://hub.docker.com/_/golang) with 
 
 ```
 docker build -t kubeone-tool-container .
-docker run  --name  kubeone-tool-container -t -d kubeone-tool-container
-docker exec -it kubeone-tool-container /bin/bash
+docker run  --name  kubeone-tool-container -p 22:22 -t -d kubeone-tool-container
+#get IP address
+sudo docker inspect -f "{{ .NetworkSettings.IPAddress }}" kubeone-tool-container
+#conect into the container
+ssh kubermatic@IP of previous command
+
+```
+
+You can optionally set a user password on container run for the kubermatic user:
+``` 
+docker run -e PASS=hallo --name  kubeone-tool-container -p 22:22  -t -d kubeone-tool-container
 ```
 
 Image is currently NOT updated automatically at [quay.io > kubermatic-labs > kubeone-tooling](https://quay.io/repository/kubermatic-labs/kubeone-tooling?tab=tags), but you find the latest version at:

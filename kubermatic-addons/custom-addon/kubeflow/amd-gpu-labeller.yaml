@@ -1,0 +1,90 @@
+# Copyright 2021 The Flowmatic Authors.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+{{ if .Variables.AMDDevicePlugin }}
+---
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRole
+metadata:
+  name: cr-node-labeller
+rules:
+- apiGroups: [""]
+  resources: ["nodes"]
+  verbs: ["watch", "get", "list", "update"]
+---
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRoleBinding
+metadata:
+  name: labeller
+  namespace: default
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cr-node-labeller
+subjects:
+- kind: ServiceAccount
+  name: default
+  namespace: default
+- kind: ServiceAccount
+  name: default
+  namespace: kube-system
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: amdgpu-labeller-daemonset
+  namespace: kube-system
+spec:
+  selector:
+    matchLabels:
+      name: amdgpu-lr-ds
+  template:
+    metadata:
+      annotations:
+        scheduler.alpha.kubernetes.io/critical-pod: ""
+      labels:
+        name: amdgpu-lr-ds
+    spec:
+      tolerations:
+      - key: CriticalAddonsOnly
+        operator: Exists
+      containers:
+      - image: rocm/k8s-device-plugin:labeller-latest
+        name: amdgpu-lr-cntr
+        imagePullPolicy: Always
+        workingDir: /root
+        command: ["./k8s-node-labeller"]
+        args: ["-vram", "-cu-count", "-simd-count", "-device-id", "-family"]
+        env:
+          - name: DS_NODE_NAME
+            valueFrom:
+              fieldRef:
+                fieldPath: spec.nodeName
+        securityContext:
+          privileged: true #Needed for /dev
+          capabilities:
+            drop: ["ALL"]
+        volumeMounts:
+          - name: sys
+            mountPath: /sys
+          - name: dev
+            mountPath: /dev
+      volumes:
+        - name: sys
+          hostPath:
+            path: /sys
+        - name: dev
+          hostPath:
+            path: /dev
+{{ end }}

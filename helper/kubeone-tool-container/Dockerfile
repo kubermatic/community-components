@@ -13,8 +13,12 @@
 # limitations under the License.
 
 
-FROM golang:1.15
+FROM ubuntu:latest
 
+ARG kubeone_version=1.10
+ARG USER=kubermatic
+ARG PASS=kubermatic
+ARG DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && apt-get install -y \
     bash-completion \
     python3-crcmod \
@@ -25,12 +29,19 @@ RUN apt-get update && apt-get install -y \
     gnupg \
     unzip \
     upx-ucl \
-    fzf
-
+    fzf \
+    openssh-server \
+    sudo \
+    vim \
+    git
 
 ENV GO111MODULE on
-ENV USER root
 
+RUN useradd -rm -d /home/${USER} -s /bin/bash -g root -G sudo -u 1000 ${USER}
+
+RUN service ssh start
+
+RUN echo "${USER}:${PASS}"|chpasswd
 
 # Install Kubectl
 RUN curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
@@ -50,9 +61,8 @@ RUN RELEASE_URL=$(curl -Ls -o /dev/null -w %{url_effective} https://github.com/m
 RUN curl -fL https://releases.hashicorp.com/terraform/$(curl -s https://checkpoint-api.hashicorp.com/v1/check/terraform | jq -r -M '.current_version')/terraform_$(curl -s https://checkpoint-api.hashicorp.com/v1/check/terraform | jq -r -M '.current_version')_linux_amd64.zip | funzip >/usr/local/bin/terraform
 RUN chmod +x /usr/local/bin/terraform
 
-
 # Install KubeOne
-RUN VERSION=$(curl -w '%{url_effective}' -I -L -s -S https://github.com/kubermatic/kubeone/releases/latest -o /dev/null | sed -e 's|.*/v||') && \
+RUN VERSION=$kubeone_version && \
  curl -LO "https://github.com/kubermatic/kubeone/releases/download/v${VERSION}/kubeone_${VERSION}_linux_amd64.zip" && \
  unzip kubeone_${VERSION}_linux_amd64.zip -d kubeone_${VERSION}_linux_amd64 && \
  mv kubeone_${VERSION}_linux_amd64/kubeone /usr/local/bin
@@ -78,6 +88,23 @@ RUN echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] http://packages.c
     apt-get update -y && \
     apt-get install google-cloud-sdk -y
 
+# Install govc
+RUN curl -L $(curl -s https://api.github.com/repos/vmware/govmomi/releases/latest | grep browser_download_url | grep govc_linux_amd64 | cut -d '"' -f 4) | gunzip > /usr/local/bin/govc && \
+    chmod +x /usr/local/bin/govc
+
+RUN rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+USER ${USER}
+WORKDIR /home/${USER}
+
+RUN mkdir ~/bash_completion.d/
+RUN mkdir ~/.ssh/
+
+RUN mkdir -p $HOME/.terraform.d/plugins/linux_amd64
+COPY terraform_libraries.tf .
+RUN terraform init -input=false
+RUN mv .terraform/providers $HOME/.terraform.d/plugins/linux_amd64/
+
 # Install krew
 RUN ( set -x; cd "$(mktemp -d)" && \
       curl -fsSLO "https://github.com/kubernetes-sigs/krew/releases/latest/download/krew.tar.gz" && \
@@ -87,23 +114,25 @@ RUN ( set -x; cd "$(mktemp -d)" && \
 
 RUN echo 'export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"' >> ~/.bashrc
 
-# Install fubectl
-RUN wget https://rawgit.com/kubermatic/fubectl/master/fubectl.source -O /etc/bash_completion.d/fubectl
-
 RUN /bin/bash -ic 'kubectl krew install tree'
 RUN /bin/bash -ic 'kubectl krew install view-secret'
 
+# Install fubectl
+RUN wget https://rawgit.com/kubermatic/fubectl/master/fubectl.source -O ~/bash_completion.d/fubectl
 
-# Install govc
-RUN curl -L $(curl -s https://api.github.com/repos/vmware/govmomi/releases/latest | grep browser_download_url | grep govc_linux_amd64 | cut -d '"' -f 4) | gunzip > /usr/local/bin/govc && \
-    chmod +x /usr/local/bin/govc
-
+RUN kubectl completion bash >> ~/bash_completion.d/kubectl
+RUN kubeone completion bash >> ~/bash_completion.d/kubeone
+RUN echo "if [ -f ~/bash_completion.d ]; then source ~/bash_completion.d; fi" >> ~/.bash_profile
 
 # Clean up APT when done.
-RUN rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+USER root
 
+RUN sed -ri 's/UsePAM yes/#UsePAM yes/g' /etc/ssh/sshd_config
+RUN mkdir /root/.ssh
 
-RUN kubectl completion bash >> /etc/bash_completion.d/kubectl
-RUN kubeone completion bash >> /etc/bash_completion.d/kubeone
-RUN echo "if [ -f /etc/bash_completion ]; then source /etc/bash_completion; fi" >> /root/.bashrc
-CMD ["/bin/bash", "--rcfile", "/root/.bashrc"]
+COPY startup.sh /root/startup.sh
+RUN chmod +x /root/startup.sh
+
+EXPOSE 22
+#CMD ["/bin/bash", "--rcfile", "/root/.bashrc"]
+CMD    ["/root/startup.sh"]
