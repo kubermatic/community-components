@@ -31,3 +31,8 @@ You can optionally set a user password on container run for the kubermatic user:
 ``` 
 docker run -e PASS=hallo --name  kubeone-tool-container -p 22:22  -t -d kubeone-tool-container
 ```
+
+Image is currently NOT updated automatically at [quay.io > kubermatic-labs > kubeone-tooling](https://quay.io/repository/kubermatic-labs/kubeone-tooling?tab=tags), but you find the latest version at:
+```
+docker run --name  kubeone-tool-container -it quay.io/kubermatic-labs/kubeone-tooling
+```
