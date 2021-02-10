@@ -41,3 +41,5 @@ export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"
 
 #### terrafrom autocompletion
 complete -C /usr/local/bin/terraform terraform
+
+### TODO add kubeone autocompletion

@@ -37,6 +37,7 @@ RUN apt-get update && apt-get install -y \
         git \
         fonts-powerline \
     && apt-get clean
+# TODO add tmux
 
 # Install AWS CLI
 RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" && \
@@ -79,6 +80,7 @@ RUN RELEASE_URL=$(curl -Ls -o /dev/null -w %{url_effective} https://github.com/m
  wget https://github.com/mikefarah/yq/releases/download/$YQ_LATEST/yq_linux_amd64 -O /usr/bin/yq && chmod +x /usr/bin/yq
 
 # Install Terraform
+# TODO install as apt package
 RUN curl -fL https://releases.hashicorp.com/terraform/$(curl -s https://checkpoint-api.hashicorp.com/v1/check/terraform | jq -r -M '.current_version')/terraform_$(curl -s https://checkpoint-api.hashicorp.com/v1/check/terraform | jq -r -M '.current_version')_linux_amd64.zip | funzip >/usr/local/bin/terraform \
  && chmod +x /usr/local/bin/terraform
 
@@ -123,9 +125,8 @@ ENV TF_CLI_ARGS_init="-plugin-dir /home/${USER}/.terraform.d/plugins/linux_amd64
 ##only if you start ssh on demand
 EXPOSE 22
 
-SHELL ["/bin/bash", "-ci"]
+SHELL ["/bin/bash", "-ic"]
 ### tail to enable to run in backend
 CMD ["tail", "-f", "/var/lib/*"]
 
-### TODO
-# - check why CTRL+d works and not CTRL+c
+### TODO: check why CTRL+d works and not CTRL+c
