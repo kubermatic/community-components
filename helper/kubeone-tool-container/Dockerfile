@@ -18,6 +18,7 @@ FROM ubuntu:20.04
 ENV GO111MODULE on
 # Install KubeOne
 ENV DEBIAN_FRONTEND=noninteractive
+
 RUN apt-get update && apt-get install -y \
         bash-completion \
         python3-crcmod \
@@ -36,8 +37,17 @@ RUN apt-get update && apt-get install -y \
         git-crypt \
         git \
         fonts-powerline \
+        tmux \
+        software-properties-common
+
+
+RUN wget --no-check-certificate -qO -  https://apt.releases.hashicorp.com/gpg | apt-key add -
+RUN apt-add-repository "deb [arch=$(dpkg --print-architecture)] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
+
+RUN apt-get update && apt-get install -y \
+    terraform \
     && apt-get clean
-# TODO add tmux
+
 
 # Install AWS CLI
 RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" && \
@@ -78,11 +88,6 @@ RUN curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add 
 RUN RELEASE_URL=$(curl -Ls -o /dev/null -w %{url_effective} https://github.com/mikefarah/yq/releases/latest) && \
  YQ_LATEST="${RELEASE_URL##*/}" && \
  wget https://github.com/mikefarah/yq/releases/download/$YQ_LATEST/yq_linux_amd64 -O /usr/bin/yq && chmod +x /usr/bin/yq
-
-# Install Terraform
-# TODO install as apt package
-RUN curl -fL https://releases.hashicorp.com/terraform/$(curl -s https://checkpoint-api.hashicorp.com/v1/check/terraform | jq -r -M '.current_version')/terraform_$(curl -s https://checkpoint-api.hashicorp.com/v1/check/terraform | jq -r -M '.current_version')_linux_amd64.zip | funzip >/usr/local/bin/terraform \
- && chmod +x /usr/local/bin/terraform
 
 # Install KubeOne
 ARG kubeone_version=1.2.0-beta.0
@@ -127,6 +132,5 @@ EXPOSE 22
 
 SHELL ["/bin/bash", "-ic"]
 ### tail to enable to run in backend
-CMD ["tail", "-f", "/var/lib/*"]
+CMD exec /bin/bash -c "trap : TERM INT; sleep infinity & wait"
 
-### TODO: check why CTRL+d works and not CTRL+c
