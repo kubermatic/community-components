@@ -7,16 +7,16 @@ https://docs.kubermatic.com/kubermatic/master/installation/
 
 Any further environment specific details, will get described later in this document. 
 
-## Infrastructure Requirements
+## Infrastructure Requirements - Summary
 
 To ensure the quality of service, Kubermatic Kubernetes Platform (KKP) relies on the basic availability and setup of the dependent infrastructure as defined at [KKP Documentation > Requirements](https://docs.kubermatic.com/kubermatic/master/requirements). 
 
 For the installation of KPP ensure that the mentioned requirements are 
 fulfilled. Besides of the mentioned minimal requirements, it's recommend that the provided infrastructure ensures the following criteria for the managing master/seed cluster as well as for the user clusters:
 - High Availability setup of the public or/and private cloud infrastructure:
-  - Multiple availability zones are accessible, routed and compatible with Kubernetes as described in the multi-zone best practices: [Kubernetes - Running in multiple zones](https://kubernetes.io/docs/setup/best-practices/multiple-zones/)
   - The target network for master and user clusters follows the recommended Kubernetes networking concept: [Kubernetes Cluster Networking](https://kubernetes.io/docs/concepts/cluster-administration/networking/)
   - The infrastructure is compatible with the recommended architecture of HA Kubernetes cluster as defined at [kubernetes.io > Set up High-Availability Kubernetes Masters](https://kubernetes.io/docs/tasks/administer-cluster/highly-available-master/)
+  - Multiple availability zones are accessible, routed and compatible with Kubernetes as described in the multi-zone best practices: [Kubernetes - Running in multiple zones](https://kubernetes.io/docs/setup/best-practices/multiple-zones/)
 - A storage layer needs to get provided, which is compatible with Kubernetes and provides a storage class, see [Kubernetes - Storage Classes](https://kubernetes.io/docs/concepts/storage/storage-classes/), and respect the customer expected requirements on data reliability and backup.     
 - A Kubernetes compatible load balancing solution is available at the target cloud environment(s), see [Kubernetes - Services, Load Balancing, and Networking](https://kubernetes.io/docs/concepts/services-networking/service/#loadbalancer)
 - An adjustable public or private DNS service is usable.
@@ -38,8 +38,10 @@ To install KKP at customer environment, we need access from external to (direct 
 - Target cloud provider APIs
 - LoadBalancer (API Servers, Ingress, etc.), Master / Worker Nodes network for testing and potential debugging
 - Access to potential used DNS servers and firewall settings
-- Install helper tools: kubeone, git, kubectl, helm, terraform
-  - optional: yq, jq, [fubectl](https://github.com/kubermatic/fubectl)
+- Tooling:
+  a) Use out tooling container `quay.io/kubermatic-labs/kubeone-tooling`, see [helper/kubeone-tool-container](../../../helper/kubeone-tool-container)
+  b) or install helper tools: [kubeone](https://github.com/kubermatic/kubeone), git, kubectl, helm, terraform
+    - optional: yq, jq, [fubectl](https://github.com/kubermatic/fubectl)
 
 ## Load Balancer
 Kubermatic exposes an NGINX server and user clusters API servers. If no external load balancer is provided for the PoC, we recommend [MetalLB](https://metallb.universe.tf/). This requires a set of usable IP addresses in the Kubermatic network that are not managed by DHCP (at least 2 for Kubermatic itself). The role of this LB is different from gobetween, which is only used to access the master clusters API server.
@@ -48,7 +50,7 @@ For other LoadBalancer we strongly recommend LoadBalancer what can interact dyna
 
 ## DHCP / Network
 * DHCP for worker nodes is recommended
-* (if MetalLB is used) fixed IPs for Load Balancer need to be reserved in the target network. 
+* (if MetalLB is used) fixed IPs for Load Balancer need to be reserved in the target network DHCP settings. 
 * Direct Node-to-Node communication is needed based on generic Kubernetes requirements: [Kubernetes - Cluster Networking](https://kubernetes.io/docs/concepts/cluster-administration/networking/)
 
 ## DNS

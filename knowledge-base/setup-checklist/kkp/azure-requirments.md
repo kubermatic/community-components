@@ -21,7 +21,7 @@
 
 ### Option I - Workers only in Azure
 
-![one seed](./.pics/azure_setup_one_seed.png)
+![one seed](../.pics/azure_setup_one_seed.png)
 
 * Worker Node IP Range need to reach seed cluster user control plan endpoints, see [Expose Strategy](https://docs.kubermatic.com/kubermatic/master/concepts/expose-strategy/expose_strategy)
 * KKP will create then a secure VPN tunnel between worker and control plan, so no way back connection need to be opened
@@ -30,7 +30,7 @@
         
 ### Option II - Additional Seed at Azure + Worker in Azure
 
-![multi seed](./.pics/azure_setup_multi_seed.png)
+![multi seed](../.pics/azure_setup_multi_seed.png)
 
 * Seed Cluster Kubernetes API endpoint at Azure need to be reachable
     * Azure Load Balancer with `https` endpoint
