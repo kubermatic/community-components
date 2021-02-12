@@ -15,10 +15,12 @@ terraform {
     helm = {
       version = "~> 2.0"
     }
+    null = {
+      version = "~> 3.0"
+    }
     kubermatic = {
       version = "~> 0.1"
       source = "kubermatic/kubermatic"
-
     }
   }
 }
