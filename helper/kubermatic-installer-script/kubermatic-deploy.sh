@@ -110,7 +110,9 @@ function deployBackup() {
       deploy    minio minio minio/
       deploy    s3-exporter kube-system s3-exporter/
     fi
+    deploy velero velero backup/velero
 }
+
 function deployCertManager() {
     if [[ -v DEPLOY_CERTMANAGER ]]; then
       #### CERT-MANAGER

@@ -38,7 +38,7 @@ k8c-addon: check-env
 	kubectl apply -f ${KUBERMATIC_ADDON_MANIFEST}
 
 k8c-deployment-core:
-	kubectl apply -f ${KUBERMATIC_PRE_OPERATOR_MANIFEST}
+	test -d ${KUBERMATIC_PRE_OPERATOR_MANIFEST} && kubectl apply -f ${KUBERMATIC_PRE_OPERATOR_MANIFEST} && echo "applied " || echo "KUBERMATIC_PRE_OPERATOR_MANIFEST manifest files ..."
 	${K8C_INSTALL_FILES}/kubermatic-installer --verbose --charts-directory ${CHARTS} deploy --config ${KUBERMATIC_CONFIG} --helm-values ${VALUE_FILE} --force
 	echo ... && sleep 10
 	${DEPLOY_SCRIPT} ${CLUSTER_TYPE} ${VALUE_FILE} ${CHARTS} cert-manager
