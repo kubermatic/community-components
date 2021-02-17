@@ -108,6 +108,15 @@ subjects:
     name: default
     namespace: kubelb
 ---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: kubelb
+  namespace: kubelb
+type: Opaque
+data:
+  kubelb: "{{ .Variables.kubeconf }}"
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -130,7 +139,7 @@ spec:
             - --cluster-name={{ .Variables.clustername}}
           command:
             - /agent
-          image: quay.io/weirdmachine/kubelb-agent:latest
+          image: quay.io/kubermatic/kubelb-agent
           imagePullPolicy: Always
           name: agent
           resources:
