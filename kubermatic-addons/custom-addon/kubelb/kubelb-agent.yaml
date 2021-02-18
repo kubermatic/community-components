@@ -111,11 +111,11 @@ subjects:
 apiVersion: v1
 kind: Secret
 metadata:
-  name: kubelb
+  name: kubeconfig
   namespace: kubelb
 type: Opaque
 data:
-  kubelb: "{{ .Variables.kubeconf }}"
+  kubelb: {{ .Variables.kubeconf | b64enc }}
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -136,10 +136,10 @@ spec:
     spec:
       containers:
         - args:
-            - --cluster-name={{ .Variables.clustername}}
+            - --cluster-name=cluster-{{ .Cluster.Name}}
           command:
             - /agent
-          image: quay.io/kubermatic/kubelb-agent
+          image: quay.io/kubermatic/kubelb-agent:v0.1
           imagePullPolicy: Always
           name: agent
           resources:
@@ -151,10 +151,10 @@ spec:
               memory: 20Mi
           volumeMounts:
             - mountPath: /home/nonroot/.kube/
-              name: kubelb
+              name: kubeconfig
               readOnly: true
       terminationGracePeriodSeconds: 10
       volumes:
-        - name: kubelb
+        - name: kubeconfig
           secret:
-            secretName: kubelb
+            secretName: kubeconfig
