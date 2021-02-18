@@ -139,7 +139,7 @@ spec:
             - --cluster-name=cluster-{{ .Cluster.Name}}
           command:
             - /agent
-          image: quay.io/kubermatic/kubelb-agent:v0.1
+          image: quay.io/kubermatic/kubelb-agent:v0.1.0
           imagePullPolicy: Always
           name: agent
           resources:
