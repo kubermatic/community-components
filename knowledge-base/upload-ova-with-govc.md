@@ -29,7 +29,7 @@ vim ubuntu.ova.json
 ```
 upload to vsphere
 ```
-govc import.ova --options ubuntu.ova.json ~/Downloads/ubuntu-tobi.ova
+govc import.ova --options ubuntu.ova.json -folder /dc-1/vm/vm-templates -name ubuntu-XXXX-XX-XX.ova ~/Downloads/ubuntu-tobi.ova
 ```
 
 set disk UUID flag (needed for machine controller):
