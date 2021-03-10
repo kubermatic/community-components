@@ -75,6 +75,7 @@ Name | Description
 [node-health-check](knowledge-base/node-health-check.md)| This doc describes how Kubermatic node health checks works
 [nvidia-gpu-operator](knowledge-base/nvidia-gpu-operator.md) | How to enable GPU support for KKP clusters by [NVIDIA - GPU Operator](https://github.com/NVIDIA/gpu-operator/)
 [offline-setup](knowledge-base/offline-setup.md) | How to run kubermatic in offline environments
+[upload-ova-with-govc](knowledge-base/upload-ova-with-govc.md) | How to upload ova by using `govc`
 
 ## Troubleshooting
 
