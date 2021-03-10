@@ -1,6 +1,6 @@
 
 ## See https://github.com/kubermatic/kubermatic-installer/releases
-KUBEONE_VERSION ?= 1.2.0-beta.0
+KUBEONE_VERSION ?= 1.2.0-rc.0
 DOCKER_REPO ?= 'quay.io/kubermatic-labs/kubeone-tooling'
 FINAL_TAG ?= kubeone-${KUBEONE_VERSION}
 TAG_DATE ?= kubeone-${KUBEONE_VERSION}-$(shell date -I)
@@ -13,6 +13,8 @@ docker-build:
 docker-run-local: docker-build
 	docker run -it -v $(shell pwd):/home/kubermatic/mnt ${DOCKER_REPO}:${TAG_DATE} bash
 
+docker-run-local-root: docker-build
+	docker run -it --user 0 -v $(shell pwd):/home/kubermatic/mnt ${DOCKER_REPO}:${TAG_DATE} bash
 docker-release: docker-build
 	docker tag ${DOCKER_REPO}:${TAG_DATE} ${DOCKER_REPO}:${FINAL_TAG}
 	docker tag ${DOCKER_REPO}:${TAG_DATE} ${DOCKER_REPO}:latest
