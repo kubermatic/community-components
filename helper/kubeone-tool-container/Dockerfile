@@ -38,7 +38,10 @@ RUN apt-get update && apt-get install -y \
         git \
         fonts-powerline \
         tmux \
-        software-properties-common
+        software-properties-common \
+        iputils-ping \
+        locate \
+        dnsutils
 
 
 RUN wget --no-check-certificate -qO -  https://apt.releases.hashicorp.com/gpg | apt-key add -
@@ -48,6 +51,7 @@ RUN apt-get update && apt-get install -y \
     terraform \
     && apt-get clean
 
+RUN terraform -install-autocomplete
 
 # Install AWS CLI
 RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" && \
@@ -96,6 +100,8 @@ RUN VERSION=$kubeone_version && \
  unzip kubeone_${VERSION}_linux_amd64.zip -d kubeone_${VERSION}_linux_amd64 && \
  mv kubeone_${VERSION}_linux_amd64/kubeone /usr/local/bin
 
+COPY ./.bashrc /root/
+
 ARG USER=kubermatic
 RUN useradd -rm -d /home/${USER} -s /bin/bash -g root -G sudo -u 1000 ${USER}
 USER ${USER}
@@ -126,6 +132,8 @@ RUN terraform init -input=false && \
     mkdir -p $HOME/.terraform.d/plugins/linux_amd64 && \
     mv .terraform/providers $HOME/.terraform.d/plugins/linux_amd64/
 ENV TF_CLI_ARGS_init="-plugin-dir /home/${USER}/.terraform.d/plugins/linux_amd64/providers"
+
+
 
 ##only if you start ssh on demand
 EXPOSE 22

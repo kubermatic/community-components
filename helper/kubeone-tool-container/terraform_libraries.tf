@@ -18,6 +18,9 @@ terraform {
     null = {
       version = "~> 3.0"
     }
+    tls = {
+      version = "~> 3.1"
+    }
     kubermatic = {
       version = "~> 0.1"
       source = "kubermatic/kubermatic"
