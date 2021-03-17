@@ -62,7 +62,7 @@ Name|Description
 [machinedeployment-patch.gce.sh](helper/machinedeployment-patch.gce.sh) | Scripts patches some specification of an Cluster API `MachineDeployment` object.
 [set-build-tags-to-image.sh](helper/set-build-tags-to-image.sh) | Set dedicated build tags to the [Kubermatic Charts](https://github.com/kubermatic/kubermatic/tree/master/charts)
 [untaint_master.sh](helper/untaint_master.sh) | untaints all master nodes, to be able to schedule workload
-
+[bash-port-scanner.sh](helper/linux-port-scan-without-dependencies/scan.sh) | A Bash bases Port-Scanner which is able to scan ports without any dependencies or tools like nmap
 ## Knowledge Base
 Helpful how-tos and detailed documentation:
 
