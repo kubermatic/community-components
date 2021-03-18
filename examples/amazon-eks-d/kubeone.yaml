@@ -1,0 +1,36 @@
+apiVersion: kubeone.io/v1beta1
+kind: KubeOneCluster
+versions:
+  kubernetes: "v1.19.6-eks-1-19-1"
+containerRuntime:
+  containerd: {}
+cloudProvider:
+  aws: {}
+assetConfiguration:
+  kubernetes:
+    imageRepository: "public.ecr.aws/eks-distro/kubernetes"
+  pause:
+    # search in the dependencies of eks d for "pause container image"
+    imageRepository: "public.ecr.aws/eks-distro/kubernetes"
+    imageTag: "v1.19.6-eks-1-19-1"
+    # search in the dependencies of eks d for "etcd container image"
+  etcd:
+    imageRepository: "public.ecr.aws/eks-distro/etcd-io"
+    imageTag: "v3.4.14-eks-1-19-1"
+    # search in the dependencies of eks d for "coredns container image"
+  coreDNS:
+    imageRepository: "public.ecr.aws/eks-distro/coredns"
+    imageTag: "v1.8.0-eks-1-19-1"
+    # search in the dependencies of eks d for "metrics-server container image"
+  metricsServer:
+    imageRepository: "public.ecr.aws/eks-distro/kubernetes-sigs"
+    imageTag: "v0.4.0-eks-1-19-1"
+    # search in the dependencies of eks d for "cni-plugins tarball for linux/amd64"
+  cni:
+    url: "https://distro.eks.amazonaws.com/kubernetes-1-19/releases/1/artifacts/plugins/v0.8.7/cni-plugins-linux-amd64-v0.8.7.tar.gz"
+    # search in the dependencies of eks d for "Kubernetes node tarball for linux/amd64"
+  nodeBinaries:
+    url: "https://distro.eks.amazonaws.com/kubernetes-1-19/releases/1/artifacts/kubernetes/v1.19.6/kubernetes-node-linux-amd64.tar.gz"
+    # search in the dependencies of eks d for "kubectl binary for linux/amd64"
+  kubectl:
+    url: "https://distro.eks.amazonaws.com/kubernetes-1-19/releases/1/artifacts/kubernetes/v1.19.6/bin/linux/amd64/kubectl"

@@ -22,6 +22,7 @@ Name|Description
 Name|Description
 ---|---
 [vSphere kubeOne / Kubermatic demo](./examples/vsphere-kubeone-kubermatic)| an example for running kubermatic on vSphere with kubeOne to install the
+[AWS EKS -D kubeOne demo](./examples/amazon-eks-d)| an example for creating a Cluster running Amazon EKS-D 
 
 ## Kubermatic Addons
 
