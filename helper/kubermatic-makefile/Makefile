@@ -34,8 +34,7 @@ endif
 
 k8c-addon: check-env
 	cd ${KUBERMATIC_ADDON_FOLDER} && KUBERMATIC_VERSION=${KUBERMATIC_VERSION} make docker-release
-	echo -e "..... update now the values.yaml image tag!\n"
-	kubectl apply -f ${KUBERMATIC_ADDON_MANIFEST}
+	echo -e "..... update now image tag in the ${KUBERMATIC_CONFIG}!\n"
 
 k8c-deployment-core:
 	test -d ${KUBERMATIC_PRE_OPERATOR_MANIFEST} && kubectl apply -f ${KUBERMATIC_PRE_OPERATOR_MANIFEST} && echo "applied " || echo "KUBERMATIC_PRE_OPERATOR_MANIFEST manifest files ..."

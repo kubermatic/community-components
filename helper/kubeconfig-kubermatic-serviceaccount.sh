@@ -115,7 +115,7 @@ apply_rbac() {
     echo " > assigning cluster role $clusterrole ..."
     kubectl apply -f - > /dev/null <<YAML
 kind: ClusterRoleBinding
-apiVersion: rbac.authorization.k8s.io/v1beta1
+apiVersion: rbac.authorization.k8s.io/v1
 metadata:
   name: $clusterrole
 subjects:
