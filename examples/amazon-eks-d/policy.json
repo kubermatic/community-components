@@ -1,0 +1,93 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "VisualEditor0",
+      "Effect": "Allow",
+      "Action": [
+        "iam:GetInstanceProfile",
+        "iam:ListInstanceProfiles"
+      ],
+      "Resource": "arn:aws:iam::YOUR_AWS_ACCOUNT_ID:instance-profile/*"
+    },
+    {
+      "Sid": "VisualEditor1",
+      "Effect": "Allow",
+      "Action": [
+        "iam:GetRole",
+        "iam:PassRole",
+        "iam:DeleteRolePolicy",
+        "iam:ListAttachedRolePolicies",
+        "iam:CreateRole",
+        "iam:DeleteRole",
+        "iam:PutRolePolicy",
+        "iam:ListRolePolicies",
+        "iam:ListInstanceProfilesForRole",
+        "iam:GetRolePolicy"
+      ],
+      "Resource": "arn:aws:iam::YOUR_AWS_ACCOUNT_ID:role/eksd-kubeone-*"
+    },
+    {
+      "Sid": "VisualEditor2",
+      "Effect": "Allow",
+      "Action": [
+        "iam:CreateInstanceProfile",
+        "iam:DeleteInstanceProfile",
+        "iam:GetInstanceProfile",
+        "iam:RemoveRoleFromInstanceProfile",
+        "iam:AddRoleToInstanceProfile"
+      ],
+      "Resource": "arn:aws:iam::YOUR_AWS_ACCOUNT_ID:instance-profile/eksd-kubeone-*"
+    },
+    {
+      "Sid": "VisualEditor3",
+      "Effect": "Allow",
+      "Action": "iam:CreateServiceLinkedRole",
+      "Resource": "arn:aws:iam::YOUR_AWS_ACCOUNT_ID:role/aws-service-role/elasticloadbalancing.amazonaws.com/AWSServiceRoleForElasticLoadBalancing"
+    },
+    {
+      "Sid": "VisualEditor4",
+      "Effect": "Allow",
+      "Action": [
+        "elasticloadbalancing:ModifyListener",
+        "sts:GetFederationToken",
+        "elasticloadbalancing:ConfigureHealthCheck",
+        "elasticloadbalancing:RegisterTargets",
+        "elasticloadbalancing:SetIpAddressType",
+        "elasticloadbalancing:SetRulePriorities",
+        "elasticloadbalancing:RemoveListenerCertificates",
+        "elasticloadbalancing:DeleteLoadBalancer",
+        "elasticloadbalancing:SetWebAcl",
+        "elasticloadbalancing:DescribeLoadBalancers",
+        "elasticloadbalancing:CreateListener",
+        "elasticloadbalancing:DescribeListeners",
+        "elasticloadbalancing:CreateRule",
+        "elasticloadbalancing:ApplySecurityGroupsToLoadBalancer",
+        "elasticloadbalancing:ModifyTargetGroupAttributes",
+        "elasticloadbalancing:RegisterInstancesWithLoadBalancer",
+        "elasticloadbalancing:DeleteRule",
+        "elasticloadbalancing:CreateLoadBalancer",
+        "elasticloadbalancing:DescribeTags",
+        "elasticloadbalancing:CreateTargetGroup",
+        "elasticloadbalancing:DeregisterTargets",
+        "elasticloadbalancing:SetSubnets",
+        "elasticloadbalancing:DeleteTargetGroup",
+        "elasticloadbalancing:CreateLoadBalancerListeners",
+        "elasticloadbalancing:DescribeLoadBalancerAttributes",
+        "elasticloadbalancing:DescribeTargetGroupAttributes",
+        "elasticloadbalancing:ModifyRule",
+        "elasticloadbalancing:DescribeTargetHealth",
+        "elasticloadbalancing:SetSecurityGroups",
+        "elasticloadbalancing:DescribeTargetGroups",
+        "elasticloadbalancing:AttachLoadBalancerToSubnets",
+        "elasticloadbalancing:AddTags",
+        "ec2:*",
+        "elasticloadbalancing:DescribeRules",
+        "elasticloadbalancing:ModifyLoadBalancerAttributes",
+        "elasticloadbalancing:ModifyTargetGroup",
+        "elasticloadbalancing:DeleteListener"
+      ],
+      "Resource": "*"
+    }
+  ]
+}
