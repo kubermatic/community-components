@@ -1,5 +1,7 @@
 source /etc/bash_completion
-export PATH="$HOME/bin:$PATH"
+export PATH=$PATH:/usr/local/bin
+export PATH=$PATH:/usr/bin
+export PATH="/home/kubermatic/bin:$PATH"
 
 ### write commands immediately to history
 #http://www.shellhacks.com/en/7-Tips-Tuning-Command-Line-History-in-Bash
@@ -34,13 +36,13 @@ complete -F __start_kubectl k
 source <(helm completion bash)
 
 ##### fubectl
-[ -f $HOME/bin/fubectl.source ] && source $HOME/bin/fubectl.source
+[ -f /home/kubermatic/bin/fubectl.source ] && source /home/kubermatic/bin/fubectl.source
 
 #### krew
-export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"
+export PATH="${KREW_ROOT:-/home/kubermatic/.krew}/bin:$PATH"
 
 #### terrafrom autocompletion
-complete -C /usr/local/bin/terraform terraform
+complete -C /usr/bin/terraform terraform
 
 ### kubeone autocompletion
 source <(kubeone completion bash)
