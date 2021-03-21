@@ -10,10 +10,14 @@ OSTAG = openshift-${TAG}
 
 docker-build:
 	docker build --build-arg KUBERMATIC_VERSION=${KUBERMATIC_VERSION} -t ${ADDON_CUSTOM_REPO}:${TAG} .
-	docker build --build-arg KUBERMATIC_VERSION=${KUBERMATIC_VERSION} -f Dockerfile.openshift -t ${ADDON_CUSTOM_REPO_OS}:${OSTAG}  .
 
 docker-release: docker-build
 	docker push ${ADDON_CUSTOM_REPO}:${TAG}
+
+docker-build-os:
+	docker build --build-arg KUBERMATIC_VERSION=${KUBERMATIC_VERSION} -f Dockerfile.openshift -t ${ADDON_CUSTOM_REPO_OS}:${OSTAG}  .
+
+docker-release-os: docker-build-os
 	docker push ${ADDON_CUSTOM_REPO}:${OSTAG}
 
 ############## TRIDENT ADDON
