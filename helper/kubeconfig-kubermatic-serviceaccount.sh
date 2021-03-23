@@ -131,6 +131,7 @@ YAML
 create_output_file(){
     echo "temp file to target: ${KUBECFG_FILE_NAME} -> ${output_kubeconfig}"
     cp ${KUBECFG_FILE_NAME} ${output_kubeconfig}
+    chmod 600 ${output_kubeconfig}
 
     kubectl create secret generic seed-kubeconfig -n $NAMESPACE --from-file kubeconfig="${output_kubeconfig}" --dry-run=client -o yaml > ${output_kubeconfig_yaml}
 
@@ -159,7 +160,7 @@ set_kube_config_values
 create_output_file
 apply_rbac
 
-if [[ "${2}" == "--master-seed" ]]; then
+if [ "$#" -gt 1 ] && [[ "${2}" == "--master-seed" ]]; then
  create_local_endpoint_conf
 fi
 
