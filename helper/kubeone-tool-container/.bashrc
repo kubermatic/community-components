@@ -32,6 +32,9 @@ source <(kubectl completion bash)
 alias k=kubectl
 complete -F __start_kubectl k
 
+### add default debug container
+alias kdebug='kcmd bash nicolaka/netshoot'
+
 ### helm
 source <(helm completion bash)
 
