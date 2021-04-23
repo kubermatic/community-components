@@ -29,7 +29,7 @@
         
 ## Configure Kubermatic
 
-See [Using a Custom CA](https://docs.kubermatic.com/kubermatic/master/advanced/custom_ca/)
+See [Using a Custom CA](https://docs.kubermatic.com/kubermatic/master/tutorials_howtos/kkp_configuration/using_custom_cert_manager/)
 
 ### Update the cluster issuer of `cert-manager` in `values.yaml`:
 
