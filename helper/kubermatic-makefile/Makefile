@@ -40,7 +40,6 @@ k8c-deployment-core:
 	test -d ${KUBERMATIC_PRE_OPERATOR_MANIFEST} && kubectl apply -f ${KUBERMATIC_PRE_OPERATOR_MANIFEST} && echo "applied " || echo "KUBERMATIC_PRE_OPERATOR_MANIFEST manifest files ..."
 	${K8C_INSTALL_FILES}/kubermatic-installer --verbose --charts-directory ${CHARTS} deploy --config ${KUBERMATIC_CONFIG} --helm-values ${VALUE_FILE} --force
 	echo ... && sleep 10
-	${DEPLOY_SCRIPT} ${CLUSTER_TYPE} ${VALUE_FILE} ${CHARTS} cert-manager
 	kubectl get pod,svc -n cert-manager
 	kubectl get pod,svc -n nginx-ingress-controller
 	kubectl get pod,svc -n oauth
@@ -53,14 +52,6 @@ k8c-apply-settings:
 	test -d ${KUBERMATIC_ADDON_MANIFEST} && kubectl apply -f ${KUBERMATIC_ADDON_MANIFEST} && echo "applied " || echo "addon manifest files ..."
 
 k8c-deployment: k8c-deployment-core k8c-apply-settings
-
-k8c-kubermatic-deployment-helm:
-	${DEPLOY_SCRIPT} ${CLUSTER_TYPE} ${VALUE_FILE} ${CHARTS} kubermatic
-	make k8c-apply-settings
-
-k8c-kubermatic-deployment-only:
-	${DEPLOY_SCRIPT} ${CLUSTER_TYPE} ${VALUE_FILE} ${CHARTS} kubermatic-deployment-only
-	make k8c-apply-settings
 
 logging-deployment:
 	${DEPLOY_SCRIPT} ${CLUSTER_TYPE} ${VALUE_FILE} ${CHARTS} logging
