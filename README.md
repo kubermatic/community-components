@@ -13,6 +13,7 @@ Name|Description
 [controllers/pod-cidr-controller](components/controllers/pod-cidr-controller) | This bash-controller watches over Cluster objects and patches spec.clusterNetwork.pods.cidrBlocks
 [cron-jobs/scale-down](components/cron-jobs/scale-down) | running a cron job that scales down worker nodes during non work hours and weekends.
 [id-management/active-directory](components/id-management/active-directory) | Example how to configure KKP with Active Directory
+[id-management/openldap](./components/id-management/openldap) | Helm based [OpenLDAP](https://www.openldap.org/) setup to deploy a indipendent LDAP server into Kubernetes for testing purposes 
 [loadbalancers/metallb](components/loadbalancers/metallb) | Example config for MetalLB what aims to redress this imbalance by offering a Network LB implementation that integrates with standard network equipment
 [logging/audit/static-audit-log](components/logging/audit/static-audit-log) | Description how static audit logging could get configured
 [vm-images/packer-ubuntu1804-vsphere-template](./components/vm-images/packer-ubuntu1804-vsphere-template)|A packer template to customize an ubuntu 18.04 cloud-image on vSphere
