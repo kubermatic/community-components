@@ -24,6 +24,7 @@ KUBERMATIC_SECRET_MANIFESTS="../secrets"
 KUBERMATIC_ADDON_FOLDER="../../kubermatic/kubermatic-addons"
 KUBERMATIC_ADDON_MANIFEST=${KUBERMATIC_ADDON_FOLDER}/addon-manifests
 KUBERMATIC_PRE_OPERATOR_MANIFEST="./pre-operator"
+KUBERMATIC_OPERATOR_ADD_FLAGS ?= --migrate-cert-manager --force
 
 check-env:
 ifndef KUBERMATIC_VERSION
@@ -38,7 +39,7 @@ k8c-addon: check-env
 
 k8c-deployment-core:
 	test -d ${KUBERMATIC_PRE_OPERATOR_MANIFEST} && kubectl apply -f ${KUBERMATIC_PRE_OPERATOR_MANIFEST} && echo "applied " || echo "KUBERMATIC_PRE_OPERATOR_MANIFEST manifest files ..."
-	${K8C_INSTALL_FILES}/kubermatic-installer --verbose --charts-directory ${CHARTS} deploy --config ${KUBERMATIC_CONFIG} --helm-values ${VALUE_FILE} --force
+	${K8C_INSTALL_FILES}/kubermatic-installer --verbose --charts-directory ${CHARTS} deploy --config ${KUBERMATIC_CONFIG} --helm-values ${VALUE_FILE} ${KUBERMATIC_OPERATOR_ADD_FLAGS}
 	echo ... && sleep 10
 	kubectl get pod,svc -n cert-manager
 	kubectl get pod,svc -n nginx-ingress-controller
