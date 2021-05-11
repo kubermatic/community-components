@@ -62,7 +62,7 @@ function deploy {
     inital_revision="$(helm history $name --output=json | jq '.Releases[0].Revision')"
   fi
 
-  echo "$(date -Is)" "Upgrading $namespace ..."
+  echo "$(date -Is)" "Upgrading [$namespace] $name ..."
   kubectl create namespace "$namespace" || true
   if [[ -v deploy_per_ns ]]; then
     kubectl apply -n "$namespace" -f ${PER_NAMESPACE_FOLDER}/pernamespace
