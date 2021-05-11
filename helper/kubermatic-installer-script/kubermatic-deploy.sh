@@ -34,11 +34,8 @@ DEPLOY_CERTMANAGER=true
 DEPLOY_MINIO=true
 DEPLOY_ALERTMANAGER=true
 DEPLOY_LOKI=true
-DEPLOY_ELASTIC=false
 DEPLOY_IAP=true
 #CANARY_DEPLOYMENT=true
-RESTART_POD_PRESETS=true
-PER_NAMESPACE_FOLDER=$(dirname $VALUES_FILE)/pernamespace
 
 #verify Helm3
 [[ $(helm version --short) =~ ^v3.*$ ]] && echo "helm3 detected!" || (echo "This script requires helm3! Please install helm3: https://helm.sh/docs/intro/install" && exit 1)
@@ -47,10 +44,7 @@ function deploy {
   local name="$1"
   local namespace="$2"
   local path="$CHART_FOLDER/$3"
-  if [[ "${4:-false}" == "true" ]] && [[ -d $PER_NAMESPACE_FOLDER ]]; then
-    local deploy_per_ns=true
-  fi
-  local timeout="${5:-300s}"
+  local timeout="${4:-300s}"
 
   if [[ ! -d "$path" ]]; then
     echo "chart not found! $path"
@@ -64,22 +58,12 @@ function deploy {
 
   echo "$(date -Is)" "Upgrading [$namespace] $name ..."
   kubectl create namespace "$namespace" || true
-  if [[ -v deploy_per_ns ]]; then
-    kubectl apply -n "$namespace" -f ${PER_NAMESPACE_FOLDER}/pernamespace
-  fi
-
   helm upgrade --install --wait --timeout $timeout $MASTER_FLAG --values "$VALUES_FILE" --namespace "$namespace" "$name" "$path"
 
   if [[ -v CANARY_DEPLOYMENT ]]; then
     TEST_NAME="[Helm] Rollback chart $name"
     echo "$(date -Is)" "Rolling back $name to revision $inital_revision as this was only a canary deployment"
     helm rollback --wait --timeout "$timeout" "$name" "$inital_revision"
-  fi
-
-  if [[ -v deploy_per_ns ]] && [[ -v RESTART_POD_PRESETS ]]; then
-      echo "$(date -Is)" "Restart deployment, daemonsets in: $namespace..."
-      kubectl  -n $namespace get deploy -o name | xargs -L1 kubectl -n $namespace rollout restart || echo "no deployment found!"
-      kubectl  -n $namespace get ds -o name | xargs -L1 kubectl -n $namespace  rollout restart || echo "no daemonset found!"
   fi
   unset TEST_NAME
 }
@@ -88,7 +72,7 @@ function deployKubermaticOperator() {
     echo "$(date -Is)" "Deploying the CRD's..."
     kubectl apply -f "$CHART_FOLDER/kubermatic/crd/"
     if [[ "$DEPLOY_TYPE" == master ]]; then
-      deploy kubermatic-operator kubermatic kubermatic-operator/ true
+      deploy kubermatic-operator kubermatic kubermatic-operator/
 
     echo "$(date -Is)" "Apply the Kubermatic config files..."
     #skip .yaml files with where no apiVersion is specified like the values.yaml
@@ -151,15 +135,10 @@ case "$DEPLOY_STACK" in
     ;;
 
   logging)
-    #### deprecated -> Loki
-    if [[ "${DEPLOY_ELASTIC}" = true ]]; then
-      deploy "elasticsearch" "logging" logging/elasticsearch/
-      deploy "fluentbit" "logging" logging/fluentbit/
-      deploy "kibana" "logging" logging/kibana/
-    fi
+    #### elastic stack removed -> Loki
     if [[ "${DEPLOY_LOKI}" = true ]]; then
       deploy "loki" "logging" logging/loki/
-      deploy "promtail" "logging" logging/promtail/
+      deploy "promtail" "logging" logging/promtail/ 900s
     fi
     ;;
 
