@@ -1,6 +1,8 @@
 ## kubeone-tool-container
 
-a docker container based on the latest ubuntu with tools included to work with kubeOne and kubernetes
+a docker container based on the latest ubuntu with tools included to work with kubeOne and kubernetes:
+
+Docker Image:`quay.io/kubermatic-labs/kubeone-tooling`
 
 ### included packages:
 
@@ -15,24 +17,42 @@ a docker container based on the latest ubuntu with tools included to work with k
 - [fubectl](https://github.com/kubermatic/fubectl)
 - [govc](https://github.com/vmware/govmomi/tree/master/govc)
 
-### usage:
+### Makefile usage:
 
-```
-docker build -t kubeone-tool-container .
-docker run  --name  kubeone-tool-container -p 22:22 -t -d kubeone-tool-container
-#get IP address
-sudo docker inspect -f "{{ .NetworkSettings.IPAddress }}" kubeone-tool-container
-#conect into the container
-ssh kubermatic@IP of previous command
+For local usage you could simply execute:
+```bash
+### use the pre-build quay.io images
+make docker-run
+make docker-run-root
 
-```
-
-You can optionally set a user password on container run for the kubermatic user:
-``` 
-docker run -e PASS=hallo --name  kubeone-tool-container -p 22:22  -t -d kubeone-tool-container
+### build and run images locally
+make docker-run-local
+make docker-run-local-root
 ```
 
-Image is currently NOT updated automatically at [quay.io > kubermatic-labs > kubeone-tooling](https://quay.io/repository/kubermatic-labs/kubeone-tooling?tab=tags), but you find the latest version at:
+### Manual Usage
+To build and run the images you can:
 ```
-docker run --name  kubeone-tool-container -it quay.io/kubermatic-labs/kubeone-tooling
+docker build -t local/kubeone-tool-container .
+```
+To temporary run the container:
+```
+docker run -v $(shell pwd):/home/kubermatic/mnt -it local/kubeone-tool-container
+```
+To run the container and "keep it running":
+```
+docker run  --name  kubeone-tool-container -v $(shell pwd):/home/kubermatic/mnt -t -d local/kubeone-tool-container
+docker exec -it kubeone-tool-container
+```
+
+## Note
+For projects, you can modify the mount command and e.g. mount your project directory:
+```
+docker run  --name  kubeone-tool-container -v /path/to/project:/home/kubermatic/mnt -t -d quay.io/kubermatic-labs/kubeone-tooling
+docker exec -it kubeone-tool-container
+```
+
+Image is currently NOT updated automatically at [quay.io > kubermatic-labs > kubeone-tooling](https://quay.io/repository/kubermatic-labs/kubeone-tooling?tab=tags), but you find the latest version at: `quay.io/kubermatic-labs/kubeone-tooling`
+```
+make docker-release
 ```
