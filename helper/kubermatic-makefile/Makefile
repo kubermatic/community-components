@@ -35,13 +35,13 @@ ifndef KKP_VERSION
 		; exit 1"
 endif
 
-k8c-addon: check-env
+kkp-addon: check-env
 	### update git module to latest
 	cd ${KKP_ADDON_FOLDER} && \
 		TAG_POST_FIX=${TAG_POST_FIX} KKP_VERSION=${KKP_VERSION} make docker-release
 	echo -e "..... update now image tag in the ${KKP_CONFIG}!\n"
 
-k8c-deployment-core:
+kkp-deployment-core:
 	test -d ${KKP_PRE_OPERATOR_MANIFEST} && KUBECONFIG=${KKP_MASTER_KUBECONFIG} \
 		kubectl apply -f ${KKP_PRE_OPERATOR_MANIFEST} && echo "applied " || echo "KKP_PRE_OPERATOR_MANIFEST manifest files ..."
 	KUBECONFIG=${KKP_MASTER_KUBECONFIG} ${KKP_INSTALL_FILES}/kubermatic-installer --verbose --charts-directory ${CHARTS} deploy --config ${KKP_CONFIG} --helm-values ${VALUE_FILE} ${KKP_OPERATOR_ADD_FLAGS}
@@ -51,7 +51,7 @@ k8c-deployment-core:
 	KUBECONFIG=${KKP_MASTER_KUBECONFIG} kubectl get pod,svc -n oauth
 	KUBECONFIG=${KKP_MASTER_KUBECONFIG} kubectl get pod,svc -n kubermatic
 
-k8c-apply-settings:
+kkp-apply-settings:
 	test -d ${KKP_SECRET_MANIFESTS} && KUBECONFIG=${KKP_MASTER_KUBECONFIG} \
 		kubectl apply -f ${KKP_SECRET_MANIFESTS} && echo "applied " || echo "SECRET manifest files ..."
 	test -f ${KKP_CONFIG} && KUBECONFIG=${KKP_MASTER_KUBECONFIG} \
@@ -61,7 +61,7 @@ k8c-apply-settings:
 	test -d ${KKP_ADDON_MANIFEST} && KUBECONFIG=${KKP_MASTER_KUBECONFIG} \
 		kubectl apply -f ${KKP_ADDON_MANIFEST} && echo "applied " || echo "addon manifest files ..."
 
-k8c-deployment: k8c-deployment-core k8c-apply-settings
+kkp-deployment: kkp-deployment-core kkp-apply-settings
 
 logging-deployment:
 	KUBECONFIG=${KKP_MASTER_KUBECONFIG} ${DEPLOY_SCRIPT} ${CLUSTER_TYPE} ${VALUE_FILE} ${CHARTS} logging
@@ -76,17 +76,17 @@ backup-deployment:
 #KKP_SEED_SETTINGS_FILE_FOLDER ?= "./kubermatic-setup/settings-seed/"
 #KKP_SEED_KUBECONFIG ?= "./secrects/seed-kubeconfig"
 #
-#k8c-seed-deployment:
+#kkp-seed-deployment:
 #	KUBECONFIG=${KKP_SEED_KUBECONFIG} ${DEPLOY_SCRIPT} seed ${VALUE_FILE} ${CHARTS} kubermatic
-#	make k8c-seed-apply-settings
+#	make kkp-seed-apply-settings
 #
-#k8c-seed-apply-settings:
-#	test -d ${K8C_SEED_SETTINGS_FILE_FOLDER} && KUBECONFIG=${KKP_MASTER_KUBECONFIG} kubectl apply -f ${KKP_SEED_SETTINGS_FILE_FOLDER} && echo "applied " || echo "settings files ..."
+#kkp-seed-apply-settings:
+#	test -d ${KKP_SEED_SETTINGS_FILE_FOLDER} && KUBECONFIG=${KKP_MASTER_KUBECONFIG} kubectl apply -f ${KKP_SEED_SETTINGS_FILE_FOLDER} && echo "applied " || echo "settings files ..."
 
-all-deployment: k8c-deployment logging-deployment monitoring-deployment backup-deployment #k8c-seed-deployment
+all-deployment: kkp-deployment logging-deployment monitoring-deployment backup-deployment #kkp-seed-deployment
 
 ################## Helpers
-download-k8c-release:
+download-kkp-release:
 	mkdir -p ${KKP_RELEASE_ROOT_FOLDER}/${KKP_VERSION}
 	wget https://github.com/kubermatic/kubermatic/releases/download/${KKP_VERSION}/kubermatic-ee-${KKP_VERSION}-linux-amd64.tar.gz -O- | tar -xz --directory ${KKP_RELEASE_ROOT_FOLDER}/${KKP_VERSION}/
 	rm -rf ${KKP_RELEASE_ROOT_FOLDER}/{KKP_VERSION}/.kube
