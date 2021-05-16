@@ -1,9 +1,0 @@
-ARG KUBERMATIC_VERSION
-## root container for copy command
-FROM quay.io/kubermatic/addons:$KUBERMATIC_VERSION
-
-FROM quay.io/kubermatic/openshift-addons:$KUBERMATIC_VERSION
-LABEL maintainer="ps@loodse.com"
-COPY --from=0 /addons/node-exporter/ /addons/node-exporter/
-ADD ./custom-addon/ /addons/
-RUN echo "Delete non *.yaml files:" && find /addons/*/ -type f -not -name '*.yaml' -print -delete
