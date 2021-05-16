@@ -75,7 +75,7 @@ RUN echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] http://packages.c
     apt-get install google-cloud-sdk -y
 
 # Install govc
-RUN curl -L $(curl -s https://api.github.com/repos/vmware/govmomi/releases/latest | grep browser_download_url | grep govc_linux_amd64 | cut -d '"' -f 4) | gunzip > /usr/local/bin/govc && \
+RUN curl -L $(curl -s https://api.github.com/repos/vmware/govmomi/releases/latest | grep browser_download_url | grep -i govc_linux_x86 | cut -d '"' -f 4) | gunzip > /usr/local/bin/govc && \
     chmod +x /usr/local/bin/govc
 
 # Install Kubectl & Helm & and fubectl depedencies
@@ -94,7 +94,7 @@ RUN RELEASE_URL=$(curl -Ls -o /dev/null -w %{url_effective} https://github.com/m
  wget https://github.com/mikefarah/yq/releases/download/$YQ_LATEST/yq_linux_amd64 -O /usr/bin/yq && chmod +x /usr/bin/yq
 
 # Install KubeOne
-ARG kubeone_version=1.2.0-beta.0
+ARG kubeone_version
 RUN VERSION=$kubeone_version && \
  curl -LO "https://github.com/kubermatic/kubeone/releases/download/v${VERSION}/kubeone_${VERSION}_linux_amd64.zip" && \
  unzip kubeone_${VERSION}_linux_amd64.zip -d kubeone_${VERSION}_linux_amd64 && \
