@@ -1,24 +1,18 @@
 
 ## See https://github.com/kubermatic/kubermatic-installer/releases
-KUBERMATIC_VERSION ?= v2.15.0-rc.3
-ADDON_CUSTOM_REPO ?= 'quay.io/kubermatic/ps-addons'
-ADDON_CUSTOM_REPO_OS ?= ${ADDON_CUSTOM_REPO}
-TAG ?= ${KUBERMATIC_VERSION}
-OSTAG = openshift-${TAG}
+KKP_VERSION ?= v2.17.0  # default value, overwrite for chosen KKP release
+KKP_ADDON_CUSTOM_REPO ?= 'quay.io/kubermatic/ps-addons'
+TAG_POST_FIX ?= ''             # default value, overwrite to build a new addon version for the same KKP version
+TAG ?= ${KKP_VERSION}${TAG_POST_FIX}
 
 .PHONY: docker-release docker-build
 
 docker-build:
-	docker build --build-arg KUBERMATIC_VERSION=${KUBERMATIC_VERSION} -t ${ADDON_CUSTOM_REPO}:${TAG} .
+	docker build --build-arg KKP_VERSION=${KKP_VERSION} -t ${KKP_ADDON_CUSTOM_REPO}:${TAG} .
 
 docker-release: docker-build
-	docker push ${ADDON_CUSTOM_REPO}:${TAG}
+	docker push ${KKP_ADDON_CUSTOM_REPO}:${TAG}
 
-docker-build-os:
-	docker build --build-arg KUBERMATIC_VERSION=${KUBERMATIC_VERSION} -f Dockerfile.openshift -t ${ADDON_CUSTOM_REPO_OS}:${OSTAG}  .
-
-docker-release-os: docker-build-os
-	docker push ${ADDON_CUSTOM_REPO}:${OSTAG}
 
 ############## TRIDENT ADDON
 TRIDENT_INSTALLER_REPO ?= 'quay.io/kubermatic-labs/trident-installer'
