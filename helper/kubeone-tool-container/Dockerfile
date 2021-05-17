@@ -93,6 +93,12 @@ RUN RELEASE_URL=$(curl -Ls -o /dev/null -w %{url_effective} https://github.com/m
  YQ_LATEST="${RELEASE_URL##*/}" && \
  wget https://github.com/mikefarah/yq/releases/download/$YQ_LATEST/yq_linux_amd64 -O /usr/bin/yq && chmod +x /usr/bin/yq
 
+# Install velero
+RUN mkdir /tmp/velero-inst && cd /tmp/velero-inst \
+    && curl -L $(curl -s https://api.github.com/repos/vmware-tanzu/velero/releases/latest | grep browser_download_url | grep -i linux-amd64 | cut -d '"' -f 4) | tar --strip 1 -xzf - \
+    && mv velero /usr/bin && cd \
+    && velero version --client-only
+
 # Install KubeOne
 ARG kubeone_version
 RUN VERSION=$kubeone_version && \
