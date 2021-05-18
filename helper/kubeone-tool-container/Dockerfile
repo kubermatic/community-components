@@ -105,6 +105,11 @@ RUN VERSION=$kubeone_version && \
  curl -LO "https://github.com/kubermatic/kubeone/releases/download/v${VERSION}/kubeone_${VERSION}_linux_amd64.zip" && \
  unzip kubeone_${VERSION}_linux_amd64.zip -d kubeone_${VERSION}_linux_amd64 && \
  mv kubeone_${VERSION}_linux_amd64/kubeone /usr/local/bin
+ 
+# Install k9s
+RUN K9S_RELEASE_URL=$(curl -Ls -o /dev/null -w %{url_effective} https://github.com/derailed/k9s/releases/latest) && \
+ K9S_LATEST="${K9S_RELEASE_URL##*/}" && \
+ wget -c "https://github.com/derailed/k9s/releases/download/${K9S_LATEST}/k9s_Linux_x86_64.tar.gz"  -O - | tar -xz -C /usr/local/bin/
 
 COPY ./.bashrc /root/
 
