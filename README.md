@@ -66,6 +66,7 @@ Name|Description
 [set-build-tags-to-image.sh](helper/set-build-tags-to-image.sh) | Set dedicated build tags to the [Kubermatic Charts](https://github.com/kubermatic/kubermatic/tree/master/charts)
 [untaint_master.sh](helper/untaint_master.sh) | untaints all master nodes, to be able to schedule workload
 [bash-port-scanner.sh](helper/linux-port-scan-without-dependencies/scan.sh) | A Bash bases Port-Scanner which is able to scan ports without any dependencies or tools like nmap
+
 ## Knowledge Base
 Helpful how-tos and detailed documentation:
 
@@ -79,6 +80,13 @@ Name | Description
 [nvidia-gpu-operator](knowledge-base/nvidia-gpu-operator.md) | How to enable GPU support for KKP clusters by [NVIDIA - GPU Operator](https://github.com/NVIDIA/gpu-operator/)
 [offline-setup](knowledge-base/offline-setup.md) | How to run kubermatic in offline environments
 [upload-ova-with-govc](knowledge-base/upload-ova-with-govc.md) | How to upload ova by using `govc`
+
+## Runbook
+Guides how to operate KubeOne / KKP.
+
+Name | Description
+--- | ---
+[manual-backup](./runbook/manual-backup.md) | How to create manual backup for your KKP/KubeOne setup.
 
 ## Troubleshooting
 
