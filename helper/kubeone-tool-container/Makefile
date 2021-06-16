@@ -1,6 +1,5 @@
-
-## See https://github.com/kubermatic/kubermatic-installer/releases
-KUBEONE_VERSION ?= 1.2.1
+## See https://github.com/kubermatic/kubeone/releases
+KUBEONE_VERSION ?= 1.2.3
 DOCKER_REPO ?= 'quay.io/kubermatic-labs/kubeone-tooling'
 FINAL_TAG ?= kubeone-${KUBEONE_VERSION}
 TAG_DATE ?= kubeone-${KUBEONE_VERSION}-$(shell date -I)
@@ -28,3 +27,4 @@ docker-release: docker-build
 	docker push ${DOCKER_REPO}:${FINAL_TAG}
 	docker push ${DOCKER_REPO}:${KUBEONE_VERSION}
 	docker push ${DOCKER_REPO}:latest
+#https://github.com/derailed/k9s/releases/download/v0.24.10/k9s_v0.24.10_Linux_arm64.tar.gz
