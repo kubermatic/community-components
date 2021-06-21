@@ -135,7 +135,7 @@ RUN mkdir /home/${USER}/bin && cd /home/${USER}/bin && \
 COPY ./.bashrc /home/${USER}/
 
 # Install minio Operator Kubectl krew plugin
-RUN kubectl krew install minio
+RUN bash -ic 'kubectl krew install minio'
 
 # Install fubectl dependencies
 RUN bash -ic 'kinstall'
