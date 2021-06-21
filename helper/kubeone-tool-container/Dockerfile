@@ -134,6 +134,9 @@ RUN mkdir /home/${USER}/bin && cd /home/${USER}/bin && \
     chmod +x /home/${USER}/bin/powerline-go
 COPY ./.bashrc /home/${USER}/
 
+# Install minio Operator Kubectl krew plugin
+RUN kubectl krew install minio
+
 # Install fubectl dependencies
 RUN bash -ic 'kinstall'
 
