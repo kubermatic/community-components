@@ -1,0 +1,12 @@
+### As reference: https://github.com/metallb/metallb/blob/v0.9.6/manifests/example-config.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  namespace: metallb-v2
+  name: config
+  labels:
+    #needed to ensure config get read in
+    metallb-config-version: '{{ .Variables.configYaml | adler32sum }}'
+data:
+  config: |
+{{ printf .Variables.configYaml | indent 4 }}

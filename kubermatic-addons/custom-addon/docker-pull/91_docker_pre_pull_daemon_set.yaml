@@ -1,0 +1,128 @@
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: docker-pull-config
+  namespace: kube-system
+type: kubernetes.io/dockercfg
+data:
+  ### base64 encoded config.json
+  .dockercfg: xxxxx
+  ### base64 encoded auth string (itself base64 encoded username:password)
+  auth: xxxxx
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: docker-pre-pull
+  namespace: kube-system
+  labels:
+    app: docker-pre-pull
+spec:
+  selector:
+    matchLabels:
+      app: docker-pre-pull
+  template:
+    metadata:
+      labels:
+        app: docker-pre-pull
+    spec:
+      priorityClassName: system-node-critical
+      ### needs to best to get schedueled before CNI starts
+      hostNetwork: true
+      tolerations:
+        - effect: NoSchedule
+          operator: Exists
+        - key: CriticalAddonsOnly
+          operator: Exists
+        - effect: NoExecute
+          operator: Exists
+      initContainers:
+        - name: docker-pre-puller
+          #{{ Registry "gcr.io" }}/
+          image: quay.io/kubermatic/go-docker:16.1-1903-0
+          command:
+            - /bin/bash
+          args:
+            - -c
+            - |
+              find /root/.docker/
+              ls -la /root/.docker/config.json
+              if [ -S /var/run/docker.sock ]; then
+                echo "start prepulling images...........!"
+                for img in ${PREPULL_IMAGES}; do docker pull ${img}; done
+              else
+                echo "no docker found -> try crictl"
+                VERSION="v1.20.0"
+                wget https://github.com/kubernetes-sigs/cri-tools/releases/download/$VERSION/crictl-$VERSION-linux-amd64.tar.gz -O- | tar -xz
+                echo "start prepulling images with crictl...........!"
+                for img in ${PREPULL_IMAGES}; do
+                  echo pull ${img}
+                  ./crictl -r unix:///run/containerd/containerd.sock pull --auth ${AUTH_SECRET} ${img}
+                  done
+              fi
+
+          volumeMounts:
+            - name: docker
+              mountPath: /var/run
+            - name: run
+              mountPath: /run
+            - name: dockercfg
+              mountPath: /root/.docker
+          env:
+            - name: AUTH_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: docker-pull-config
+                  key: auth
+            - name: PREPULL_IMAGES
+              ### find images: kubectl get pods -A -o jsonpath='{range .items[*]}{@.spec.containers[*].image}{"\n\n"}{end}' | tr " " "\n" | sort -u
+              ### find init images: kubectl get pods -A -o jsonpath='{range .items[*]}{@.spec.initContainers[*].image}{"\n\n"}{end}' | tr " " "\n" | sort -u
+              value: |
+                docker.io/calico/kube-controllers:v3.16.5
+                docker.io/calico/node:v3.16.5
+                docker.io/calico/cni:v3.16.5
+                docker.io/calico/kube-controllers:v3.8.0
+                docker.io/calico/node:v3.8.0
+                docker.io/calico/cni:v3.8.0
+                docker.io/coredns/coredns:1.7.0
+                docker.io/kubernetesui/metrics-scraper:v1.0.3
+                docker.io/dexidp/dex:v2.27.0
+                docker.io/grafana/grafana:7.4.3
+                docker.io/grafana/loki:2.1.0
+                docker.io/grafana/promtail:2.1.0
+                docker.io/jimmidyson/configmap-reload:v0.3.0
+                docker.io/lmierzwa/karma:v0.80
+                docker.io/prom/blackbox-exporter:v0.18.0
+                docker.io/sstarcher/helm-exporter:0.4.3
+                docker.io/metallb/controller:v0.9.6
+                docker.io/metallb/speaker:v0.9.6
+                docker.io/nfvpe/multus:v3.6
+                docker.io/busybox
+                docker.io/minio/minio:RELEASE.2021-03-04T00-53-13Z
+                docker.io/envoyproxy/envoy-alpine:v1.16.0
+                docker.io/envoyproxy/envoy-alpine:v1.17.1
+                docker.io/kumina/openvpn-exporter:v0.2.2
+                docker.io/kubernetesui/dashboard:v2.0.4
+                docker.io/kubermatic/machine-controller:v1.27.8
+                docker.io/velero/velero-plugin-for-aws:v1.1.0
+                docker.io/velero/velero:v1.5.3
+      containers:
+        - name: pause
+          image: gcr.io/google_containers/pause
+      volumes:
+        - name: docker
+          hostPath:
+            path: /var/run
+        - name: run
+          hostPath:
+            path: /run
+        - name: dockercfg
+          secret:
+            optional: false
+            secretName: docker-pull-config
+            items:
+              - key: .dockercfg
+                path: config.json
+      terminationGracePeriodSeconds: 0
+

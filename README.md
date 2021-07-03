@@ -27,7 +27,7 @@ Name|Description
 
 ## Kubermatic Addons
 
-Configuration and tooling for common used [Kubermatic Addons](https://docs.kubermatic.com/kubermatic/master/advanced/addons/) for user cluster customization.
+Configuration and tooling for common used [KKP - Guides - Addon](https://docs.kubermatic.com/kubermatic/master/guides/addons/) for user cluster customization.
 
 Name|Description
 ---|---
@@ -36,14 +36,17 @@ Name|Description
 [custom-addon/dns-resolve-overwrite](kubermatic-addons/custom-addon/dns-resolve-overwrite) | A DaemonSet with privileged permissions to overwrite the host DNS at the kubernetes nodes
 [custom-addon/echoserver](kubermatic-addons/custom-addon/echoserver) | Simple echo server application as an example workload deployment with ingress config
 [custom-addon/helm-operator](kubermatic-addons/custom-addon/helm-operator) | Deploys the [FluxCD - Helm Operator](https://github.com/fluxcd/helm-operator) for managing additional deployment trough Helm by CRD
-[kubermatic-addons/custom-addon/ingress-nginx](kubermatic-addons/custom-addon/ingress-nginx) | Deploys the [Ingress Nginx Controller](https://github.com/kubernetes/ingress-nginx) to the user cluster
+[custom-addon/ingress-nginx](kubermatic-addons/custom-addon/ingress-nginx) | Deploys the [Ingress Nginx Controller](https://github.com/kubernetes/ingress-nginx) to the user cluster
 [custom-addon/loki-stack](kubermatic-addons/custom-addon/loki-stack) | (Requires Helm Operator) Add Grafana Loki stack based on [Grafana Loki Charts](https://grafana.github.io/loki/charts)
 [custom-addon/metallb](kubermatic-addons/custom-addon/metallb) | MetalLB cluster addon for on-premise user cluster without native LB support
+[custom-addon/metallb-v2](kubermatic-addons/custom-addon/metallb-v2) | [MetalLB](https://metallb.universe.tf) cluster addon for on-premise user cluster without native LB support - with advanced config options, see [MetalLB - Configuration](https://metallb.universe.tf/configuration). Used if IP range config is not enough.
 [custom-addon/theia-ide](kubermatic-addons/custom-addon/theia-ide) | Customized KKP addon for quickly using [Eclipse Theia IDE](https://theia-ide.org/) at your Kubernetes cluster.
 [custom-addon/trident-installer](kubermatic-addons/custom-addon/trident-installer)| Addon for [NetApp Trident](https://github.com/NetApp/trident) storage support into a user cluster
 [custom-addon/openebs](kubermatic-addons/custom-addons/openebs) | [OpenEBS](https://openebs.io/) addon for on-premise users without distributed storage
 [custom-addon/amd-gpu](kubermatic-addons/custom-addons/amd-gpu) | [AMD-GPU](https://github.com/RadeonOpenCompute/k8s-device-plugin) device plugin addon
 [custom-addon/kubeflow](kubermatic-addons/custom-addons/kubeflow) | [Kubeflow](https://github.com/kubermatic/flowmatic) Machine Learning Toolkit
+[custom-addon/ntp-sync](kubermatic-addons/custom-addon/ntp-sync) | DaemonSet to execute `ntpdate primary secondary` scheduled on every node of a cluster
+[custom-addon/docker-pull](kubermatic-addons/custom-addon/docker-pull) | DaemonSet to pull e.g. `docker.io` based images on every node with a docker-secret, to prevent rate-limited infrastructure pods.
 
 ## Helper
 List of helper scripts and tools
@@ -66,6 +69,7 @@ Name|Description
 [set-build-tags-to-image.sh](helper/set-build-tags-to-image.sh) | Set dedicated build tags to the [Kubermatic Charts](https://github.com/kubermatic/kubermatic/tree/master/charts)
 [untaint_master.sh](helper/untaint_master.sh) | untaints all master nodes, to be able to schedule workload
 [bash-port-scanner.sh](helper/linux-port-scan-without-dependencies/scan.sh) | A Bash bases Port-Scanner which is able to scan ports without any dependencies or tools like nmap
+[pvc.test.yaml](helper/pvc.test.yaml) | small pod + pvc to test if storage provisioning works
 
 ## Knowledge Base
 Helpful how-tos and detailed documentation:

@@ -3,7 +3,7 @@ kind: AddonConfig
 metadata:
   name: metallb
 spec:
-  description: "MetalLB is an on-premise LoadBalancer implementation based on ARP and NDP"
+  description: "MetalLB is an on-premise LoadBalancer implementation based on ARP and NDP (Ensure strict ARP is enabled)"
   formSpec:
   - displayName: Address Pool Range
     internalName: addressPoolRange
