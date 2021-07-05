@@ -47,6 +47,7 @@ Name|Description
 [custom-addon/kubeflow](kubermatic-addons/custom-addons/kubeflow) | [Kubeflow](https://github.com/kubermatic/flowmatic) Machine Learning Toolkit
 [custom-addon/ntp-sync](kubermatic-addons/custom-addon/ntp-sync) | DaemonSet to execute `ntpdate primary secondary` scheduled on every node of a cluster
 [custom-addon/docker-pull](kubermatic-addons/custom-addon/docker-pull) | DaemonSet to pull e.g. `docker.io` based images on every node with a docker-secret, to prevent rate-limited infrastructure pods.
+[custom-addon/kube-proxy-ipvs-patch](kubermatic-addons/custom-addon/kube-proxy-ipvs-patch) | Custom overwrite Addon to patch IPVS mode to `strictARP: true`.
 
 ## Helper
 List of helper scripts and tools
@@ -90,6 +91,7 @@ Guides how to operate KubeOne / KKP.
 
 Name | Description
 --- | ---
+[metallb-service-connection-drops-ipvs-strict-arp](./runbook/metallb/metallb-service-connection-drops-ipvs-strict-arp.md) | Connection Drops of Service Type LoadBalancer provided by MetalLB.
 [manual-backup](./runbook/manual-backup.md) | How to create manual backup for your KKP/KubeOne setup.
 
 ## Troubleshooting
