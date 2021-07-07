@@ -1,0 +1,1 @@
+For me Details see [runbook/metallb/metallb-service-connection-drops-ipvs-strict-arp.md](../../../runbook/metallb/metallb-service-connection-drops-ipvs-strict-arp.md)
