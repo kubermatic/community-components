@@ -92,6 +92,7 @@ Guides how to operate KubeOne / KKP.
 Name | Description
 --- | ---
 [metallb-service-connection-drops-ipvs-strict-arp](./runbook/metallb/metallb-service-connection-drops-ipvs-strict-arp.md) | Connection Drops of Service Type LoadBalancer provided by MetalLB.
+[user-cluster-prometheus.md](./runbook/user-cluster-prometheus.md) | Crash Looping Prometheus at KKP user cluster namespace
 [manual-backup](./runbook/manual-backup.md) | How to create manual backup for your KKP/KubeOne setup.
 
 ## Troubleshooting
