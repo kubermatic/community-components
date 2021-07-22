@@ -71,6 +71,7 @@ Name|Description
 [untaint_master.sh](helper/untaint_master.sh) | untaints all master nodes, to be able to schedule workload
 [bash-port-scanner.sh](helper/linux-port-scan-without-dependencies/scan.sh) | A Bash bases Port-Scanner which is able to scan ports without any dependencies or tools like nmap
 [pvc.test.yaml](helper/pvc.test.yaml) | small pod + pvc to test if storage provisioning works
+[refresh-all-service-accounts-in-cluster.sh](helper/refresh-all-service-accounts-in-cluster.sh) | script to refresh all service accounts token (stored as secrets) and restart dependent pods semi-automatic
 
 ## Knowledge Base
 Helpful how-tos and detailed documentation:
