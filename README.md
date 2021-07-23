@@ -42,9 +42,9 @@ Name|Description
 [custom-addon/metallb-v2](kubermatic-addons/custom-addon/metallb-v2) | [MetalLB](https://metallb.universe.tf) cluster addon for on-premise user cluster without native LB support - with advanced config options, see [MetalLB - Configuration](https://metallb.universe.tf/configuration). Used if IP range config is not enough.
 [custom-addon/theia-ide](kubermatic-addons/custom-addon/theia-ide) | Customized KKP addon for quickly using [Eclipse Theia IDE](https://theia-ide.org/) at your Kubernetes cluster.
 [custom-addon/trident-installer](kubermatic-addons/custom-addon/trident-installer)| Addon for [NetApp Trident](https://github.com/NetApp/trident) storage support into a user cluster
-[custom-addon/openebs](kubermatic-addons/custom-addons/openebs) | [OpenEBS](https://openebs.io/) addon for on-premise users without distributed storage
-[custom-addon/amd-gpu](kubermatic-addons/custom-addons/amd-gpu) | [AMD-GPU](https://github.com/RadeonOpenCompute/k8s-device-plugin) device plugin addon
-[custom-addon/kubeflow](kubermatic-addons/custom-addons/kubeflow) | [Kubeflow](https://github.com/kubermatic/flowmatic) Machine Learning Toolkit
+[custom-addon/openebs](kubermatic-addons/custom-addon/openebs)   | [OpenEBS](https://openebs.io/) addon for on-premise users without distributed storage
+[custom-addon/amd-gpu](kubermatic-addons/custom-addon/amd-gpu)   | [AMD-GPU](https://github.com/RadeonOpenCompute/k8s-device-plugin) device plugin addon
+[custom-addon/kubeflow](kubermatic-addons/custom-addon/kubeflow) | [Kubeflow](https://github.com/kubermatic/flowmatic) Machine Learning Toolkit
 [custom-addon/ntp-sync](kubermatic-addons/custom-addon/ntp-sync) | DaemonSet to execute `ntpdate primary secondary` scheduled on every node of a cluster
 [custom-addon/docker-pull](kubermatic-addons/custom-addon/docker-pull) | DaemonSet to pull e.g. `docker.io` based images on every node with a docker-secret, to prevent rate-limited infrastructure pods.
 [custom-addon/kube-proxy-ipvs-patch](kubermatic-addons/custom-addon/kube-proxy-ipvs-patch) | Custom overwrite Addon to patch IPVS mode to `strictARP: true`.
