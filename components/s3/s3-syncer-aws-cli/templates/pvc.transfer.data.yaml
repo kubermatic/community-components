@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: s3-syncer-transfer-storage
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ .Values.s3syncer.storage.size }}
+  {{- if .Values.s3syncer.storage.class }}
+  storageClassName: {{ .Values.s3syncer.storage.class }}
+  {{- end }}

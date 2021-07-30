@@ -1,0 +1,16 @@
+{{- if .Values.s3syncer.target.azuregateway.enabled -}}
+apiVersion: v1
+kind: Service
+metadata:
+  name: minio-azure-gateway
+  labels:
+    app: minio-azure-gateway
+spec:
+  type: ClusterIP
+  selector:
+    app: minio-azure-gateway
+  ports:
+    - name: http
+      port: 9000
+      targetPort: http
+{{- end }}

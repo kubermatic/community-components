@@ -1,0 +1,104 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  labels:
+    job: s3-syncer
+  name: s3-syncer
+spec:
+  schedule: "{{ .Values.s3syncer.cron.schedule }}"
+  concurrencyPolicy: Forbid
+  failedJobsHistoryLimit: 3
+  successfulJobsHistoryLimit: 1
+  jobTemplate:
+    metadata:
+      labels:
+        job: s3-syncer
+    spec:
+      activeDeadlineSeconds: 7200
+      backoffLimit: 5
+      parallelism: 1
+      template:
+        metadata:
+          labels:
+            job: s3-syncer
+        spec:
+          terminationGracePeriodSeconds: 10
+          restartPolicy: Never
+          tolerations:
+            - effect: NoSchedule
+              key: node-role.kubernetes.io/master
+          containers:
+          - image: {{ .Values.s3syncer.image.repository }}:{{ .Values.s3syncer.image.tag }}
+            imagePullPolicy: IfNotPresent
+            name: aws-client
+            resources:
+              limits:
+                cpu: 500m
+                memory: 500Mi
+            volumeMounts:
+              - mountPath: /config
+                name: config
+                readOnly: true
+              - mountPath: /data
+                name: tmp-data-vol
+            env:
+{{- if .Values.s3syncer.target.azuregateway.enabled }}
+            - name: AZURE_STORAGE_ACCOUNT
+              value: {{ .Values.s3syncer.target.azuregateway.azureStorageAcct }}
+            - name: AZURE_STORAGE_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: azure-storage-key
+                  key: key
+{{- end }}
+            command:
+              - /bin/bash
+              - -c
+              - |
+                source /config/env
+                set -Eeuo pipefail
+                trap "echo 'error occured, sleep for 60 sec!'; sleep 60" ERR
+
+                mkdir ~/.aws && cp /config/* ~/.aws/
+                export AWS_EC2_METADATA_DISABLED=true 
+                echo --------- source ---------
+                env | grep SOURCE_
+                aws s3 --profile source $SOURCE_SSL_VERIFY_FLAG --endpoint-url $SOURCE_URL ls s3://$SOURCE_BUCKET || echo done!
+                echo --------------------------
+                echo --------- target ---------
+                env | grep TARGET_
+                aws s3 --profile target $TARGET_SSL_VERIFY_FLAG --endpoint-url $TARGET_URL ls s3://$TARGET_BUCKET || echo done!
+                echo --------------------------
+                echo --- download to source ---
+                if [[ "$SOURCE_BUCKET" == "" ]]; then
+                  for bucket in `aws s3 --profile source $SOURCE_SSL_VERIFY_FLAG --endpoint-url $SOURCE_URL ls | awk '{print $3}'`; do
+                    aws s3 --profile source $SOURCE_SSL_VERIFY_FLAG --endpoint-url $SOURCE_URL --delete sync s3://$bucket/ /data/$bucket
+                  done
+                else
+                  aws s3 --profile source $SOURCE_SSL_VERIFY_FLAG --endpoint-url $SOURCE_URL sync --delete s3://$SOURCE_BUCKET/ /data/
+                fi
+                echo --------------------------
+
+                if [[ "$TARGET_RENAME_CHAR" == true ]]; then
+                echo --- REMOVE incompatible char ':' ----------
+                for file in $(find /data/ -type f); do mv -v "${file}" "${file//:/-}" || true ; done
+                echo --------------------------
+                fi
+
+                echo --- upload to target -----
+                aws s3 --profile target $TARGET_SSL_VERIFY_FLAG --endpoint-url $TARGET_URL sync --delete /data/ s3://$TARGET_BUCKET/
+                echo --------------------------
+                echo --- SYNC JOB FINISHED ----
+                echo --------- source ---------
+                aws s3 --profile source $SOURCE_SSL_VERIFY_FLAG --endpoint-url $SOURCE_URL ls s3://$SOURCE_BUCKET
+                echo --------------------------
+                echo --------- target ---------
+                aws s3 --profile target $TARGET_SSL_VERIFY_FLAG --endpoint-url $TARGET_URL ls s3://$TARGET_BUCKET
+                echo --------------------------
+          volumes:
+            - name: config
+              configMap:
+                name: s3-syncer
+            - name: tmp-data-vol
+              persistentVolumeClaim:
+                claimName: s3-syncer-transfer-storage

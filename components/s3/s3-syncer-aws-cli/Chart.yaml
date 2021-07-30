@@ -1,0 +1,14 @@
+apiVersion: v2
+name: s3-syncer-aws-cli
+description: s3-syncer based on the `aws s3` cli
+version: 0.1.1
+type: application
+appVersion: 2.2.13
+keywords:
+  - kubermatic
+  - minio
+  - s3
+  - aws
+maintainers:
+  - name: Kubermatic GmbH
+    email: ps@kubermatic.com

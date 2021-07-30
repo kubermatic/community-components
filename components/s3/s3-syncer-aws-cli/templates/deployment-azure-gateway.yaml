@@ -1,0 +1,41 @@
+{{- if .Values.s3syncer.target.azuregateway.enabled -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: minio-azure-gateway
+  labels:
+    app: minio-azure-gateway
+spec:
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: minio-azure-gateway
+  template:
+    metadata:
+      labels:
+        app: minio-azure-gateway
+    spec:
+      containers:
+      - name: azure-gateway
+        image: "{{ .Values.s3syncer.target.azuregateway.image.repository }}:{{ .Values.s3syncer.target.azuregateway.image.tag }}"
+        args:
+        - gateway
+        - azure
+        env:
+        - name: MINIO_ROOT_USER
+          value: {{ .Values.s3syncer.target.accessKey }}
+        - name: MINIO_ROOT_PASSWORD
+          value: {{ .Values.s3syncer.target.secretKey }}
+        - name: AZURE_STORAGE_ACCOUNT
+          value: {{ .Values.s3syncer.target.azuregateway.azureStorageAcct }}
+        - name: AZURE_STORAGE_KEY
+          valueFrom:
+            secretKeyRef:
+              name: azure-storage-key
+              key: key
+        ports:
+        - name: http
+          containerPort: 9000
+          protocol: TCP
+{{- end }}
