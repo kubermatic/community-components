@@ -1,0 +1,41 @@
+s3syncer:
+  cron:
+    schedule: '*/30 * * * *'
+  image:
+    repository: docker.io/amazon/aws-cli
+    tag: 2.2.13
+  storage:
+    size: 100Gi
+    class: ''
+  source:
+    # These settings are required. Keys must be alphanumeric.
+    url: "http://minio.minio.svc.cluster.local:9000"
+    bucket: ''
+    accessKey: '' # 32 byte long
+    secretKey: '' # 64 byte long
+    insecure_skip_verify: false
+    ca_bundle: ''
+#    ca_bundle: |-
+#      -----BEGIN CERTIFICATE-----
+#      xxxxxxxx EXAMPLE xxxxxxxxxx
+#      -----END CERTIFICATE-----
+  target:
+    azuregateway:
+      enabled: false # if true.. then we use azure as target
+      image:
+        repository: docker.io/minio/minio
+        tag: RELEASE.2021-03-04T00-53-13Z
+      azureStorageKey: ''
+      azureStorageAcct: ''
+    # These settings are required. Keys must be alphanumeric.
+    url: "https://s3.amazonaws.com"
+    bucket: ''
+    accessKey: '' # 32 byte long
+    secretKey: '' # 64 byte long
+    insecure_skip_verify: false
+    renameChar: false
+    ca_bundle: ''
+#    ca_bundle: |-
+#      -----BEGIN CERTIFICATE-----
+#      xxxxxxxx EXAMPLE xxxxxxxxxx
+#      -----END CERTIFICATE-----
