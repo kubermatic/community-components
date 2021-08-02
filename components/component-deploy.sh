@@ -5,7 +5,7 @@ set +x
 
 DEPLOY_S3_SYNCER="s3-syncer"
 DEPLOY_SGW="service-gateway"
-DEPLOY_WACKER_CERT="wacker-cert-update-svc"
+DEPLOY_CERT="cert-update-svc"
 DEPLOY_THANOS_SEED_INGRESS="thanos-seed-ingress"
 
 if [[ $# -lt 4 ]] || [[ "$1" == "--help" ]]; then
@@ -67,8 +67,8 @@ case "$DEPLOY_STACK" in
     deploy s3-syncer-aws-cli s3-syncer s3/s3-syncer-aws-cli
     ;;
 
-  "$DEPLOY_WACKER_CERT")
-    deploy wacker-cert-upd-svc cert-manager wacker-cert-update-svc
+  "$DEPLOY_CERT_UPDATE")
+    deploy cert-upd-svc cert-manager cert-update-svc
     ;;
 
   "$DEPLOY_THANOS_SEED_INGRESS")
