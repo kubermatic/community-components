@@ -37,7 +37,7 @@ In our case it's the local minio deployed by KKP:
 ```
 4. Connect to the Minio service by port-forward to access the Storage by localhost:
 ```bash
-kubectl port-forward -n minio minio-54dcf47d46-6ztjz 9000:9000
+kubectl port-forward -n minio svc/minio 9000:9000
 ```
 check connection:
 ```bash
