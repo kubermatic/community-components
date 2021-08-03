@@ -76,6 +76,11 @@ chown -R 1000:1000 /data/*
 ```
 The copy of restic based backup under your folder `./backup-master` can now get used by the kubeone restore procedure if needed, see [KubeOne Manual Cluster Recovery](https://docs.kubermatic.com/kubeone/master/guides/manual_cluster_recovery/) 
 
+Sometime for restrict a password is needed, therefore you could also use the `restric` container and create the environment varliable :
+```
+docker run -it -e RESTIC_PASSWORD="`echo xxxxBASE64_ENCODEDxxxx | base64 -d`" restic/restic:0.9.6
+```
+
 **Alternatives to get the Snapshot etcd backup**:
 - k cp
 - docker
