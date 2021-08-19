@@ -4,7 +4,7 @@
 
 For dynamic provisioning of nodes Kubermatic needs access to the vSphere API endpoint and depending on the chosen permission concept at least the following permissions:
 
-- [Doc Permissions](https://docs.kubermatic.com/kubermatic/master/requirements/cloud_provider/_vsphere/#permissions)
+- [Doc Permissions](https://docs.kubermatic.com/kubermatic/master/architecture/requirements/support_policy/provider_support_matrix/vsphere/vsphere/)
 - Alternative TF [kubermatic-vsphere-permissions-terraform](https://github.com/kubermatic-labs/kubermatic-vsphere-permissions-terraform)
 
 ## User Cluster / Network separation
