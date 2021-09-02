@@ -1,0 +1,39 @@
+
+# commit: https://github.com/kubermatic/managed-service/commit/803cdfabff51cf872d4cca4dba93cd7f0ac7ae3c
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+{{- with .Values.serviceGateway.ingress.thanos }}
+metadata:
+  annotations:
+    cert-manager.io/cluster-issuer: {{ .certIssuer.clusterIssuerName }}
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/auth-type: basic
+    nginx.ingress.kubernetes.io/auth-secret: thanos-basic-auth
+    nginx.ingress.kubernetes.io/auth-realm: 'Authentication Required - Thanos'
+    ingress.kubernetes.io/auth-type: basic
+    ingress.kubernetes.io/auth-secret: thanos-basic-auth
+    ingress.kubernetes.io/auth-realm: "Authentication Required - Thanos"
+  name: thanos
+  namespace: monitoring
+spec:
+  defaultBackend:
+    service:
+      name: prometheus-thanos-query
+      port:
+        number: 10902
+  rules:
+    - host: {{ required "A hostname value for .Values.serviceGateway.ingress.thanos.host entry required!" .host }}
+      http:
+        paths:
+          - backend:
+              service:
+                name: {{ .targetService.name }}
+                port:
+                  number: {{ .targetService.port }}
+            path: /
+            pathType: ImplementationSpecific
+  tls:
+  - hosts:
+    - {{ .host }}
+    secretName: thanos-tls
+{{- end }}

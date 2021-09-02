@@ -1,0 +1,223 @@
+# Copyright 2021 The Kubermatic Kubernetes Platform contributors.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+{{- if eq .Values.serviceGateway.mode "server" }}
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: service-gw-server
+  name: service-gw-server
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: service-gw-server
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+    type: RollingUpdate
+  template:
+    metadata:
+      annotations:
+        prometheus.io/path: /metrics
+        prometheus.io/port: "9176"
+        prometheus.io/scrape: "true"
+      labels:
+        app: service-gw-server
+    spec:
+      containers:
+
+      - name: openvpn-server
+        image: {{ .Values.serviceGateway.openvpn.image.repository }}:{{ .Values.serviceGateway.openvpn.image.tag }}
+        imagePullPolicy: {{ .Values.serviceGateway.openvpn.image.pullPolicy }}
+        command:
+        - /usr/sbin/openvpn
+        args:
+{{- if eq .Values.serviceGateway.openvpn.protocol "TCP" }}
+        - --proto
+        - tcp
+{{- else }}
+        - --proto
+        - udp
+        {{- if .Values.serviceGateway.openvpn.tunMTU }}
+        - --tun-mtu
+        - {{ .Values.serviceGateway.openvpn.tunMTU | quote }}
+        {{- end }}
+        {{- if .Values.serviceGateway.openvpn.mssFix }}
+        - --mssfix
+        - {{ .Values.serviceGateway.openvpn.mssFix | quote }}
+        {{- end }}
+{{- end }}
+        - --dev
+        - tun
+        - --mode
+        - server
+        - --lport
+        - "1194"
+        - --server
+        - 169.254.0.0
+        - 255.255.255.0
+        - --ca
+        - /etc/openvpn/pki/server/ca.crt
+        - --cert
+        - /etc/openvpn/pki/server/tls.crt
+        - --key
+        - /etc/openvpn/pki/server/tls.key
+        - --dh
+        - none
+        - --duplicate-cn
+        - --client-config-dir
+        - /etc/openvpn/clients
+        - --status
+        - /run/openvpn/openvpn-status
+        - --status-version
+        - "3"
+        - --cipher
+        - AES-256-GCM
+        - --auth
+        - SHA1
+        - --keysize
+        - "256"
+        - --script-security
+        - "2"
+        - --ping
+        - "5"
+        - --verb
+        - "3"
+        - --log
+        - /dev/stdout
+        - --route
+        - 169.254.100.100
+        - 255.255.255.255
+        ports:
+        - containerPort: 1194
+          protocol: TCP
+        readinessProbe:
+          exec:
+            command:
+            - test
+            - -s
+            - /run/openvpn/openvpn-status
+          failureThreshold: 3
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          successThreshold: 1
+          timeoutSeconds: 1
+        resources:
+{{ toYaml .Values.serviceGateway.containers.openvpn.resources | indent 10 }}
+        securityContext:
+          privileged: true
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /etc/openvpn/pki/server
+          name: service-gw-server-certificates
+          readOnly: true
+        - mountPath: /etc/openvpn/clients
+          name: service-gw-client-configs
+          readOnly: true
+        - mountPath: /run/openvpn
+          name: openvpn-status
+
+      - name: ip-fixup
+        image: {{ .Values.serviceGateway.openvpn.image.repository }}:{{ .Values.serviceGateway.openvpn.image.tag }}
+        imagePullPolicy: {{ .Values.serviceGateway.openvpn.image.pullPolicy }}
+        command:
+        - /bin/bash
+        args:
+        - -c
+        - |-
+          while true; do sysctl -w net.ipv4.ip_forward=1;
+{{- if eq .Values.serviceGateway.openvpn.protocol "TCP" }}
+            if ! iptables -t mangle -C INPUT -p tcp --tcp-flags SYN,RST SYN --dport 1194 -j TCPMSS --set-mss 1300 &>/dev/null; then
+             iptables -t mangle -A INPUT -p tcp --tcp-flags SYN,RST SYN --dport 1194 -j TCPMSS --set-mss 1300
+            fi
+{{- end }}
+            sleep 30;
+          done
+        resources:
+{{ toYaml .Values.serviceGateway.containers.ipFixup.resources | indent 10 }}
+        securityContext:
+          privileged: true
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+
+      - name: openvpn-exporter
+        image: {{ .Values.serviceGateway.openvpnExporter.image.repository }}:{{ .Values.serviceGateway.openvpnExporter.image.tag }}
+        imagePullPolicy: {{ .Values.serviceGateway.openvpnExporter.image.pullPolicy }}
+        command:
+        - /bin/openvpn_exporter
+        args:
+        - -openvpn.status_paths
+        - /run/openvpn/openvpn-status
+        ports:
+        - containerPort: 9176
+          protocol: TCP
+        resources:
+{{ toYaml .Values.serviceGateway.containers.openvpnExporter.resources | indent 10 }}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /run/openvpn
+          name: openvpn-status
+
+      initContainers:
+      - name: iptables-init
+        image: {{ .Values.serviceGateway.openvpn.image.repository }}:{{ .Values.serviceGateway.openvpn.image.tag }}
+        imagePullPolicy: {{ .Values.serviceGateway.openvpn.image.pullPolicy }}
+        command:
+        - /bin/bash
+        args:
+        - -c
+        - |
+          # DNAT traffic from CNI interface to "virtual IP" (169.254.100.100)
+          {{- range .Values.serviceGateway.services }}
+          iptables -t nat -A PREROUTING -i eth0 -p tcp --dport {{ .internalPort }} -j DNAT --to-destination 169.254.100.100
+          {{- end }}
+
+          # forward the traffic to VIP into the tunnel
+          iptables -A FORWARD -p tcp -d 169.254.100.100 -m state --state NEW,ESTABLISHED,RELATED -j ACCEPT
+
+          # masquerade source IP to tun0 IP:
+          iptables -t nat -A POSTROUTING -o tun0 -j MASQUERADE
+        resources:
+{{ toYaml .Values.serviceGateway.containers.iptablesInit.resources | indent 10 }}
+        securityContext:
+          capabilities:
+            add:
+            - NET_ADMIN
+            - NET_RAW
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - name: service-gw-server-certificates
+        secret:
+          defaultMode: 420
+          secretName: service-gw-server-certificates
+      - configMap:
+          defaultMode: 420
+          name: service-gw-client-configs
+        name: service-gw-client-configs
+      - emptyDir: {}
+        name: openvpn-status
+
+{{- end }}

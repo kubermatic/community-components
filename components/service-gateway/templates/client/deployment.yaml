@@ -1,0 +1,156 @@
+# Copyright 2021 The Kubermatic Kubernetes Platform contributors.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+{{- if eq .Values.serviceGateway.mode "client" }}
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: service-gw-client
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      role: service-gw-client
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        role: service-gw-client
+    spec:
+      containers:
+      - name: openvpn-client
+        args:
+        - --config
+        - /etc/openvpn/config/config
+        command:
+        - /usr/sbin/openvpn
+        image: {{ .Values.serviceGateway.openvpn.image.repository }}:{{ .Values.serviceGateway.openvpn.image.tag }}
+        imagePullPolicy: {{ .Values.serviceGateway.openvpn.image.pullPolicy }}
+        livenessProbe:
+          exec:
+            command:
+            - /bin/ping
+            - -c
+            - "1"
+            - -w
+            - "5"
+            - 169.254.0.1
+          failureThreshold: 3
+          initialDelaySeconds: 60
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 1
+        readinessProbe:
+          exec:
+            command:
+            - /bin/ping
+            - -c
+            - "1"
+            - -w
+            - "5"
+            - 169.254.0.1
+          failureThreshold: 3
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 1
+        resources:
+{{ toYaml .Values.serviceGateway.containers.openvpn.resources | indent 10 }}
+        securityContext:
+          privileged: true
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /etc/openvpn/config
+          name: service-gw-client-config
+          readOnly: true
+        - mountPath: /etc/openvpn/certs
+          name: service-gw-client-certificates
+          readOnly: true
+
+      - name: dnat-controller
+        image: {{ .Values.serviceGateway.openvpn.image.repository }}:{{ .Values.serviceGateway.openvpn.image.tag }}
+        imagePullPolicy: {{ .Values.serviceGateway.openvpn.image.pullPolicy }}
+        command:
+        - bash
+        - -ec
+        - |
+          # forward the traffic from the tunnel interface
+          echo 1 > /proc/sys/net/ipv4/ip_forward
+          iptables -A FORWARD -i tun0 -m state --state NEW,ESTABLISHED,RELATED -j ACCEPT
+
+          # masquerade source IP to eth0 IP:
+          iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
+
+          # make sure we have two chains:
+          iptables -t nat -N host_dnat || true
+          iptables -t nat -N host_dnat_inactive || true
+          iptables -t nat -D PREROUTING -j host_dnat || true
+          iptables -t nat -D PREROUTING -j host_dnat_inactive || true
+
+          while true; do
+            iptables -t nat -F host_dnat_inactive || true
+            
+            # DNAT traffic from the tunnel interface to the service IP
+            {{- range .Values.serviceGateway.services }}
+            {{- if .clientService.headless }}
+            targetIP=$(kubectl get ep {{ .clientService.name }} -n {{ .clientService.namespace }} -o json | jq -r '.subsets[0].addresses[{{ .clientService.headlessInstance }}].ip')
+            {{- else }}
+            targetIP=$(kubectl get svc {{ .clientService.name }} -n {{ .clientService.namespace }} -o json | jq -r '.spec.clusterIP')
+            {{- end }}
+            if [ -z "$targetIP" ] || [ "$targetIP" = "null" ]; then
+              echo "Target IP cannot be retrieved for the service {{ .clientService.namespace }}/{{ .clientService.name }}"
+            else
+              iptables -t nat -A host_dnat_inactive -i tun0 -p tcp --dport {{ .internalPort }} -j DNAT --to-destination "${targetIP}":{{ .clientService.port }}
+            fi
+            {{- end }}
+
+            # swap the chains (inactive / active):
+            iptables -t nat -I PREROUTING -j host_dnat_inactive
+            iptables -t nat -D PREROUTING -j host_dnat || true
+            iptables -t nat -E host_dnat host_dnat_old
+            iptables -t nat -E host_dnat_inactive host_dnat
+            iptables -t nat -E host_dnat_old host_dnat_inactive
+
+            sleep 30
+          done
+          echo "Terminating."
+        resources:
+{{ toYaml .Values.serviceGateway.containers.dnatController.resources | indent 10 }}
+        securityContext:
+          privileged: true
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 5
+      serviceAccount: service-gw-client
+      serviceAccountName: service-gw-client
+      volumes:
+      - name: service-gw-client-certificates
+        secret:
+          defaultMode: 256
+          secretName: service-gw-client-certificates
+      - configMap:
+          defaultMode: 420
+          name: service-gw-client-config
+        name: service-gw-client-config
+
+{{- end }}

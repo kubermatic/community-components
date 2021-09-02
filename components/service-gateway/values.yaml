@@ -1,0 +1,141 @@
+# Copyright 2021 The Kubermatic Kubernetes Platform contributors.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+serviceGateway:
+  mode: server # "server" or "client"
+  server:
+    # server-related config
+    service:
+      type: LoadBalancer
+      port: 1194
+      # a list of additional annotations for the LoadBalancer service; use this
+      # to set any provider-related settings
+      annotations:
+        # make sure the LoadBalancer stays when this Helm release is ever removed
+        "helm.sh/resource-policy": keep
+    useCertManger: true
+  client:
+    # client-related config
+    remoteAddress: service-gw-server.server.svc.cluster.local
+    remotePort: 1194
+  services:
+    # metrics
+    - name: thanos-receive
+      port: 19291
+      internalPort: 10001
+      clientService:
+        name: thanos-receive
+        namespace: monitoring
+        port: 19291
+    # logs
+    - name: loki-distributor
+      port: 3100
+      internalPort: 10002
+      clientService:
+        name: loki-distributed-distributor
+        namespace: monitoring
+        port: 3100
+    # alerts
+    - name: alertmanager-0
+      port: 9093
+      internalPort: 10003
+      clientService:
+        name: alertmanager
+        namespace: monitoring
+        port: 9093
+        headless: true
+        headlessInstance: 0
+    - name: alertmanager-1
+      port: 9093
+      internalPort: 10004
+      clientService:
+        name: alertmanager
+        namespace: monitoring
+        port: 9093
+        headless: true
+        headlessInstance: 1
+    # - name: user-cluster-alertmanager-0
+      # port: 9093
+      # internalPort: 10005
+      # clientService:
+        # name: user-cluster-alertmanager
+        # namespace: monitoring
+        # port: 8080
+        # headless: true
+        # headlessInstance: 0
+    # - name: user-cluster-alertmanager-1
+      # port: 9093
+      # internalPort: 10006
+      # clientService:
+        # name: user-cluster-alertmanager
+        # namespace: monitoring
+        # port: 8080
+        # headless: true
+        # headlessInstance: 1
+
+  openvpn:
+    protocol: TCP
+    tunMTU: 0
+    mssFix: 0
+    image:
+      repository: quay.io/kubermatic/openvpn
+      tag: v2.5.2-r0
+      pullPolicy: IfNotPresent
+  openvpnExporter:
+    image:
+      repository: docker.io/kumina/openvpn-exporter
+      tag: v0.2.2
+      pullPolicy: IfNotPresent
+
+  containers:
+    openvpn:
+      resources:
+        requests:
+          cpu: 200m
+          memory: 25Mi
+        limits:
+          cpu: 1
+          memory: 150Mi
+    dnatController:
+      resources:
+        requests:
+          cpu: 25m
+          memory: 25Mi
+        limits:
+          cpu: 100m
+          memory: 50Mi
+    ipFixup:
+      resources:
+        requests:
+          cpu: 5m
+          memory: 16Mi
+        limits:
+          cpu: 50m
+          memory: 32Mi
+    iptablesInit:
+      resources:
+        requests:
+          cpu: 5m
+          memory: 5Mi
+        limits:
+          cpu: 100m
+          memory: 50Mi
+    openvpnExporter:
+      resources:
+        requests:
+          cpu: 5m
+          memory: 5Mi
+        limits:
+          cpu: 100m
+          memory: 50Mi
