@@ -67,10 +67,6 @@ case "$DEPLOY_STACK" in
     deploy s3-syncer-aws-cli s3-syncer s3/s3-syncer-aws-cli
     ;;
 
-  "$DEPLOY_CERT_UPDATE")
-    deploy cert-upd-svc cert-manager cert-update-svc
-    ;;
-
   "$DEPLOY_THANOS_SEED_INGRESS")
     deploy thanos-seed-ingress monitoring thanos-seed-ingress
     ;;
