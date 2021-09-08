@@ -78,13 +78,9 @@ The Kubelet will automatically restart the container, which will pick up the new
 Assuming everything is working as expected, the final step is to update the kubeadm ConfigMap stored in the cluster. This is important so that when you use kubeadm to orchestrate a cluster upgrade later, the updated information will be present in the cluster.
 
 ```
-kubeadm init phase upload-config kubeadm --config kubeadm-config.yaml
+kubectl edit -n kube-system configmap kubeadm-config 
 ```
+Update SAN and cluster endpoint as needed.
 
-You can verify the changes to the configuration were applied successfully with this command:
-
-```
-kubectl -n kube-system get configmap kubeadm-config -o yaml
-```
 _Note: This run book wont be useful if the objective is to replace an exisiting IP/DNS name to a new IP/name. For that additionally we need to edit all API end points which will be documented in a seperate runbook._
 
