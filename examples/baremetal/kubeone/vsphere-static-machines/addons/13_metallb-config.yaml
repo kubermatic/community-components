@@ -1,0 +1,27 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  namespace: metallb-system
+  name: config
+data:
+  config: |
+    address-pools:
+    - name: default
+      protocol: layer2
+      addresses:
+      - 10.2.0.86-10.2.0.87
+#    - name: kubermatic-ingress
+#      protocol: layer2
+#      addresses:
+#      - 10.2.0.80/32
+#    - name: kubermatic-nodeport
+#      protocol: layer2
+#      addresses:
+#      - 192.168.150.101/32
+
+####### DNS mapping ###########
+#### 10.2.0.81
+# tobi.lab.kubermatic.io
+# *.tobi.lab.kubermatic.io
+#### 10.2.0.86
+# test.app.tobi.lab.kubermatic.io
