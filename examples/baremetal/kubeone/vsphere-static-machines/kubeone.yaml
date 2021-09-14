@@ -1,0 +1,87 @@
+apiVersion: kubeone.io/v1beta1
+kind: KubeOneCluster
+name: tobi-baremetal-sim
+versions:
+  kubernetes: 1.18.8
+cloudProvider:
+  none: {}
+# features:
+  # Enables PodSecurityPolicy admission plugin in API server, as well as creates
+  # default 'privileged' PodSecurityPolicy, plus RBAC rules to authorize
+  # 'kube-system' namespace pods to 'use' it.
+#  podSecurityPolicy:
+#    enable: true
+addons:
+  enable: true
+  path: "./addons" # always apply
+
+# If the cluster runs on bare metal or an unsupported cloud provider,
+# you can disable the machine-controller deployment entirely. In this
+# case, anything you configure in your "workers" sections is ignored.
+machineController:
+  deploy: false
+
+# The API server can also be overwritten by Terraform. Provide the
+# external address of your load balancer or the public addresses of
+# the first control plane nodes.
+apiEndpoint:
+  host: '10.2.26.1'
+  port: 6443
+
+
+# The list of nodes can be overwritten by providing Terraform output.
+# You are strongly encouraged to provide an odd number of nodes and
+# have at least three of them.
+# Remember to only specify your *master* nodes.
+controlPlane:
+  hosts:
+  - publicAddress: '10.2.39.243'
+    sshUsername: ubuntu
+  - publicAddress: '10.2.41.178'
+    sshUsername: ubuntu
+  - publicAddress: '10.2.12.78'
+    sshUsername: ubuntu
+
+#     privateAddress: '172.18.0.1'
+#     bastion: '4.3.2.1'
+#     bastionPort: 22  # can be left out if using the default (22)
+#     bastionUser: 'root'  # can be left out if using the default ('root')
+#     sshPort: 22 # can be left out if using the default (22)
+#     # You usually want to configure either a private key OR an
+#     # agent socket, but never both. The socket value can be
+#     # prefixed with "env:" to refer to an environment variable.
+#     sshPrivateKeyFile: '/home/me/.ssh/id_rsa'
+#     sshAgentSocket: 'env:SSH_AUTH_SOCK'
+#     # Taints is used to apply taints to the node.
+#     # If not provided defaults to TaintEffectNoSchedule, with key
+#     # node-role.kubernetes.io/master for control plane nodes.
+#     # Explicitly empty (i.e. taints: {}) means no taints will be applied.
+#     taints:
+#     - key: "node-role.kubernetes.io/master"
+#       effect: "NoSchedule"
+
+# A list of static workers, not managed by MachineController.
+# The list of nodes can be overwritten by providing Terraform output.
+staticWorkers:
+  hosts:
+  - publicAddress: '10.2.26.241'
+    sshUsername: ubuntu
+  - publicAddress: '10.2.28.180'
+    sshUsername: ubuntu
+
+#     privateAddress: '172.18.0.2'
+#     bastion: '4.3.2.1'
+#     bastionPort: 22  # can be left out if using the default (22)
+#     bastionUser: 'root'  # can be left out if using the default ('root')
+#     sshPort: 22 # can be left out if using the default (22)
+#     # You usually want to configure either a private key OR an
+#     # agent socket, but never both. The socket value can be
+#     # prefixed with "env:" to refer to an environment variable.
+#     sshPrivateKeyFile: '/home/me/.ssh/id_rsa'
+#     sshAgentSocket: 'env:SSH_AUTH_SOCK'
+#     # Taints is used to apply taints to the node.
+#     # Explicitly empty (i.e. taints: {}) means no taints will be applied.
+#     # taints:
+#     # - key: ""
+#     #   effect: ""
+

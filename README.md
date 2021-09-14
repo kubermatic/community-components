@@ -23,8 +23,10 @@ Name|Description
 
 Name|Description
 ---|---
-[vSphere kubeOne / Kubermatic demo](./examples/vsphere-kubeone-kubermatic)| an example for running kubermatic on vSphere with kubeOne to install the
-[AWS EKS -D kubeOne demo](./examples/amazon-eks-d)| an example for creating a Cluster running Amazon EKS-D 
+[vSphere kubeOne / Kubermatic demo](./examples/vsphere-kubeone-kubermatic) | an example for running kubermatic on vSphere with kubeOne to install the
+[AWS EKS -D kubeOne demo](./examples/amazon-eks-d) | an example for creating a Cluster running Amazon EKS-D 
+[Bare Metal - KubeOne Static Hosts](./examples/baremetal/kubeone/vsphere-static-machines) | Example how to managed static bare metal workers. The "bare metal" workers are simulated with vSphere by terraform automation  
+[Bare Metal - KKP and kubeadm join implementation examples](examples/baremetal/kkp) | Example how to use [kubeadm](https://kubernetes.io/docs/setup/independent/install-kubeadm/) to join the KKP managed controlplan: [1 Manual Example](examples/baremetal/kkp/kubadm-manual), [2 SSH Multi Client join script](examples/baremetal/kkp/kubeadm-multi-client)
 
 ## Kubermatic Addons
 
