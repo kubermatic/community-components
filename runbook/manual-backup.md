@@ -37,7 +37,7 @@ In our case it's the local minio deployed by KKP:
 ```
 4. Connect to the Minio service by port-forward to access the Storage by localhost:
 ```bash
-kubectl port-forward -n minio minio-54dcf47d46-6ztjz 9000:9000
+kubectl port-forward -n minio svc/minio 9000:9000
 ```
 check connection:
 ```bash
@@ -75,6 +75,11 @@ mc mirror minio/kubermatic-master-backups /data/backup-master
 chown -R 1000:1000 /data/*
 ```
 The copy of restic based backup under your folder `./backup-master` can now get used by the kubeone restore procedure if needed, see [KubeOne Manual Cluster Recovery](https://docs.kubermatic.com/kubeone/master/guides/manual_cluster_recovery/) 
+
+Sometime for restrict a password is needed, therefore you could also use the `restric` container and create the environment varliable:
+```
+docker run -it -e RESTIC_PASSWORD="`echo xxxxBASE64_ENCODEDxxxx | base64 -d`" -v $(pwd):/data restic/restic:0.9.6 snapshots -r /data ls
+```
 
 **Alternatives to get the Snapshot etcd backup**:
 - k cp

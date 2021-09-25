@@ -1,0 +1,82 @@
+# Copyright 2020 The Kubermatic Kubernetes Platform contributors.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  labels:
+    app: kube-proxy
+    wacker-patched: "2021-06-30"
+  name: kube-proxy
+  namespace: kube-system
+data:
+  config.conf: |-
+    apiVersion: kubeproxy.config.k8s.io/v1alpha1
+    bindAddress: 0.0.0.0
+    clientConnection:
+      acceptContentTypes: ""
+      burst: 10
+      contentType: application/vnd.kubernetes.protobuf
+      kubeconfig: /var/lib/kube-proxy/kubeconfig.conf
+      qps: 5
+    clusterCIDR: "{{ first .Cluster.Network.PodCIDRBlocks }}"
+    configSyncPeriod: 15m0s
+    conntrack:
+      max: null
+      maxPerCore: 0
+      # Following the recommendation from thz #3026
+      min: 524288
+      tcpCloseWaitTimeout: 15m
+      tcpEstablishedTimeout: 2h
+    enableProfiling: false
+    healthzBindAddress: 0.0.0.0:10256
+    hostnameOverride: ""
+    iptables:
+      masqueradeAll: false
+      masqueradeBit: 14
+      minSyncPeriod: 0s
+      syncPeriod: 30s
+    ipvs:
+      excludeCIDRs: null
+      minSyncPeriod: 0s
+      scheduler: ""
+      syncPeriod: 30s
+      strictARP: true
+    kind: KubeProxyConfiguration
+    metricsBindAddress: 127.0.0.1:10249
+    mode: {{ .Cluster.Network.ProxyMode }}
+    nodePortAddresses: null
+    oomScoreAdj: -999
+    portRange: ""
+    resourceContainer: /kube-proxy
+    udpIdleTimeout: 250ms
+  kubeconfig.conf: |-
+    apiVersion: v1
+    kind: Config
+    clusters:
+    - cluster:
+        certificate-authority: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+        server: {{ .Cluster.ApiserverExternalURL }}
+      name: default
+    contexts:
+    - context:
+        cluster: default
+        namespace: default
+        user: default
+      name: default
+    current-context: default
+    users:
+    - name: default
+      user:
+        tokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token

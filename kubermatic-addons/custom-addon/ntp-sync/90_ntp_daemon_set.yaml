@@ -1,0 +1,57 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ntp-server
+  namespace: kube-system
+data:
+           #first          #backup
+  server: "de.pool.ntp.org pool.ntp.org"
+  syncInterval: "60"
+---
+### Tested for OS-Systems:
+#- flatcar
+#- ubuntu 20.04
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: ntp-sync
+  namespace: kube-system
+  labels:
+    app: ntp-sync
+spec:
+  selector:
+    matchLabels:
+      app: ntp-sync
+  template:
+    metadata:
+      labels:
+        app: ntp-sync
+    spec:
+      tolerations:
+        - key: node-role.kubernetes.io/master
+          effect: NoSchedule
+      hostPID: true
+      hostNetwork: true
+      containers:
+        - name: ntp-sync
+          #{{ Registry "gcr.io" }}/
+          image: quay.io/kubermatic/util:1.4.1
+          command:
+            - /bin/sh
+          args:
+            - -c
+            - nsenter -t 1 -m -u -i -n -p -- sh -c 'if test -f /usr/sbin/ntpdate; then echo installed; else /usr/bin/apt-get update && /usr/bin/apt-get -y install ntpdate; fi && while true; do ntpdate $NTP_SERVER && sleep $INTERVAL; done'
+          securityContext:
+            privileged: true
+          env:
+            - name: NTP_SERVER
+              valueFrom:
+                configMapKeyRef:
+                  name: ntp-server
+                  key: server
+            - name: INTERVAL
+              valueFrom:
+                configMapKeyRef:
+                  name: ntp-server
+                  key: syncInterval
+      terminationGracePeriodSeconds: 10
