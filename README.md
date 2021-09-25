@@ -66,6 +66,7 @@ Name|Description
 [set-build-tags-to-image.sh](helper/set-build-tags-to-image.sh) | Set dedicated build tags to the [Kubermatic Charts](https://github.com/kubermatic/kubermatic/tree/master/charts)
 [untaint_master.sh](helper/untaint_master.sh) | untaints all master nodes, to be able to schedule workload
 [bash-port-scanner.sh](helper/linux-port-scan-without-dependencies/scan.sh) | A Bash bases Port-Scanner which is able to scan ports without any dependencies or tools like nmap
+[local-connect-k8s-services.sh](helper/local-connect-k8s-services.sh) | A small helper script to `kubectl port-forward` a handful of service, in the example the typical MLA services `prometheus`, `grafana`, `alertmanager`
 
 ## Knowledge Base
 Helpful how-tos and detailed documentation:
