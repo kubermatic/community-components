@@ -1,90 +1,164 @@
-## Adding new IP address/DNS name of an exisiting KubeOne cluster ##
+## Changing IP address/hostname of an existing Kubernetes cluster  ##
 
 <br>
 
-There can be scenarios where we will have to add/change IP address/DNS name to an exisiting kubeone cluster. If we try and change/add IP/DNS name on an exisiting cluster we will get into TLS certificate errors (when we try connecting to the cluster) as the new IP/DNS name is not available in the **SAN (Subject Alternative Name)** of the API server certificate. This run book will walk you through on how to add a IP address/DNS name to the TLS certificate used by the Kubernetes API server.
+### 1.0 Introduction
 
-The process of updating the certificate SAN to include a IP address/DNS name could find use for a few different scenarios. A couple of situations  such as
+There can be scenarios where we will have to change IP of an existing kubernetes cluster. If we try and change IP on an existing cluster we will end up messing up connectivity between various components in the cluster where API server come into picture. Apart from that we will face issues pertaining to certificate issues as the SAN (Subject Alternate Name) will not have the new IP address.
+
+The process of changing IP address/DNS name could find use for a few different scenarios. A couple of situations  such as
 
 - Adding a load balancer in front of the control plane.
 - Using a new or different URL/hostname to access the API server.
 - New DHCP leases/IP getting used by other hosts in a data centre.
 
-As kubeone internally uses ``kudeadm`` to bootstrap the cluster, the same `kubeadm` will be used to update the API server’s certificate to include additional names in the list of SANs.
+Changing the IP of the existing cluster will have multiple steps involved and the flowchart for the same is depicted below.
 
-To do this, first we need the `kubeadm` configuration file. `kubeadm` writes its configuration into a ConfigMap named “kubeadm-config” found in the “kube-system” namespace.
+![IP change flowchart](ip_change.png " Depicts flow chart for the process involved in IP change")
 
-To pull the kubeadm configuration from the cluster into an external file, run this command:
+### 2.0 Prerequisites (will not be covered in the document)
+
+* Detailed procedure for the below mentioned in  not in the preview of this runbook*
+
+- Backup etcd.
+- Have the new IP/hostnames in place and adding required firewall rules for the same.
+- Cluster backup (various configs)
+
+### 3.0 Steps involved
+
+* Initial step will be to download the existing cluster configuration to a file using the below command.
+
+  ```
+  kubectl get configmap -n kube-system kubeadm-config -o jsonpath='{.data.ClusterConfiguration}' > kubeadm-config.yaml
+
+  ```
+
+* Modify terraform.tfvars to chnage the loadbalancer scheme as below.
+
+  ```
+  internal_api_lb = true
+
+  ```
+* Once the tfvars is modified do a terraform apply with the below command
+
+  ```
+  terraform apply
+  ```
+
+* Modify the configmap with the new SAN and controlplan end points
 
 
-```
-kubectl get configmap -n kube-system kubeadm-config -o jsonpath='{.data.ClusterConfiguration}' > kubeadm-config.yaml
-```
+* Modify admin.conf file for **server** parameters on all master nodes (as per the below diagram).
 
-_This creates a file named kubeadm-config.yaml, the contents of which may look something like this (the file from your cluster may have different values):_
+  ```
+  kubectl edit -n kube-system configmap kubeadm-config
 
-![image](https://user-images.githubusercontent.com/29113813/132445235-2ab22fa0-712d-4a21-8321-6520a36804c4.png)
+  ```
+  Please use below image as a reference for doing the edit
 
-In this particular case, only one additional SAN is listed. To add another SAN, add an entry in certSANs list under the apiServer section. 
-If you already had a kubeadm configuration file that you used when you bootstrapped the cluster, you may already have a certSANs list. If not, you’ll need to add it; if so, you’ll just add another entry to that list.
+  ![kubeadm-config](configyml.png "editing kubeadm-config")
 
-Here’s an example (showing only the apiServer section):
 
-![image](https://user-images.githubusercontent.com/29113813/132445880-dbe2cd58-0874-40d8-adf9-04c8ef105e97.png)
+* Next is to update the SAN path of the exisiting certificates in the master nodes with new IP/hostnames.
 
-This change to the `kubeadm` configuration file adds SANs for the entries listed under `certSANs`. This would be in addition to the standard list of SANs that are included (which would be the local hostname, some names for the default Kubernetes Service object, the default IP address for the Kubernetes Service object, and the primary IP address of the node).
+  _First, move the existing API server certificate and key (if kubeadm sees that they already exist in the designated location, it won’t create new ones_
 
-Once you’ve updated the kubeadm configuration file (one pulled from the ConfigMap) you’re ready to update the certificate.
+  ```
+  mv /etc/kubernetes/pki/apiserver.{crt,key} ~
+  ```
 
-_**First, move the existing API server certificate and key (if kubeadm sees that they already exist in the designated location, it won’t create new ones**_
+  Then, use kubeadm to just generate a new certificate:
 
-```
-mv /etc/kubernetes/pki/apiserver.{crt,key} ~
-```
-Then, use kubeadm to just generate a new certificate:
-```
-kubeadm init phase certs apiserver --config kubeadm-config.yaml
-```
-This command will generate a new certificate and key for the API server, using the specified configuration file for guidance. Since the specified configuration file includes a certSANs list, then kubeadm will automatically add those SANs when creating the new certificate.
+  ```
+  kubeadm init phase certs apiserver --config kubeadm-config.yaml
+  ```
+  This command will generate a new certificate and key for the API server, using the specified configuration file  (which was generated in the initial step) for your guidance. Since the specified configuration file includes a certSANs list, kubeadm will automatically add those SANs when creating the new certificate.
 
-## Verifying the change
+  #### 3.1 Verifying the change
 
-The way to verify the change is to use openssl on the control plane node to decode the certificate and show the list of SANs on the certificate:
-```
-openssl x509 -in /etc/kubernetes/pki/apiserver.crt -text
-```
-Look for the `X509v3 Subject Alternative Name` line, after which will be a list of all the DNS names and IP addresses that are included on the certificate as SANs. After following this procedure, you should see the newly-added names and IP addresses you specified in the modified kubeadm configuration file. If you don’t, then something went wrong along the way. Common mistakes in this process include forgetting to remove the previous certificate and key (kubeadm won’t create new ones if they already exist), or failing to include the --config kubeadm-config.yaml on the kubeadm init phase certs command.
+    The way to verify the change is to use openssl on the control plane node to decode the certificate and show the list of SANs on the certificate:
 
-## Restarting API server
+    ```
+    openssl x509 -in /etc/kubernetes/pki/apiserver.crt -text
+    ```
+    Look for the `X509v3 Subject Alternative Name` line, after which will be a list of all the DNS names and IP addresses that are included on the certificate as SANs. After following this procedure, you should see the newly-added names and IP addresses you specified in the modified kubeadm configuration file. If you don’t, then something went wrong along the way. Common mistakes in this process include forgetting to remove the previous certificate and key (kubeadm won’t create new ones if they already exist), or failing to include the --config kubeadm-config.yaml on the kubeadm init phase certs command.
 
-The final step is restarting the API server to pick up the new certificate. The easiest way to do this is to kill the API server container using docker:
+  #### 3.2 Restarting API server
 
-Run `docker ps | grep kube-apiserver | grep -v pause` to get the container ID for the container running the Kubernetes API server. (The container ID will be the very first field in the output.)
+    The final step is restarting the API server to pick up the new certificate. The easiest way to do this is to kill the API server container using docker:
 
-Run `docker kill <containerID>` to kill the container.
+    Run `docker ps | grep kube-apiserver | grep -v pause` to get the container ID for the container running the Kubernetes API server. (The container ID will be the very first field in the output.)
 
-If your nodes are running containerd as the container runtime, the commands are a bit different:
+    Run `docker kill <containerID>` to kill the container.
 
-Run `crictl pods | grep kube-apiserver | cut -d' ' -f1` to get the Pod ID for the Kubernetes API server Pod.
+    If your nodes are running containerd as the container runtime, the commands are a bit different:
 
-Run `crictl stop <pod-id>` to stop the Pod.
+    Run `crictl pods | grep kube-apiserver | cut -d' ' -f1` to get the Pod ID for the Kubernetes API server Pod.
 
-Run `crictl rmp <pod-id>` to remove the Pod.
+    Run `crictl stop <pod-id>` to stop the Pod.
 
-The Kubelet will automatically restart the container, which will pick up the new certificate. As soon as the API server restarts, you will immediately be able to connect to it using one of the newly-added IP addresses/DNS names.
+    Run `crictl rmp <pod-id>` to remove the Pod.
 
-## Updating the In-Cluster Configuration
+    The Kubelet will automatically restart the container, which will pick up the new certificate. As soon as the API server restarts, you will immediately be able to connect to it using one of the newly-added IP addresses/DNS names.
 
-Assuming everything is working as expected, the final step is to update the kubeadm ConfigMap stored in the cluster. This is important so that when you use kubeadm to orchestrate a cluster upgrade later, the updated information will be present in the cluster.
+  #### 3.3 Updating the In-Cluster Configuration
+  <br>
 
-```
-kubeadm init phase upload-config kubeadm --config kubeadm-config.yaml
-```
+  Assuming everything is working as expected, the final step is to update various `ConfigMap` stored in the cluster.
 
-You can verify the changes to the configuration were applied successfully with this command:
+    - You can verify the changes to the configuration were applied successfully with this command:
 
-```
-kubectl -n kube-system get configmap kubeadm-config -o yaml
-```
-_Note: This run book wont be useful if the objective is to replace an exisiting IP/DNS name to a new IP/name. For that additionally we need to edit all API end points which will be documented in a seperate runbook._
+    ```
+    kubectl edit -n kube-system configmap kubeadm-config
+
+    ```
+
+    - If this is reflecting all required changes you can go ahead with updating cluster-info ConfigMap in kube-system namespace.
+
+    ```
+    kubectl edit -n kube-public cm cluster-info
+
+    ```
+    - Once completed update the kube-proxy ConfigMap in kube-system namespace
+
+    ```
+    kubectl edit -n kube-public cm kube-proxy
+
+    ```
+
+    - Update seed.yaml with new `KUBECONFIG` (with base64 encoding)
+
+    ```
+    cat xxxxx-kubeconfig | base64 | tr -d '\n\r'
+
+    ```
+
+  - Add the new encoded kubeconfig in seed.yaml as below
+
+    ```
+    apiVersion: v1
+    kind: Secret
+    metadata:
+    name: xxxx-kubeconfig
+    namespace: kubermatic
+    type: Opaque
+    data:
+    kubeconfig: <add base64 encoded kubeconfig>
+    <truncated>
+    ...
+
+    ```
+
+  - Apply the new seed.yaml
+
+    ```
+    kubectl apply -f seed.yaml
+
+    ```
+
+  - Verify `/var/lib/kubelet/kubeconfig` on all master servers for its contents and ensure it reflects the new values of cluster endpoint.
+
+Once all the above metioned activities are completed you will be able to see all the master/worker nodes in ready state and all pods in running state as well. 
+
+
 
