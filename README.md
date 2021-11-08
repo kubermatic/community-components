@@ -18,6 +18,7 @@ Name|Description
 [logging/audit/static-audit-log](components/logging/audit/static-audit-log) | Description how static audit logging could get configured
 [vm-images/packer-ubuntu1804-vsphere-template](./components/vm-images/packer-ubuntu1804-vsphere-template)|A packer template to customize an ubuntu 18.04 cloud-image on vSphere
 [s3/s3-syncer-aws-cli](./components/s3/s3-syncer-aws-cli) | s3-syncer based CronJob on the `aws s3` cli to sync two different S3 locations as well Azure (by Minio Azure Gateway)
+[api/cluster-management-by-api](components/api/cluster-management-by-api) | Bash based management scripts to specify your KKP cluster by API for CI/CD or GitOPs purposes. 
 
 ## Kubermatic Example Setups
 

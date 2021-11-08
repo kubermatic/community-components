@@ -1,0 +1,36 @@
+{
+  "name": "ubuntu-node-pool",
+  "annotations": {
+      "cluster.k8s.io/cluster-api-autoscaler-node-group-max-size": "5",
+      "cluster.k8s.io/cluster-api-autoscaler-node-group-min-size": "2"
+  },
+  "spec": {
+    "template": {
+      "cloud": {
+        "kubevirt": {
+          "cpus": "2",
+          "memory": "4Gi",
+          "namespace": "default",
+          "sourceURL": "http://http-server.kube-system.svc.cluster.local/ubuntu.img",
+          "storageClassName": "local-path",
+          "pvcSize": "15Gi"
+        }
+      },
+      "versions": {
+        "kubelet": "1.21.5"
+      },
+      "labels": {},
+      "taints": [],
+      "operatingSystem": {
+        "flatcar": null,
+        "ubuntu": {
+          "distUpgrade": false
+        },
+        "centos": null,
+        "sles": null
+      }
+    },
+    "replicas": 1,
+    "dynamicConfig": false
+  }
+}

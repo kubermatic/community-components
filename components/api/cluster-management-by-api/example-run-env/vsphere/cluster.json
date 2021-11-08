@@ -1,0 +1,33 @@
+{
+  "cluster": {
+    "name": "tobi-api-vsphere",
+    "labels": {
+      "test": "test"
+    },
+    "spec": {
+      "cloud": {
+        "vsphere": {
+          "username": null,
+          "password": null,
+          "infraManagementUser": {
+            "username": null,
+            "password": null
+          },
+          "datastore": "",
+          "datastoreCluster": ""
+        },
+        "dc": "vsphere"
+      },
+      "version": "1.20.11",
+      "auditLogging": {
+        "enabled": false
+      },
+      "opaIntegration": {
+        "enabled": false
+      },
+      "enableUserSSHKeyAgent": true
+    },
+    "type": "kubernetes",
+    "credential": "api-presets"
+  }
+}

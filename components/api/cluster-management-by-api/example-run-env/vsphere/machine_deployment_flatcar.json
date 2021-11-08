@@ -1,0 +1,30 @@
+{
+  "name": "flatcar-node-pool",
+  "spec": {
+    "template": {
+      "cloud": {
+        "vsphere": {
+          "template": "flatcar_2905.2.3",
+          "cpus": 2,
+          "memory": 4096,
+          "diskSizeGB": 25
+        }
+      },
+      "labels": {},
+      "taints": [],
+      "operatingSystem": {
+        "flatcar": {
+          "disableAutoUpdate": false
+        },
+        "ubuntu": null,
+        "centos": null,
+        "sles": null
+      }
+    },
+    "replicas": 1,
+    "dynamicConfig": null,
+    "versions": {
+      "kubelet": "1.20.11"
+    }
+  }
+}

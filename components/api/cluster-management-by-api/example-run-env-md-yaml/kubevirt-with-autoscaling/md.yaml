@@ -1,0 +1,53 @@
+#### Get applied into the user clusters
+apiVersion: cluster.k8s.io/v1alpha1
+kind: MachineDeployment
+metadata:
+  annotations:
+    cluster.k8s.io/cluster-api-autoscaler-node-group-max-size: "5"
+    cluster.k8s.io/cluster-api-autoscaler-node-group-min-size: "1"
+    machinedeployment.clusters.k8s.io/revision: "3"
+  name: ubuntu-scaling-node-pool
+  namespace: kube-system
+spec:
+  minReadySeconds: 0
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 1
+  selector:
+    matchLabels:
+      node-pool: ubuntu-scaling
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+    type: RollingUpdate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        node-pool: ubuntu-scaling
+    spec:
+      metadata:
+        creationTimestamp: null
+        labels:
+          node-pool: ubuntu-scaling
+      providerSpec:
+        value:
+          cloudProvider: kubevirt
+          cloudProviderSpec:
+            cpus: "2"
+            dnsConfig:
+              nameservers:
+              - 8.8.8.8
+            dnsPolicy: None
+            kubeconfig: ""
+            memory: 8Gi
+            namespace: default
+            pvcSize: 15Gi
+            sourceURL: http://http-server.kube-system.svc.cluster.local/ubuntu.img
+            storageClassName: local-path
+          operatingSystem: ubuntu
+          operatingSystemSpec:
+            distUpgradeOnBoot: false
+      versions:
+        kubelet: 1.21.5
