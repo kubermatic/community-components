@@ -1,0 +1,33 @@
+s3DBdumpSyncer:
+  cron:
+    schedule: '*/30 * * * *'
+  storage:
+    size: 100Gi
+    class: ''
+  db:
+    dump:
+      filename: db-dump.sql
+    postgresql:
+      host: 'postgresql'
+      port: 5432
+      database: 'test'
+      user: 'postgres'
+      pw: 'password'
+      options: ''
+  s3:
+    image:
+      repository: docker.io/amazon/aws-cli
+      tag: 2.2.13
+    target:
+      # These settings are required. Keys must be alphanumeric.
+      url: "https://s3.amazonaws.com"
+      bucket: ''
+      accessKey: '' # 32 byte long
+      secretKey: '' # 64 byte long
+      insecure_skip_verify: false
+      renameChar: false
+      ca_bundle: ''
+  #    ca_bundle: |-
+  #      -----BEGIN CERTIFICATE-----
+  #      xxxxxxxx EXAMPLE xxxxxxxxxx
+  #      -----END CERTIFICATE-----

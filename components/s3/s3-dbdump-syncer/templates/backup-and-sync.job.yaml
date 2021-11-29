@@ -1,0 +1,104 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  labels:
+    job: s3-dbdump-syncer
+  name: s3-dbdump-syncer
+spec:
+  schedule: "{{ .Values.s3DBdumpSyncer.cron.schedule }}"
+  concurrencyPolicy: Forbid
+  failedJobsHistoryLimit: 3
+  successfulJobsHistoryLimit: 1
+  jobTemplate:
+    metadata:
+      labels:
+        job: s3-dbdump-syncer
+    spec:
+      activeDeadlineSeconds: 7200
+      backoffLimit: 5
+      parallelism: 1
+      template:
+        metadata:
+          labels:
+            job: s3-dbdump-syncer
+        spec:
+          terminationGracePeriodSeconds: 10
+          restartPolicy: Never
+          tolerations:
+            - effect: NoSchedule
+              key: node-role.kubernetes.io/master
+          initContainers:
+            - name: sql-dumper
+              image: docker.io/bitnami/postgresql:11.13.0-debian-10-r60
+              securityContext:
+                runAsGroup: 1001
+              command:
+                - /bin/bash
+                - -c
+                - |
+                  source /config/env
+                  set -Eeuo pipefail
+                  trap "echo 'error occured, sleep for 60 sec!'; sleep 60" ERR
+
+                  echo "----- start dump of SQL DATABAES: $(date) ---------"
+                  echo "USER: $(id -u)"
+                  ls -lah /data/
+                  echo "----- dump of $PGDATABASE ---------"
+                  pg_dump -f /data/$DB_DUMP_NAME
+                  echo "----- dump finished ---------"
+              volumeMounts:
+              - mountPath: /config
+                name: db-config
+                readOnly: true
+              - mountPath: /data
+                readOnly: false
+                name: tmp-data-vol
+          containers:
+          - image: {{ .Values.s3DBdumpSyncer.s3.image.repository }}:{{ .Values.s3DBdumpSyncer.s3.image.tag }}
+            imagePullPolicy: IfNotPresent
+            name: aws-client
+            resources:
+              limits:
+                cpu: 500m
+                memory: 500Mi
+            volumeMounts:
+              - mountPath: /config
+                name: s3-config
+                readOnly: true
+              - mountPath: /data
+                name: tmp-data-vol
+            command:
+              - /bin/bash
+              - -c
+              - |
+                source /config/env
+                set -Eeuo pipefail
+                trap "echo 'error occured, sleep for 60 sec!'; sleep 60" ERR
+
+                mkdir ~/.aws && cp /config/* ~/.aws/
+                export AWS_EC2_METADATA_DISABLED=true
+
+                if [[ "$TARGET_RENAME_CHAR" == true ]]; then
+                echo --- REMOVE incompatible char ':' ----------
+                for file in $(find /data/ -type f); do mv -v "${file}" "${file//:/-}" || true ; done
+                echo --------------------------
+                fi
+
+                echo --- upload to target -----
+                aws s3 --profile target $TARGET_SSL_VERIFY_FLAG --endpoint-url $TARGET_URL sync --delete /data/ s3://$TARGET_BUCKET/
+                echo --------------------------
+                echo --- SYNC JOB FINISHED ----
+                echo --------- target ---------
+                aws s3 --profile target $TARGET_SSL_VERIFY_FLAG --endpoint-url $TARGET_URL ls s3://$TARGET_BUCKET
+                echo --------------------------
+          volumes:
+            - name: s3-config
+              secret:
+                secretName: s3-config
+            - name: db-config
+              secret:
+                secretName: db-config
+            - name: tmp-data-vol
+              persistentVolumeClaim:
+                readOnly: false
+                claimName: s3-syncer-transfer-storage
