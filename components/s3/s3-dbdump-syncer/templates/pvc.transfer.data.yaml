@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: s3-syncer-transfer-storage
+  labels:
+    job: s3-db-dump-syncer
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ .Values.s3DBdumpSyncer.storage.size }}
+  {{- if .Values.s3DBdumpSyncer.storage.class }}
+  storageClassName: {{ .Values.s3DBdumpSyncer.storage.class }}
+  {{- end }}
