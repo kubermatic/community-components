@@ -29,7 +29,7 @@ spec:
               key: node-role.kubernetes.io/master
           initContainers:
             - name: sql-dumper
-              image: docker.io/bitnami/postgresql:11.13.0-debian-10-r60
+              image: {{ .Values.s3DBdumpSyncer.db.dumper.image.repository }}:{{ .Values.s3DBdumpSyncer.db.dumper.image.tag }}
               securityContext:
                 runAsGroup: 1001
               command:

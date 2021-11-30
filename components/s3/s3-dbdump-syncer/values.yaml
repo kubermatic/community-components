@@ -5,7 +5,10 @@ s3DBdumpSyncer:
     size: 100Gi
     class: ''
   db:
-    dump:
+    dumper:
+      image:
+        repository: docker.io/bitnami/postgresql
+        tag: 11.13.0-debian-10-r60
       filename: db-dump.sql
     postgresql:
       host: 'postgresql'
