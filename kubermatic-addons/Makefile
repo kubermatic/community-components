@@ -15,11 +15,11 @@ docker-release: docker-build
 
 ############## ARGOCD ADDON
 
-.PHONY: kustomize-build-argocd-ha
-kustomize-build-argocd-ha:
+.PHONY: kustomize-build-argocd
+kustomize-build-argocd:
 	docker run --rm --volume ${WORK_DIR}:/src \
 	  k8s.gcr.io/kustomize/kustomize:v4.4.0 \
-	  build /src/kustomize/argocd-ha/ > custom-addon/argocd-ha/00-manifest.yaml
+	  build /src/kustomize/argocd/ > custom-addon/argocd/00-manifest.yaml
 
 ############## FLUX2 ADDON
 
