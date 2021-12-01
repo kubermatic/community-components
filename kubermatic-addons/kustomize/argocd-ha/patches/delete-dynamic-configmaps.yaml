@@ -1,0 +1,39 @@
+# NOTE: The following configmaps are modified by ArgoCD at runtime and must
+# therefore not be included in the addon manifest to prevent changes by the
+# addon reconciliation mechanism.
+$patch: delete
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: argocd-cm
+---
+$patch: delete
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: argocd-cmd-params-cm
+---
+$patch: delete
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: argocd-gpg-keys-cm
+---
+$patch: delete
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: argocd-rbac-cm
+---
+$patch: delete
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: argocd-ssh-known-hosts-cm
+---
+$patch: delete
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: argocd-tls-certs-cm
+---

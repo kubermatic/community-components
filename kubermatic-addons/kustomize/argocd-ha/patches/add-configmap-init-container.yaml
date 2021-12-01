@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: argocd-application-controller
+spec:
+  template:
+    spec:
+      initContainers:
+        - image: bitnami/kubectl:1.22
+          command:
+            - /bin/bash
+            - -c
+            - |
+              #!/usr/bin/env bash
+              
+              set -euo pipefail
+
+              declare -a configmaps
+              configmaps=(argocd-cm argocd-cmd-params-cm argocd-gpg-keys-cm argocd-rbac-cm argocd-ssh-known-hosts-cm argocd-tls-certs-cm)
+
+              for configmap in "${configmaps[@]}"; do
+                echo "Ensuring configmap ${configmap} exists..."
+                if ! kubectl --namespace="${RUNTIME_NAMESPACE}" get configmap "${configmap}" &> /dev/null; then
+                  kubectl --namespace="${RUNTIME_NAMESPACE}" create configmap "${configmap}"
+                fi
+
+                echo "Ensuring configmap ${configmap} is labelled..."
+                kubectl --namespace="${RUNTIME_NAMESPACE}" label --overwrite configmap "${configmap}" \
+                  app.kubernetes.io/name="${configmap}" app.kubernetes.io/part-of="argocd"
+              done
+          env:
+            - name: RUNTIME_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+          name: configmap-reconciler
