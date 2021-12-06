@@ -11,7 +11,7 @@ spec:
         required: true
         type: text
       - displayName: Git repository branch
-        helpText: Name of the Git branch to checkout and monitor for changes (defaults to "master")
+        helpText: Name of the Git branch to checkout and monitor for changes (defaults to "main")
         internalName: gitRepositoryBranch
         required: false
         type: text

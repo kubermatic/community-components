@@ -21,10 +21,8 @@ metadata:
   namespace: flux-system
 spec:
   interval: {{ default "1m" .Variables.updateInterval | quote }}
-  {{- with .Variables.gitRepositoryBranch }}
   ref:
-    branch: {{ . | quote }}
-  {{- end }}
+    branch: {{ default "main" .Variables.gitRepositoryBranch | quote }}
   {{- if $authenticationRequired }}
   secretRef:
     name: cluster-sync-credentials
