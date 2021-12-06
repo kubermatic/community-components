@@ -17,7 +17,7 @@ spec:
         type: text
       - displayName: Manifest directory
         helpText: Relative path to the directory within the Git repository containing manifests to be reconciled in the cluster (defaults to "./clusters/${CLUSTER_ID}")
-        internalName: kustomizationPath
+        internalName: manifestsPath
         required: false
         type: text
       - displayName: Username

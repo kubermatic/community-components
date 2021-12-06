@@ -36,7 +36,7 @@ metadata:
   namespace: flux-system
 spec:
   interval: {{ default "1m" .Variables.updateInterval | quote }}
-  path: {{ default (printf "./clusters/%s" .Cluster.Name) .Variables.kustomizationPath | quote }}
+  path: {{ default (printf "./clusters/%s" .Cluster.Name) .Variables.manifestsPath | quote }}
   prune: true
   sourceRef:
     kind: GitRepository
