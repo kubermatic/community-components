@@ -52,6 +52,7 @@ Name|Description
 [custom-addon/ntp-sync](kubermatic-addons/custom-addon/ntp-sync) | DaemonSet to execute `ntpdate primary secondary` scheduled on every node of a cluster
 [custom-addon/docker-pull](kubermatic-addons/custom-addon/docker-pull) | DaemonSet to pull e.g. `docker.io` based images on every node with a docker-secret, to prevent rate-limited infrastructure pods.
 [custom-addon/kube-proxy-ipvs-patch](kubermatic-addons/custom-addon/kube-proxy-ipvs-patch) | Custom overwrite Addon to patch IPVS mode to `strictARP: true`.
+[custom-addon/flux2](kubermatic-addons/custom-addon/flux2) | Deploys [Flux](https://github.com/fluxcd/flux2/) for keeping your Kubernetes clusters in sync with sources of configuration (like Git repositories).
 
 ## Helper
 List of helper scripts and tools

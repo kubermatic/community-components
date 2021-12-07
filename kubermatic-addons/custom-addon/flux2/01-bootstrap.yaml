@@ -1,0 +1,40 @@
+{{- $httpCredentialsProvided := and (not (empty .Variables.gitRepositoryHttpUsername)) (not (empty .Variables.gitRepositoryHttpPassword)) -}}
+---
+{{- if $httpCredentialsProvided }}
+apiVersion: v1
+kind: Secret
+metadata:
+  name: cluster-source-credentials
+  namespace: flux-system
+data:
+  password: {{ .Variables.gitRepositoryHttpUsername | b64enc | quote }}
+  username: {{ .Variables.gitRepositoryHttpPassword | b64enc | quote }}
+{{- end }}
+---
+apiVersion: source.toolkit.fluxcd.io/v1beta1
+kind: GitRepository
+metadata:
+  name: cluster-source
+  namespace: flux-system
+spec:
+  interval: {{ default "1m" .Variables.updateInterval | quote }}
+  ref:
+    branch: {{ default "main" .Variables.gitRepositoryBranch | quote }}
+  {{- if $httpCredentialsProvided }}
+  secretRef:
+    name: cluster-source-credentials
+  {{- end }}
+  url: {{ .Variables.gitRepositoryUrl | quote }}
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: cluster-source
+  namespace: flux-system
+spec:
+  interval: {{ default "1m" .Variables.updateInterval | quote }}
+  path: {{ default (printf "./clusters/%s" .Cluster.Name) .Variables.manifestsPath | quote }}
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: cluster-source
