@@ -5,7 +5,7 @@
 apiVersion: v1
 kind: Secret
 metadata:
-  name: cluster-sync-credentials
+  name: cluster-source-credentials
   namespace: flux-system
 data:
   {{- if $httpCredentialsProvided }}
@@ -17,7 +17,7 @@ data:
 apiVersion: source.toolkit.fluxcd.io/v1beta1
 kind: GitRepository
 metadata:
-  name: cluster-sync
+  name: cluster-source
   namespace: flux-system
 spec:
   interval: {{ default "1m" .Variables.updateInterval | quote }}
@@ -25,14 +25,14 @@ spec:
     branch: {{ default "main" .Variables.gitRepositoryBranch | quote }}
   {{- if $authenticationRequired }}
   secretRef:
-    name: cluster-sync-credentials
+    name: cluster-source-credentials
   {{- end }}
   url: {{ .Variables.gitRepositoryUrl | quote }}
 ---
 apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
 kind: Kustomization
 metadata:
-  name: cluster-sync
+  name: cluster-source
   namespace: flux-system
 spec:
   interval: {{ default "1m" .Variables.updateInterval | quote }}
@@ -40,4 +40,4 @@ spec:
   prune: true
   sourceRef:
     kind: GitRepository
-    name: cluster-sync
+    name: cluster-source
