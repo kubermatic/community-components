@@ -1,0 +1,37 @@
+{{- $httpCredentialsProvided := and (not (empty .Variables.gitRepositoryHttpUsername)) (not (empty .Variables.gitRepositoryHttpPassword)) -}}
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: cluster-bootstrap-repository
+  namespace: argocd
+  labels:
+    argocd.argoproj.io/secret-type: repository
+data:
+  url: {{ .Variables.gitRepositoryUrl | b64enc | quote }}
+  {{- if $httpCredentialsProvided }}
+  password: {{ .Variables.gitRepositoryHttpPassword | b64enc | quote }}
+  username: {{ .Variables.gitRepositoryHttpUsername | b64enc | quote }}
+  {{- end }}
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: cluster-bootstrap
+  namespace: argocd
+spec:
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: argocd
+  project: default
+  source:
+    directory:
+      recurse: true
+    path: {{ default (printf "./clusters/%s/bootstrap" .Cluster.Name) .Variables.manifestsPath | quote }}
+    repoURL: {{ .Variables.gitRepositoryUrl | quote }}
+    targetRevision: {{ default "main" .Variables.gitRepositoryBranch | quote}}
+  syncPolicy:
+    automated:
+      allowEmpty: true
+      prune: true
+      selfHeal: true

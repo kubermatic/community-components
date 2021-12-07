@@ -13,6 +13,14 @@ docker-build:
 docker-release: docker-build
 	docker push ${KKP_ADDON_CUSTOM_REPO}:${TAG}
 
+############## ARGOCD ADDON
+
+.PHONY: kustomize-build-argocd
+kustomize-build-argocd:
+	docker run --rm --volume ${WORK_DIR}:/src \
+	  k8s.gcr.io/kustomize/kustomize:v4.4.0 \
+	  build /src/kustomize/argocd/ > custom-addon/argocd/00-manifest.yaml
+
 ############## FLUX2 ADDON
 
 .PHONY: kustomize-build-flux2
