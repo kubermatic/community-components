@@ -1,17 +1,14 @@
 {{- $httpCredentialsProvided := and (not (empty .Variables.gitRepositoryHttpUsername)) (not (empty .Variables.gitRepositoryHttpPassword)) -}}
-{{- $authenticationRequired := $httpCredentialsProvided -}}
 ---
-{{- if $authenticationRequired }}
+{{- if $httpCredentialsProvided }}
 apiVersion: v1
 kind: Secret
 metadata:
   name: cluster-source-credentials
   namespace: flux-system
 data:
-  {{- if $httpCredentialsProvided }}
   password: {{ .Variables.gitRepositoryHttpUsername | b64enc | quote }}
   username: {{ .Variables.gitRepositoryHttpPassword | b64enc | quote }}
-  {{- end }}
 {{- end }}
 ---
 apiVersion: source.toolkit.fluxcd.io/v1beta1
@@ -23,7 +20,7 @@ spec:
   interval: {{ default "1m" .Variables.updateInterval | quote }}
   ref:
     branch: {{ default "main" .Variables.gitRepositoryBranch | quote }}
-  {{- if $authenticationRequired }}
+  {{- if $httpCredentialsProvided }}
   secretRef:
     name: cluster-source-credentials
   {{- end }}
