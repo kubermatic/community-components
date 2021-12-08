@@ -6,7 +6,7 @@ spec:
   description: Declarative continuous deployment for Kubernetes (as high availability installation).
   formSpec:
       - displayName: Git repository URL
-        helpText: URL of the Git repository used as source (only HTTP/S URLs are currently supported)
+        helpText: URL of the Git repository used as source (HTTP/S w/ username+password or SSH w/ your private key)
         internalName: gitRepositoryUrl
         required: true
         type: text
@@ -30,6 +30,11 @@ spec:
         internalName: gitRepositoryHttpPassword
         required: false
         type: text
+      - displayName: SSH Private Key
+        helpText: Please provide SSH Private Key if you use a SSH-RepoURL (leave username and password empty in this case)
+        internalName: gitRepositorySshPrivateKey
+        required: false
+        type: text-area
       - displayName: ArgoCD container image
         helpText: Container image used for all ArgoCD components (defaults to "quay.io/argoproj/argocd:v2.1.7")
         internalName: argoContainerImage
