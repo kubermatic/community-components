@@ -6,7 +6,7 @@ spec:
   description: Declarative continuous deployment for Kubernetes (as high availability installation).
   formSpec:
       - displayName: Git repository URL
-        helpText: URL of the Git repository used as source (HTTP/S w/ username+password or SSH w/ your private key)
+        helpText: URL of the Git repository used as source (HTTP/S with username/password or SSH with SSH private key)
         internalName: gitRepositoryUrl
         required: true
         type: text
@@ -30,9 +30,14 @@ spec:
         internalName: gitRepositoryHttpPassword
         required: false
         type: text
-      - displayName: SSH Private Key
-        helpText: Please provide SSH Private Key if you use a SSH-RepoURL (leave username and password empty in this case)
+      - displayName: SSH private key
+        helpText: SSH private key used to access the Git repository
         internalName: gitRepositorySshPrivateKey
+        required: false
+        type: text-area
+      - displayName: SSH known hosts
+        helpText: Initial SSH known host entries added to ArgoCD (if there are already existing SSH known host entries, this value has no effect)
+        internalName: initialSshKnownHosts
         required: false
         type: text-area
       - displayName: ArgoCD container image
