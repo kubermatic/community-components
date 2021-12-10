@@ -13,6 +13,10 @@ data:
   password: {{ .Variables.gitRepositoryHttpPassword | b64enc | quote }}
   username: {{ .Variables.gitRepositoryHttpUsername | b64enc | quote }}
   {{- end }}
+  {{- if .Variables.gitRepositorySshPrivateKey }}
+  sshPrivateKey: |
+      {{ .Variables.gitRepositorySshPrivateKey | b64enc }}
+  {{- end }}
 ---
 apiVersion: argoproj.io/v1alpha1
 kind: Application

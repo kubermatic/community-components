@@ -4394,6 +4394,38 @@ spec:
               fieldPath: metadata.namespace
         image: '{{ Registry "docker.io" }}/bitnami/kubectl:{{ .Cluster.MajorMinorVersion }}'
         name: init-configmaps
+{{- if .Variables.initialSshKnownHosts }}
+      - command:
+        - /bin/bash
+        - -c
+        - |
+          #!/usr/bin/env bash
+
+          set -euo pipefail
+
+          configmap="argocd-ssh-known-hosts-cm"
+          key="ssh_known_hosts"
+
+          echo "Ensuring configmap ${configmap} exists and does not contain key ${key}..."
+          if kubectl --namespace="${RUNTIME_NAMESPACE}" get configmap "${configmap}" &> /dev/null; then
+            if [ -z "$(kubectl --namespace="${RUNTIME_NAMESPACE}" get configmap "${configmap}" -o jsonpath='{.data.ssh_known_hosts}')" ]; then
+              echo "Adding initial SSH known hosts entries to configmap ${configmap}..."
+              kubectl --namespace="${RUNTIME_NAMESPACE}" patch configmap "${configmap}" --patch="$(cat <<- EOF
+                data:
+                  ${key}: |
+                    {{- .Variables.initialSshKnownHosts | nindent 20 }}
+          EOF
+          )"
+            fi
+          fi
+        env:
+        - name: RUNTIME_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        image: '{{ Registry "docker.io" }}/bitnami/kubectl:{{ .Cluster.MajorMinorVersion }}'
+        name: init-ssh-known-hosts
+{{- end }}
       serviceAccountName: argocd-application-controller
       volumes:
       - emptyDir: {}

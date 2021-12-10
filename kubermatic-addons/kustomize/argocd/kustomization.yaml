@@ -8,4 +8,5 @@ resources:
 
 patchesStrategicMerge:
   - patches/delete-dynamic-configmaps.yaml
+  - patches/add-ssh-known-hosts-init-container.yaml
   - patches/add-configmap-init-container.yaml
