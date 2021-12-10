@@ -76,8 +76,12 @@ spec:
                   name: docker-pull-config
                   key: auth
             - name: PREPULL_IMAGES
-              ### find images: kubectl get pods -A -o jsonpath='{range .items[*]}{@.spec.containers[*].image}{"\n\n"}{end}' | tr " " "\n" | sort -u
-              ### find init images: kubectl get pods -A -o jsonpath='{range .items[*]}{@.spec.initContainers[*].image}{"\n\n"}{end}' | tr " " "\n" | sort -u
+              ### 1. find images:
+              # kubectl get pods -A -o jsonpath='{range .items[*]}{@.spec.containers[*].image}{"\n\n"}{end}' | tr " " "\n" | sort -u > image-list.txt
+              ### 2. find init images:
+              # kubectl get pods -A -o jsonpath='{range .items[*]}{@.spec.initContainers[*].image}{"\n\n"}{end}' | tr " " "\n" | sort -u >> image-list.txt
+              ### 3. remove all know registries and sort again
+              # grep -v gcr.io image-list.txt | grep -v quay.io | grep -v wacker.corp | sort -u
               value: |
                 docker.io/calico/kube-controllers:v3.16.5
                 docker.io/calico/node:v3.16.5
