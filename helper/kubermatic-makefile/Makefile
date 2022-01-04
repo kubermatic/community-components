@@ -86,9 +86,10 @@ backup-deployment:
 all-deployment: kkp-deployment logging-deployment monitoring-deployment backup-deployment #kkp-seed-deployment
 
 ################## Helpers
+BIN_ARCH ?= linux-amd64    #use e.g. for MAC OS: BIN_ARCH=darwin-amd64 make download-kkp-release
 download-kkp-release:
 	mkdir -p ${KKP_RELEASE_ROOT_FOLDER}/${KKP_VERSION}
-	wget https://github.com/kubermatic/kubermatic/releases/download/${KKP_VERSION}/kubermatic-ee-${KKP_VERSION}-linux-amd64.tar.gz -O- | tar -xz --directory ${KKP_RELEASE_ROOT_FOLDER}/${KKP_VERSION}/
+	wget https://github.com/kubermatic/kubermatic/releases/download/${KKP_VERSION}/kubermatic-ee-${KKP_VERSION}-${BIN_ARCH}.tar.gz -O- | tar -xz --directory ${KKP_RELEASE_ROOT_FOLDER}/${KKP_VERSION}/
 	rm -rf ${KKP_RELEASE_ROOT_FOLDER}/{KKP_VERSION}/.kube
 
 ######## VAULT
