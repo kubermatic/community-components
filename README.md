@@ -85,7 +85,8 @@ List of helper scripts and tools
 | [pvc.test.yaml](helper/pvc.test.yaml)                                                           | small pod + pvc to test if storage provisioning works                                                                                                                                                            |
 | [refresh-all-service-accounts-in-cluster.sh](helper/refresh-all-service-accounts-in-cluster.sh) | script to refresh all service accounts token (stored as secrets) and restart dependent pods semi-automatic                                                                                                       |
 | [local-connect-k8s-services.sh](helper/local-connect-k8s-services.sh)                           | A small helper script to `kubectl port-forward` a handful of service, in the example the typical MLA services `prometheus`, `grafana`, `alertmanager`                                                            |
-| [ssh-jumphosts-template.sh](helper/ssh-jumphosts-template.sh)                                   | Template to create a jumphost script with predefined enviroments. |
+| [ssh-jumphosts-template.sh](helper/ssh-jumphosts-template.sh)                                   | Template to create a jumphost script with predefined enviroments. 
+|
 
 | [Infrastructure benchmarking](helper/benchmarking)                                             | Documentation on how to benchmark various infrastrucutre elements used for hosting a kubernetes cluster. |
 
