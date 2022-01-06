@@ -87,7 +87,9 @@ List of helper scripts and tools
 | [local-connect-k8s-services.sh](helper/local-connect-k8s-services.sh)                           | A small helper script to `kubectl port-forward` a handful of service, in the example the typical MLA services `prometheus`, `grafana`, `alertmanager`                                                            |
 | [ssh-jumphosts-template.sh](helper/ssh-jumphosts-template.sh)                                   | Template to create a jumphost script with predefined enviroments. |
 
-| [iInfrastructure benchmarking](helper/benchmarking)                                             | Documentation on how to benchmark various infrastrucutre elements used for hosting a kubernetes cluster.                                                                                                         |
+| [Infrastructure benchmarking](helper/benchmarking)                                             | Documentation on how to benchmark various infrastrucutre elements used for hosting a kubernetes cluster. |
+
+
 ## Knowledge Base
 
 Helpful how-tos and detailed documentation:
