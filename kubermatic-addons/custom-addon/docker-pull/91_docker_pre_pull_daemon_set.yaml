@@ -22,6 +22,10 @@ spec:
   selector:
     matchLabels:
       app: docker-pre-pull
+  updateStrategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 100
   template:
     metadata:
       labels:
