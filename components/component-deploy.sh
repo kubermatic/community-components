@@ -7,6 +7,7 @@ DEPLOY_S3_SYNCER="s3-syncer"
 DEPLOY_SGW="service-gateway"
 DEPLOY_CERT="cert-update-svc"
 DEPLOY_THANOS_SEED_INGRESS="thanos-seed-ingress"
+DEPLOY_VMWARE_EXPORTER="vmware-exporter"
 
 if [[ $# -lt 4 ]] || [[ "$1" == "--help" ]]; then
   echo "ARGUMENTS:"$*
@@ -69,6 +70,10 @@ case "$DEPLOY_STACK" in
 
   "$DEPLOY_THANOS_SEED_INGRESS")
     deploy thanos-seed-ingress monitoring thanos-seed-ingress
+    ;;
+    
+  "$DEPLOY_VMWARE_EXPORTER")
+    deploy vmware-exporter monitoring vmware-exporter
     ;;
   *)
     echo "error: no DEPLOY_STACK defined"

@@ -1,0 +1,14 @@
+1. Get vmware_exporter running using prometheus service discovery
+
+  Assure your Prometheus kubernetes_sd is configured to scrape the following pod annotations:
+
+  podAnnotations:
+ {{- range $k, $v := .Values.vmware-exporter.podAnnotations }}   
+    {{- if $v }}
+    - {{ $k }}: {{ $v | quote }}
+    {{- end }}
+ {{- end }}
+
+  Double check annotation names in source_labels match, your podAnnotations i.e. prometheus.io/scrape: "true"
+  annotation will result in checking the source label __meta_kubernetes_pod_annotation_prometheus_io_scrape
+
