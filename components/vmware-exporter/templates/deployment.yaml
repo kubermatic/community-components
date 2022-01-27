@@ -1,0 +1,64 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ template "vmware-exporter.fullname" . }}
+  labels:
+    app: {{ template "vmware-exporter.name" . }}
+    chart: {{ template "vmware-exporter.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  replicas: {{ .Values.vmware-exporter.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ template "vmware-exporter.name" . }}
+      release: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app: {{ template "vmware-exporter.name" . }}
+        release: {{ .Release.Name }}
+      annotations:
+{{- with .Values.vmware-exporter.podAnnotations }}
+{{ toYaml . | indent 8 }}
+{{- end }}
+    spec:
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.vmware-exporter.image.repository }}:{{ .Values.vmware-exporter.image.tag }}"
+          imagePullPolicy: {{ .Values.vmware-exporter.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: 9272
+              protocol: TCP
+          envFrom:
+            - configMapRef:
+                name: {{ template "vmware-exporter.fullname" . }}-config
+            - secretRef:
+                name: {{ if not .Values.vmware-exporter.vsphere.existingSecret }}{{ template "vmware-exporter.fullname" . }}-secret{{ else }}{{ .Values.vmware-exporter.vsphere.existingSecret }}{{ end }}
+          livenessProbe:
+{{ toYaml .Values.vmware-exporter.livenessProbe | indent 12 }}
+          readinessProbe:
+{{ toYaml .Values.vmware-exporter.readinessProbe | indent 12 }}
+          resources:
+{{ toYaml .Values.vmware-exporter.resources | indent 12 }}
+        {{- with .Values.vmware-exporter.securityContext }}
+          securityContext:
+        {{- toYaml . | nindent 12 }}
+        {{- end }}
+    {{- with .Values.vmware-exporter.nodeSelector }}
+      nodeSelector:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.vmware-exporter.affinity }}
+      affinity:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.vmware-exporter.tolerations }}
+      tolerations:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.vmware-exporter.podSecurityContext }}
+      securityContext:
+    {{- toYaml . | nindent 8 }}
+    {{- end }}

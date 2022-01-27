@@ -1,0 +1,11 @@
+apiVersion: v1
+name: vmware-exporter
+appVersion: v0.18.2
+description: VMware vCenter Exporter for Prometheus Helm chart
+home: https://github.com/pryorda/vmware_exporter
+maintainers:
+- name: The Kubermatic Kubernetes Platform contributors
+  email: support@kubermatic.com
+sources:
+- https://github.com/pryorda/vmware_exporter
+version: 2.2.0

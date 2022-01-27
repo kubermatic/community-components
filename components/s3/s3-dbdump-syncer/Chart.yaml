@@ -1,0 +1,16 @@
+apiVersion: v2
+name: s3-dbdump-syncer
+description: DB dumper and s3-syncer based on the `aws s3` cli
+version: 0.1.0
+type: application
+appVersion: 2.2.13
+keywords:
+  - kubermatic
+  - minio
+  - s3
+  - aws
+  - postgresql
+  - db
+maintainers:
+  - name: Kubermatic GmbH
+    email: ps@kubermatic.com

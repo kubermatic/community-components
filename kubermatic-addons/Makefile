@@ -1,4 +1,4 @@
-
+WORK_DIR := $(dir $(abspath $(MAKEFILE_LIST)))
 ## See https://github.com/kubermatic/kubermatic-installer/releases
 KKP_VERSION ?= v2.17.0  # default value, overwrite for chosen KKP release
 KKP_ADDON_CUSTOM_REPO ?= 'quay.io/kubermatic/ps-addons'
@@ -13,6 +13,21 @@ docker-build:
 docker-release: docker-build
 	docker push ${KKP_ADDON_CUSTOM_REPO}:${TAG}
 
+############## ARGOCD ADDON
+
+.PHONY: kustomize-build-argocd
+kustomize-build-argocd:
+	docker run --rm --volume ${WORK_DIR}:/src \
+	  k8s.gcr.io/kustomize/kustomize:v4.4.0 \
+	  build /src/kustomize/argocd/ > custom-addon/argocd/00-manifest.yaml
+
+############## FLUX2 ADDON
+
+.PHONY: kustomize-build-flux2
+kustomize-build-flux2:
+	docker run --rm --volume ${WORK_DIR}:/src \
+	  k8s.gcr.io/kustomize/kustomize:v4.4.0 \
+	  build /src/kustomize/flux2/ > custom-addon/flux2/00-manifest.yaml
 
 ############## TRIDENT ADDON
 TRIDENT_INSTALLER_REPO ?= 'quay.io/kubermatic-labs/trident-installer'

@@ -26,6 +26,8 @@ export
 k1-load-env:
 	@test -d ${K1_CONFIG} && echo "[ok]" && echo "kubeone config folder found " || exit 1
 	@cd ${K1_CONFIG} && test -f ${K1_SSH_KEY} && chmod 600 ${K1_SSH_KEY} && ssh-add ${K1_SSH_KEY} && echo "[ok] "|| (echo "ERROR: ssh key permission ..." && exit 2)
+	### store kubeone version
+	kubeone version > ${K1_CONFIG}/kubeone.version.json
 	##### CHECK for vSphere user credentials
 	#ifdef GOVC_USERNAME
 	#	@echo "VSphere UserName sourced is: ${GOVC_USERNAME}"
