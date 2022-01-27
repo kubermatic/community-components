@@ -1,0 +1,9 @@
+{
+  "name": "metallb",
+  "spec": {
+    "variables": {
+      "addressPoolRange": "10.2.0.86-10.2.0.87"
+    },
+    "continuouslyReconcile": true
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "name": "centos-node-pool",
+  "spec": {
+    "template": {
+      "cloud": {
+        "vsphere": {
+          "cpus": 2,
+          "memory": 4096,
+          "diskSizeGB": 10,
+          "template": "machine-controller-e2e-centos"
+        }
+      },
+      "versions": {
+        "kubelet": "1.20.11"
+      },
+      "labels": {},
+      "taints": [],
+      "operatingSystem": {
+        "flatcar": null,
+        "ubuntu": null,
+        "centos": {
+          "distUpgradeOnBoot": true
+        },
+        "sles": null
+      }
+    },
+    "replicas": 1,
+    "dynamicConfig": false
+  }
+}

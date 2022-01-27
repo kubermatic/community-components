@@ -1,0 +1,30 @@
+{
+  "name": "ubuntu-node-pool",
+  "spec": {
+    "template": {
+      "cloud": {
+        "vsphere": {
+          "cpus": 2,
+          "memory": 4096,
+          "diskSizeGB": 10,
+          "template": "ubuntu-focal-20.04-cloudimg-20211026"
+        }
+      },
+      "versions": {
+        "kubelet": "1.20.11"
+      },
+      "labels": {},
+      "taints": [],
+      "operatingSystem": {
+        "flatcar": null,
+        "ubuntu": {
+          "distUpgrade": false
+        },
+        "centos": null,
+        "sles": null
+      }
+    },
+    "replicas": 1,
+    "dynamicConfig": false
+  }
+}

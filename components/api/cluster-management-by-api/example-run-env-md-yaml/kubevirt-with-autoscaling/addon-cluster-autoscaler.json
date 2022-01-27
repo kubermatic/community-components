@@ -1,0 +1,6 @@
+{
+  "name": "cluster-autoscaler",
+  "spec": {
+    "continuouslyReconcile": true
+  }
+}
