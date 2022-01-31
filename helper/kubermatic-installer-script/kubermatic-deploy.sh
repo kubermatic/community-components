@@ -58,6 +58,7 @@ function deploy {
 
   echo "$(date -Is)" "Upgrading [$namespace] $name ..."
   kubectl create namespace "$namespace" || true
+  helm dependency build $path
   helm upgrade --install --wait --timeout $timeout $MASTER_FLAG --values "$VALUES_FILE" --namespace "$namespace" "$name" "$path"
 
   if [[ -v CANARY_DEPLOYMENT ]]; then
