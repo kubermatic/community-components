@@ -13,7 +13,8 @@
 # limitations under the License.
 
 
-FROM ubuntu:20.04
+ARG ARCH=amd64
+FROM ${ARCH}/ubuntu:20.04
 
 ENV GO111MODULE on
 # Install KubeOne
