@@ -42,7 +42,9 @@ RUN apt-get update && apt-get install -y \
         software-properties-common \
         iputils-ping \
         locate \
-        dnsutils
+        netcat \
+        dnsutils\
+        && apt-get clean
 
 
 RUN wget --no-check-certificate -qO -  https://apt.releases.hashicorp.com/gpg | apt-key add -

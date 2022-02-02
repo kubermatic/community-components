@@ -7,7 +7,7 @@ TAG_DATE ?= kubeone-${KUBEONE_VERSION}-$(shell date -I)
 .PHONY: docker-release docker-build
 
 docker-build:
-	docker build --build-arg kubeone_version=${KUBEONE_VERSION} -t ${DOCKER_REPO}:${TAG_DATE} .
+	docker build --pull --build-arg kubeone_version=${KUBEONE_VERSION} -t ${DOCKER_REPO}:${TAG_DATE} .
 
 docker-run-local: docker-build
 	docker run -it -v $(shell pwd):/home/kubermatic/mnt ${DOCKER_REPO}:${TAG_DATE} bash
