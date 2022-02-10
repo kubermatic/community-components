@@ -1,0 +1,63 @@
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: k8s-event-logger
+  namespace: kube-system
+  labels:
+    app.kubernetes.io/name: k8s-event-logger
+rules:
+- apiGroups: [""]
+  resources: ["events"]
+  verbs: ["get", "list", "watch"]
+
+---
+
+kind: ServiceAccount
+apiVersion: v1
+metadata:
+  name: k8s-event-logger
+  namespace: kube-system
+  labels:
+    app.kubernetes.io/name: k8s-event-logger
+---
+
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: k8s-event-logger
+  labels:
+    app.kubernetes.io/name: k8s-event-logger
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: k8s-event-logger
+subjects:
+- kind: ServiceAccount
+  name: k8s-event-logger
+  namespace: kube-system
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: k8s-event-logger
+  namespace: kube-system
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: k8s-event-logger
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: k8s-event-logger
+    spec:
+      containers:
+        - name: k8s-event-logger
+          image: maxrocketinternet/k8s-event-logger:1.5
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+      serviceAccountName: k8s-event-logger
