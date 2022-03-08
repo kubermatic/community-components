@@ -1,0 +1,25 @@
+{{- if .Values.service.enabled -}}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "nutanix-exporter.fullname" . }}
+  labels:
+    app: {{ template "nutanix-exporter.name" . }}
+    chart: {{ template "nutanix-exporter.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+{{- with .Values.service.annotations }} 
+  annotations: 
+{{ toYaml . | indent 4 }} 
+{{- end }} 
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - port: {{ .Values.service.port }}
+      targetPort: {{ .Values.service.targetport }}
+      protocol: TCP
+      name: http
+  selector:
+    app: {{ template "nutanix-exporter.name" . }}
+    release: {{ .Release.Name }}
+{{- end }}
