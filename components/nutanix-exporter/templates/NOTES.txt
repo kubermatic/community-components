@@ -1,0 +1,14 @@
+1. Get nutanix-exporter running using prometheus service discovery
+
+  Assure your Prometheus kubernetes_sd is configured to scrape the following pod annotations:
+
+  podAnnotations:
+ {{- range $k, $v := .Values.podAnnotations }}   
+    {{- if $v }}
+    - {{ $k }}: {{ $v | quote }}
+    {{- end }}
+ {{- end }}
+
+  Double check annotation names in source_labels match, your podAnnotations i.e. prometheus.io/scrape: "true"
+  annotation will result in checking the source label __meta_kubernetes_pod_annotation_prometheus_io_scrape
+

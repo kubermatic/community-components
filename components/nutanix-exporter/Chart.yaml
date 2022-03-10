@@ -1,0 +1,11 @@
+apiVersion: v1
+name: nutanix-exporter
+appVersion: v0.5.1
+description: Nutanix Exporter for Prometheus Helm chart
+home: https://github.com/claranet/nutanix-exporter
+maintainers:
+- name: The Kubermatic Kubernetes Platform contributors
+  email: support@kubermatic.com
+sources:
+- https://github.com/claranet/nutanix-exporter
+version: 1.0.0
