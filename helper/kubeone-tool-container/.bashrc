@@ -49,3 +49,5 @@ complete -C /usr/bin/terraform terraform
 
 ### kubeone autocompletion
 source <(kubeone completion bash)
+
+[ -f ~/.fzf.bash ] && source ~/.fzf.bash
