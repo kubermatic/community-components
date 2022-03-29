@@ -41,6 +41,9 @@ source <(helm completion bash)
 ##### fubectl
 [ -f /home/kubermatic/bin/fubectl.source ] && source /home/kubermatic/bin/fubectl.source
 
+# fzf
+[ -f ~/.fzf.bash ] && source ~/.fzf.bash
+
 #### krew
 export PATH="${KREW_ROOT:-/home/kubermatic/.krew}/bin:$PATH"
 
@@ -49,5 +52,3 @@ complete -C /usr/bin/terraform terraform
 
 ### kubeone autocompletion
 source <(kubeone completion bash)
-
-[ -f ~/.fzf.bash ] && source ~/.fzf.bash
