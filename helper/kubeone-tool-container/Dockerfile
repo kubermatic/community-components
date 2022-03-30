@@ -20,7 +20,7 @@ ENV GO111MODULE on
 # Install KubeOne
 ENV DEBIAN_FRONTEND=noninteractive
 
-RUN apt-get update && apt-get install -y --no-install-recommends\
+RUN apt-get update && apt-get install -y\
         bash-completion \
         python3-crcmod \
         ca-certificates \
@@ -43,7 +43,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends\
         locate \
         netcat \
         dnsutils\
-        wget \
         zsh \
         && apt-get clean
 
