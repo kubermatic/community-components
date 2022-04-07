@@ -1,0 +1,92 @@
+groups:
+  - name: vmware
+    rules:
+    - record: resource:infrastructure_saturation:ratio
+      labels:
+        service: infrastructure:datastore
+        provider: vmware
+      expr: >
+        max by (dc_name, ds_name, cluster_name) (
+          vmware_datastore_freespace_size 
+          /
+          vmware_datastore_capacity_size
+        )
+
+    # CPU usage
+    - record: :vmware_vm_num_cpu:sum
+      expr: >
+        sum without (vm_name, ds_name) (vmware_vm_num_cpu)
+    - record: resource:infrastructure_saturation:ratio
+      labels:
+        service: infrastructure:cpu
+        provider: vmware
+      expr: >
+        (
+          :vmware_vm_num_cpu:sum 
+          / on(host_name) 
+          group_left() (vmware_host_num_cpu)
+        )
+
+    # Memory usage
+    - record: resource:infrastructure_saturation:ratio
+      labels:
+        service: infrastructure:memory
+        provider: vmware
+      expr: >
+        max by (dc_name, host_name, cluster_name) (
+          vmware_host_memory_usage 
+          /
+          vmware_host_memory_max
+        )
+
+    # Average values for each component, over a week
+    - record: resource:infrastructure_saturation:ratio:avg_over_time_1w
+      expr: >
+        avg_over_time(resource:infrastructure_saturation:ratio[1w])
+
+    # Predicted value in 14 days, based on average over previous 7 days
+    - record: resource:infrastructure_saturation:ratio:predict_linear_2w
+      expr: >
+        predict_linear(
+          resource:infrastructure_saturation:ratio:avg_over_time_1w[1w],
+          86400 * 14
+        )
+
+    - alert: InfrastructureSaturationOutOfBounds
+      expr: resource:infrastructure_saturation:ratio{service="infrastructure:cpu"} > 1.5
+      for: 5m
+      labels:
+        resource: '{{ $labels.host_name }}'
+        severity: warning
+      annotations:
+        message: |
+          Saturation of {{ $labels.service }} - {{ $labels.resource }} is over 150%.
+
+    - alert: InfrastructureSaturationOutOfBounds
+      expr: resource:infrastructure_saturation:ratio{service="infrastructure:memory"} > 0.95
+      for: 5m
+      labels:
+        resource: '{{ $labels.host_name }}'
+        severity: warning
+      annotations:
+        message: |
+          Saturation of {{ $labels.service }} - {{ $labels.resource }} is over 95%.
+
+    - alert: InfrastructureSaturationOutOfBounds
+      expr: resource:infrastructure_saturation:ratio{service="infrastructure:datastore"} > 0.95
+      for: 5m
+      labels:
+        resource: '{{ $labels.ds_name }}'
+        severity: warning
+      annotations:
+        message: |
+          Saturation of {{ $labels.service }} - {{ $labels.resource }} is over 95%.
+
+    - alert: PrognosedInfrastructureLimitReachedIn14days
+      expr: resource:infrastructure_saturation:ratio:predict_linear_2w{service!="cpu"} > 1
+      for: 60m
+      labels:
+        severity: warning
+      annotations:
+        message: |
+          Saturation of {{ $labels.service }} - {{ $labels.resource }} is predicted to exceed 100% within next 14 days.
