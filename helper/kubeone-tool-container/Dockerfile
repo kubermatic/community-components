@@ -116,7 +116,7 @@ RUN K9S_RELEASE_URL=$(curl -Ls -o /dev/null -w %{url_effective} https://github.c
 
 # Install LazyGit
 RUN LAZYGIT_VERSION=v0.34 && \
-    mkdir /tmp/lazygit-inst && cd tmp/lazygit-inst && \
+    mkdir /tmp/lazygit-inst && cd /tmp/lazygit-inst && \
     curl -sL https://github.com/jesseduffield/lazygit/releases/download/v0.34/lazygit_0.34_Linux_x86_64.tar.gz | tar -xvz && \
     mv lazygit /usr/local/bin && \
     cd .. && rm -rf /tmp/lazygit-inst
