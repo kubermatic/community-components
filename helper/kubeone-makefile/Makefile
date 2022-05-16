@@ -75,17 +75,19 @@ k1-kubeconfig: k1-load-env
 VAULT_ADDR="https://vault.example.com"
 VAULT_ENGINE_PATH="project-kv-engine/k1.example.com"
 VAULT_LOCAL="../secrets"
+VAULT_SCRIPT="../vault/vault-kv-management.sh"
+OIDC_PATH=TODO
 vault-upload:
 	VAULT_ADDR=${VAULT_ADDR} VAULT_ENGINE_PATH=${VAULT_ENGINE_PATH} LOCAL="${VAULT_LOCAL}" \
-		"../vault-kv-management.sh" --upload
+		${VAULT_SCRIPT} --upload
 
 vault-download:
 	VAULT_ADDR=${VAULT_ADDR} VAULT_ENGINE_PATH=${VAULT_ENGINE_PATH} LOCAL="${VAULT_LOCAL}" \
-    		"../vault-kv-management.sh"
+		${VAULT_SCRIPT}
 
-vault-login:
+vault-login-user:
 	@read -p "Enter vault username:" user; \
 	VAULT_ADDR=${VAULT_ADDR} vault login -method=userpass username=$$user
 
-vault-login-oidc:
-	VAULT_ADDR=${VAULT_ADDR} vault login --method=oidc --path=OIDC_PATH
+vault-login:
+	VAULT_ADDR=${VAULT_ADDR} vault login --method=oidc --path=$OIDC_PATH
