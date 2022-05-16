@@ -20,7 +20,7 @@ ENV GO111MODULE on
 # Install KubeOne
 ENV DEBIAN_FRONTEND=noninteractive
 
-RUN apt-get update && apt-get install -y \
+RUN apt-get update && apt-get install -y\
         bash-completion \
         python3-crcmod \
         ca-certificates \
@@ -30,7 +30,6 @@ RUN apt-get update && apt-get install -y \
         gnupg \
         unzip \
         upx-ucl \
-        fzf \
         openssh-server \
         sudo \
         vim \
@@ -44,6 +43,7 @@ RUN apt-get update && apt-get install -y \
         locate \
         netcat \
         dnsutils\
+        zsh \
         && apt-get clean
 
 
@@ -114,6 +114,25 @@ RUN K9S_RELEASE_URL=$(curl -Ls -o /dev/null -w %{url_effective} https://github.c
  K9S_LATEST="${K9S_RELEASE_URL##*/}" && \
  wget -c "https://github.com/derailed/k9s/releases/download/${K9S_LATEST}/k9s_Linux_x86_64.tar.gz"  -O - | tar -xz -C /usr/local/bin/
 
+# Install LazyGit
+RUN LAZYGIT_VERSION=v0.34 && \
+    mkdir /tmp/lazygit-inst && cd /tmp/lazygit-inst && \
+    curl -sL https://github.com/jesseduffield/lazygit/releases/download/v0.34/lazygit_0.34_Linux_x86_64.tar.gz | tar -xvz && \
+    mv lazygit /usr/local/bin && \
+    cd .. && rm -rf /tmp/lazygit-inst
+
+# Install fzf manually since apt-get install does not install bash completion
+RUN git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf && ~/.fzf/install
+
+# Install zsh, oh-my-zsh, powerlevel10k
+COPY ./.zshrc /root/
+COPY ./.p10k.zsh /root/
+RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended --keep-zshrc && \
+    git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k && \
+    git clone --depth=1 https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions && \
+    git clone --depth=1 https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting && \
+    git clone --depth=1 https://github.com/kubermatic/fubectl.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/fubectl
+
 COPY ./.bashrc /root/
 
 ARG USER=kubermatic
@@ -150,12 +169,9 @@ RUN terraform init -input=false && \
     mv .terraform/providers $HOME/.terraform.d/plugins/linux_amd64/
 ENV TF_CLI_ARGS_init="-plugin-dir /home/${USER}/.terraform.d/plugins/linux_amd64/providers"
 
-
-
 ##only if you start ssh on demand
 EXPOSE 22
 
 SHELL ["/bin/bash", "-ic"]
 ### tail to enable to run in backend
 CMD exec /bin/bash -c "trap : TERM INT; sleep infinity & wait"
-

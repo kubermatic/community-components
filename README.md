@@ -94,26 +94,28 @@ List of helper scripts and tools
 
 Helpful how-tos and detailed documentation:
 
-| Name                                                                 | Description                                                                                                                                 |
-|----------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------|
-| [setup-checklist/kkp](./knowledge-base/setup-checklist/kkp)          | Detailed requirement documentation to setup Kubermatic KKP at different environments                                                        |
-| [setup-checklist/kubeone](./knowledge-base/setup-checklist/kubeone)  | Detailed requirement documentation to setup KubeOne at different environments                                                               |
-| [how-to-convert-to-docx](./knowledge-base/how-to-convert-to-docx.md) | Commands to convert markdown to docx                                                                                                        |
-| [migrate-helm2-to-helm3](./knowledge-base/migrate-helm2-to-helm3.md) | This document shows you how to migrate Heml releases from using Helm version 2.x with Tiller to being managed by Helm version 3.x in place. |
-| [node-health-check](knowledge-base/node-health-check.md)             | This doc describes how Kubermatic node health checks works                                                                                  |
-| [nvidia-gpu-operator](knowledge-base/nvidia-gpu-operator.md)         | How to enable GPU support for KKP clusters by [NVIDIA - GPU Operator](https://github.com/NVIDIA/gpu-operator/)                              |
-| [offline-setup](knowledge-base/offline-setup.md)                     | How to run kubermatic in offline environments                                                                                               |
-| [upload-ova-with-govc](knowledge-base/upload-ova-with-govc.md)       | How to upload ova by using `govc`                                                                                                           |
+| Name                                                                                        | Description                                                                                                                                 |
+|---------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------|
+| [setup-checklist/kkp](./knowledge-base/setup-checklist/kkp)                                 | Detailed requirement documentation to setup Kubermatic KKP at different environments                                                        |
+| [setup-checklist/kubeone](./knowledge-base/setup-checklist/kubeone)                         | Detailed requirement documentation to setup KubeOne at different environments                                                               |
+| [how-to-convert-to-docx](./knowledge-base/how-to-convert-to-docx.md)                        | Commands to convert markdown to docx                                                                                                        |
+| [migrate-helm2-to-helm3](./knowledge-base/migrate-helm2-to-helm3.md)                        | This document shows you how to migrate Heml releases from using Helm version 2.x with Tiller to being managed by Helm version 3.x in place. |
+| [node-health-check](knowledge-base/node-health-check.md)                                    | This doc describes how Kubermatic node health checks works                                                                                  |
+| [nvidia-gpu-operator](knowledge-base/nvidia-gpu-operator.md)                                | How to enable GPU support for KKP clusters by [NVIDIA - GPU Operator](https://github.com/NVIDIA/gpu-operator/)                              |
+| [offline-setup](knowledge-base/offline-setup.md)                                            | How to run kubermatic in offline environments                                                                                               |
+| [upload-ova-with-govc](knowledge-base/upload-ova-with-govc.md)                              | How to upload ova by using `govc`                                                                                                           |
+| [how-to-collect-cluster-cpu-memory.md](knowledge-base/how-to-collect-cluster-cpu-memory.md) | How to collect the provisioned CPU/Memory of Kubernetes Clusters                                                                            |
 
 ## Runbook
 
 Guides how to operate KubeOne / KKP.
 
-| Name                                                                                                                      | Description                                                        |
-|---------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------|
-| [metallb-service-connection-drops-ipvs-strict-arp](./runbook/metallb/metallb-service-connection-drops-ipvs-strict-arp.md) | Connection Drops of Service Type LoadBalancer provided by MetalLB. |
-| [user-cluster-prometheus.md](./runbook/user-cluster-prometheus.md)                                                        | Crash Looping Prometheus at KKP user cluster namespace             |
-| [manual-backup](./runbook/manual-backup.md)                                                                               | How to create manual backup for your KKP/KubeOne setup.            |
+| Name                                                                                                                      | Description                                                           |
+|---------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------|
+| [metallb-service-connection-drops-ipvs-strict-arp](./runbook/metallb/metallb-service-connection-drops-ipvs-strict-arp.md) | Connection Drops of Service Type LoadBalancer provided by MetalLB.    |
+| [user-cluster-prometheus.md](./runbook/user-cluster-prometheus.md)                                                        | Crash Looping Prometheus at KKP user cluster namespace                |
+| [manual-backup](./runbook/manual-backup.md)                                                                               | How to create manual backup for your KKP/KubeOne setup.               |
+| [k8s-kubeconfig-expiring-failure.md](./runbook/k8s-kubeconfig-expiring-failure.md)                                        | Expiring `kubeconfig` client certificate (at KubeOne Cluster example) |
 
 ## Troubleshooting
 
