@@ -44,6 +44,7 @@ RUN apt-get update && apt-get install -y\
         netcat \
         dnsutils\
         zsh \
+        uuid-runtime \
         && apt-get clean
 
 
