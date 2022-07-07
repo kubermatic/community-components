@@ -1,0 +1,113 @@
+# Copyright 2021 The Flowmatic Authors.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+apiVersion: kubermatic.k8s.io/v1
+kind: AddonConfig
+metadata:
+  name: kubeflow
+spec:
+  shortDescription: "Kubeflow machine learning toolkit for Kubernetes"
+  description: "Kubeflow machine learning toolkit for Kubernetes"
+  logoFormat: "svg+xml"
+  logo: |+
+    PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+Cjxz
+    dmcgaWQ9IkxheWVyXzEiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDM5OC4zIDky
+    LjUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sOnNwYWNlPSJwcmVzZXJ2
+    ZSIgdmlld0JveD0iMCAwIDM5OC4zIDkyLjUiIHdpZHRoPSIxNjYiIGhlaWdodD0iNDAiIHZlcnNp
+    b249IjEuMSIgeT0iMHB4IiB4PSIwcHgiIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8x
+    OTk5L3hsaW5rIj4KPHN0eWxlIHR5cGU9InRleHQvY3NzIj4KCS5zdDB7ZmlsbDojNDI3OUY0O30K
+    CS5zdDF7ZmlsbDojMDAyOEFBO30KCS5zdDJ7ZmlsbDojMDE0QkQxO30KCS5zdDN7ZmlsbDojQkVE
+    Q0ZGO30KCS5zdDR7ZmlsbDojNkNBMUZGO30KCS5zdDV7ZmlsbDojQTFDM0ZGO30KCS5zdDZ7Zmls
+    bDojNDI3OUY0O3N0cm9rZTojNDI3OUY0O3N0cm9rZS13aWR0aDozLjE5NjY7c3Ryb2tlLW1pdGVy
+    bGltaXQ6MTA7fQoJLnN0N3tmaWxsOiMwMDI4QUE7c3Ryb2tlOiMwMDI4QUE7c3Ryb2tlLXdpZHRo
+    OjMuMTk2NjtzdHJva2UtbWl0ZXJsaW1pdDoxMDt9Cjwvc3R5bGU+Cgk8cGF0aCBjbGFzcz0ic3Qw
+    IiBkPSJtMjYuMyAzMS40bDIgNTEuMSAzNi45LTQ3LjFjMC42LTAuNyAxLjQtMS4yIDIuMy0xLjNz
+    MS44IDAuMiAyLjUgMC43bDIzIDE4LjUtNy41LTMyLjgtNTkuMiAxMC45eiIvPgoJPHBvbHlnb24g
+    cG9pbnRzPSIyOS42IDkxLjkgNjIuNCA5MS45IDQyLjMgNzUuOCIgY2xhc3M9InN0MSIvPgoJPHBv
+    bHlnb24gcG9pbnRzPSI2OC41IDQyLjMgNDYuNSA3MC40IDY5LjkgODkuMiA5Mi4yIDYxLjMiIGNs
+    YXNzPSJzdDIiLz4KCTxwb2x5Z29uIHBvaW50cz0iMjAuMiAyNi41IDIwLjIgMjYuNSAzOS41IDIu
+    MiA4LjMgMTcuMyAwLjYgNTEiIGNsYXNzPSJzdDMiLz4KCTxwb2x5Z29uIHBvaW50cz0iMSA2MS40
+    IDIxLjcgODcuNCAxOS44IDM3LjkiIGNsYXNzPSJzdDQiLz4KCTxwb2x5Z29uIHBvaW50cz0iNzku
+    NiAxNC43IDQ5LjcgMC4zIDMxLjEgMjMuNiIgY2xhc3M9InN0NSIvPgoJPHBhdGggY2xhc3M9InN0
+    NiIgZD0ibTEyMi4yIDY5LjZ2LTQ0LjdoNS43djIzLjRsMjAuNS0yMy40aDYuNGwtMTcuNCAxOS43
+    IDE5IDI1LjFoLTYuOGwtMTUuOS0yMC44LTUuOCA2LjZ2MTQuMWgtNS43eiIvPgoJPHBhdGggY2xh
+    c3M9InN0NiIgZD0ibTE2Mi4yIDU5Ljl2LTIyLjJoNS40djIyLjRjMCAxLjggMC44IDMuMiAyLjQg
+    NC4yczMuNCAxLjUgNS41IDEuNSA0LTAuNSA1LjUtMS41YzEuNi0xIDIuMy0yLjQgMi4zLTQuMnYt
+    MjIuNGg1LjR2MjIuMmMwIDMuMy0xLjQgNi00LjEgNy45cy01LjggMi45LTkuMiAyLjljLTMuNCAw
+    LTYuNS0wLjktOS4yLTIuOC0yLjYtMi00LTQuNy00LTh6Ii8+Cgk8cGF0aCBjbGFzcz0ic3Q2IiBk
+    PSJtMTk4LjEgNjkuNnYtNDhoNS40djE2LjhjMy4zLTEuMSA2LjQtMS43IDkuMy0xLjcgMi4zIDAg
+    NC40IDAuNSA2LjIgMS40czMuMiAyLjIgNC4yIDMuNyAxLjcgMy4yIDIuMiA1LjFjMC41IDEuOCAw
+    LjcgMy43IDAuNyA1LjYgMCA1LjYtMS41IDkuOS00LjQgMTIuOHMtNy41IDQuNC0xMy44IDQuNGgt
+    OS44em01LjQtNC44aDQuNWM0LjUgMCA3LjctMSA5LjctM3MzLTUuMSAzLTkuNWMwLTIuOS0wLjYt
+    NS40LTEuOS03LjVzLTMuMy0zLjItNi0zLjJjLTMuNiAwLTYuNyAwLjUtOS4zIDEuNXYyMS43eiIv
+    PgoJPHBhdGggY2xhc3M9InN0NiIgZD0ibTIzMyA1My42YzAtNS4xIDEuNC05LjIgNC4xLTEyLjNz
+    Ni4zLTQuNiAxMC44LTQuNmM4LjkgMCAxMy40IDYuMyAxMy40IDE4LjloLTIyLjhjMC4yIDIuNiAx
+    LjIgNSAyLjkgNy4xczQuNCAzLjEgNy45IDMuMWM0LjEgMCA3LjYtMC43IDEwLjYtMnY1Yy0zLjIg
+    MS4yLTYuNSAxLjktOS45IDEuOS0yLjkgMC01LjUtMC41LTcuNy0xLjRzLTQtMi4yLTUuMy0zLjgt
+    Mi4zLTMuNC0zLTUuNC0xLTQuMi0xLTYuNXptNS42LTIuMWgxNy4zYy0wLjMtMi45LTEuMS01LjMt
+    Mi40LTcuMS0xLjMtMS45LTMuMi0yLjgtNS42LTIuOHMtNC41IDAuOS02LjIgMi43LTIuOCA0LjIt
+    My4xIDcuMnoiLz4KCTxwYXRoIGNsYXNzPSJzdDciIGQ9Im0yNjcuOSA0Mi41di00LjloNXYtNy42
+    YzAtMi41IDAuOC00LjUgMi4zLTZzMy40LTIuMyA1LjctMi4zaDcuOXY0LjloLTVjLTIuMiAwLTMu
+    NyAwLjQtNC40IDEuM3MtMS4xIDIuNS0xLjEgNXY0LjdoOC41djQuOWgtOC41djI3LjFoLTUuNHYt
+    MjcuMWgtNXoiLz4KCTxwYXRoIGNsYXNzPSJzdDciIGQ9Im0yOTUuOSA2OS42di00Ny45aDUuNHY0
+    Ny45aC01LjR6Ii8+Cgk8cGF0aCBjbGFzcz0ic3Q3IiBkPSJtMzE1IDY1LjdjLTMuMi0zLjMtNC44
+    LTcuMy00LjgtMTIgMC00LjggMS42LTguOCA0LjgtMTIgMy4yLTMuMyA3LjMtNC45IDEyLjMtNC45
+    czkuMSAxLjYgMTIuMyA0LjkgNC44IDcuMyA0LjggMTItMS42IDguNy00LjggMTItNy4zIDQuOS0x
+    Mi4zIDQuOS05LjEtMS42LTEyLjMtNC45em0zLjktMjAuN2MtMi4xIDIuMy0zLjIgNS4yLTMuMiA4
+    LjZzMS4xIDYuMyAzLjIgOC42IDUgMy41IDguNSAzLjUgNi4zLTEuMiA4LjUtMy41IDMuMi01LjIg
+    My4yLTguNi0xLjEtNi4zLTMuMi04LjZjLTIuMi0yLjMtNS0zLjUtOC41LTMuNS0zLjYgMC4xLTYu
+    NCAxLjItOC41IDMuNXoiLz4KCTxwYXRoIGNsYXNzPSJzdDciIGQ9Im0zNDkuMSAzNy43aDUuN2w3
+    LjMgMjUuMyA3LjQtMjUuM2g1LjRsNy4zIDI1LjMgNy40LTI1LjNoNS43bC0xMC4xIDMyaC02LjFs
+    LTYuOC0yNC42LTYuOCAyNC42aC02LjVsLTkuOS0zMnoiLz4KPC9zdmc+Cg==
+  formSpec:
+    - displayName: "Expose via LoadBalancer"
+      internalName: "ExposeLoadBalancer"
+      helpText: "The Kubeflow dashboard will be exposed via a LoadBalancer service instead of a NodePort service."
+      required: false
+      type: boolean
+    - displayName: "Enable TLS"
+      internalName: "EnableTLS"
+      helpText: "TLS will be enabled and a certificate will be automatically issued for the specified domain name."
+      required: false
+      type: boolean
+    - displayName: "Install NVIDIA GPU Operator"
+      internalName: "NVIDIAOperator"
+      helpText: "NVIDIA GPU Operator will be installed. Also installs Node Feature Discovery for Kubernetes."
+      required: false
+      type: boolean
+    - displayName: "Install AMD GPU Device Plugin"
+      internalName: "AMDDevicePlugin"
+      helpText: "AMD GPU Device Plugin will be installed. Also installs AMG GPU Node Labeler."
+      required: false
+      type: boolean
+    - displayName: "Domain Name"
+      internalName: "DomainName"
+      helpText: "Domain name for accessing the Kubeflow dashboard. Make sure to set up your DNS accordingly."
+      required: false
+      type: text
+    - displayName: "OIDC Provider URL"
+      internalName: "OIDCProviderURL"
+      helpText: "URL of external OIDC provider, e.g. the Kubermatic Dex instance. If not provided, static users will be used."
+      required: false
+      type: text
+    - displayName: "OIDC Secret"
+      internalName: "OIDCSecret"
+      helpText: "Secret string shared between the OIDC provider and Kubeflow. If not provided, the default one will be used."
+      required: false
+      type: text
+    - displayName: "Enable Istio RBAC"
+      internalName: "EnableIstioRBAC"
+      helpText: "Enable Istio RBAC (Role Based Access Control) for multi-tenancy."
+      required: false
+      type: boolean
