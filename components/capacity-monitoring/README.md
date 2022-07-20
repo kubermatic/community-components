@@ -51,7 +51,7 @@ Suggested exporter: [nutanix-exporter](https://github.com/claranet/nutanix-expor
 
 Installation method: [helm chart](components/nutanix-exporter/Chart.yaml)
 
-Suggested rulesets: [included](knowledge-base/capacity-management/prometheus-rules/nutanix.yaml)
+Suggested rulesets: TBD
 
 ### Openstack
 
