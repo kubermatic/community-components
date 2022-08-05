@@ -1,19 +1,19 @@
 terraform {
   required_providers {
     aws = {
-      version = "~> 3.2"
+      version = "~> 4.25"
     }
     google = {
-      version = "~> 2.0"
+      version = "~> 4.31"
     }
     vsphere = {
       version = "~> 1.2"
     }
     azurerm = {
-      version = "~> 2.4"
+      version = "~> 3.17"
     }
     helm = {
-      version = "~> 2.0"
+      version = "~> 2.6"
     }
     null = {
       version = "~> 3.0"

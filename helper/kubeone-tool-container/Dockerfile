@@ -109,7 +109,16 @@ RUN VERSION=$kubeone_version && \
  curl -LO "https://github.com/kubermatic/kubeone/releases/download/v${VERSION}/kubeone_${VERSION}_linux_amd64.zip" && \
  unzip kubeone_${VERSION}_linux_amd64.zip -d kubeone_${VERSION}_linux_amd64 && \
  mv kubeone_${VERSION}_linux_amd64/kubeone /usr/local/bin
- 
+
+# Install kustomize
+RUN curl -s "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh"  | bash && \
+ mv kustomize /usr/local/bin
+
+# Install Sops
+RUN SOPS_VERSION=$(curl -w '%{url_effective}' -I -L -s -S https://github.com/mozilla/sops/releases/latest -o /dev/null | sed -e 's|.*/v||') && \
+ curl -LO https://github.com/mozilla/sops/releases/download/v${SOPS_VERSION}/sops-v${SOPS_VERSION}.linux && \
+ install -o root -g root -m 0755 sops-v${SOPS_VERSION}.linux /usr/local/bin/sops
+
 # Install k9s
 RUN K9S_RELEASE_URL=$(curl -Ls -o /dev/null -w %{url_effective} https://github.com/derailed/k9s/releases/latest) && \
  K9S_LATEST="${K9S_RELEASE_URL##*/}" && \
