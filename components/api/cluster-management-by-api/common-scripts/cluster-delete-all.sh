@@ -5,6 +5,7 @@ source ${SCRIPT_FOLDER}/_common.sh
 
 ### environment variables managed external - e.g. by source ${SCRIPT_FOLDER}/.kkp-env file
 set -euo pipefail
+confirm=${1:-true}
 
 ids=$(getRequest "/projects/${KKP_PROJECT}/clusters" | jq -r .[].id)
 getRequest "/projects/${KKP_PROJECT}/clusters" | jq
@@ -12,7 +13,7 @@ echo -e "delete clusters: \n$ids"
 
 check_continue "delete all clusters?"
 for id in $ids; do
-  ${SCRIPT_FOLDER}/cluster-delete.sh $id
+  ${SCRIPT_FOLDER}/cluster-delete.sh $id $confirm
 done
 
 

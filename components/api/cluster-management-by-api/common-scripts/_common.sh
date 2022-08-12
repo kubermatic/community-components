@@ -46,6 +46,22 @@ postRequest(){
     -d  @"${payload_file_path}"
 }
 
+postRequestRaw(){
+  api_path=${1}
+  payload_string=${2}
+  if [ "$#" -lt 2 ]; then
+    echo "Usage: postRequest API_PATH PAYLOAD_STRING"
+    echo "e.g.: postRequest /projects/PROJECT_ID/clusters '{count: 1}'"
+    exit 0
+  fi
+  curl -k -X POST \
+      "${KKP_API}${api_path}" \
+    -H  "accept: application/json" \
+    -H  "Content-Type: application/json" \
+    -H  "authorization: Bearer ${KKP_TOKEN}" \
+    -d  "${payload_string}"
+}
+
 patchRequest(){
   api_path=${1}
   payload_file_path=${2}

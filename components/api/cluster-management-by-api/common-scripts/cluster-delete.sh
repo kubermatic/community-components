@@ -5,13 +5,16 @@ source ${SCRIPT_FOLDER}/_common.sh
 
 ### environment variables managed external - e.g. by source ${SCRIPT_FOLDER}/.kkp-env file
 cluster_id=${1:-${CLUSTER_ID}}
+confirm=${2:-true}
 echo $cluster_id
 checkClusterIDSet $(basename $0) $cluster_id
 set -euo pipefail
 echo -e "cluster_id: $cluster_id"
 
 getRequest "${KKP_API}/projects/${KKP_PROJECT}/clusters/${cluster_id}" | jq
-check_continue "delete cluster $cluster_id?"
+if [[ "$confirm" != "false" ]]; then
+  check_continue "delete cluster $cluster_id?"
+fi
 
 curl -k -X DELETE \
   "${KKP_API}/projects/${KKP_PROJECT}/clusters/${cluster_id}" \
