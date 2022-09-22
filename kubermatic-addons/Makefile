@@ -1,9 +1,11 @@
 WORK_DIR := $(dir $(abspath $(MAKEFILE_LIST)))
 ## See https://github.com/kubermatic/kubermatic-installer/releases
-KKP_VERSION ?= v2.17.0  # default value, overwrite for chosen KKP release
+# default value, overwrite for chosen KKP release
+KKP_VERSION ?= 'v2.21.0'
 KKP_ADDON_CUSTOM_REPO ?= 'quay.io/kubermatic/ps-addons'
-TAG_POST_FIX ?= ''             # default value, overwrite to build a new addon version for the same KKP version
-TAG ?= ${KKP_VERSION}${TAG_POST_FIX}
+# default value, overwrite to build a new addon version for the same KKP version
+TAG_POST_FIX ?= '2022-09-20'
+TAG ?= ${KKP_VERSION}-${TAG_POST_FIX}
 
 .PHONY: docker-release docker-build
 
