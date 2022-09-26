@@ -1,0 +1,15 @@
+apiVersion: apps.kubermatic.k8c.io/v1
+kind: ApplicationDefinition
+metadata:
+  name: argocd
+spec:
+  description: Argo CD - Declarative Continuous Delivery for Kubernetes.
+  method: helm
+  versions:
+  - template:
+      source:
+        helm:
+          chartName: argo-cd
+          chartVersion: 5.4.3
+          url: https://argoproj.github.io/argo-helm
+    version: 2.4.11
