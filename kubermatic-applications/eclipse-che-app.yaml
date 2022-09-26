@@ -9,8 +9,9 @@ spec:
   versions:
   - template:
       source:
-        helm:
-          chartName: eclipse-che
-          chartVersion: 7.53.0
-          url: https://eclipse-che.github.io/che-operator/charts
-    version: 7.53.0
+        git:
+          path: components/eclipse-che
+          ref:
+            branch: main
+          remote: https://github.com/kubermatic/community-components
+    version: 0.1.0
