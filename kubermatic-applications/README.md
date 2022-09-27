@@ -55,12 +55,12 @@ Sample values yaml for exposing Echo server
 
 Sample values yaml for exposing Eclipse CHE 
 ```yaml
-k8s:
-  ingressDomain: eclipse-che.xxxx.lab.kubermatic.io
-auth:
-  identityProviderURL: "https://xxxx.lab.kubermatic.io/dex"
-  oAuthClientName: "kubermaticIssuer"
-  oAuthSecret: "XXXXXXXXXXXXXXXXXXXXXX"
+networking:
+  auth:
+    identityProviderURL: "https://xxxxx.lab.kubermatic.io/dex"
+    oAuthClientName: "kubermaticIssuer"
+    oAuthSecret: "xxxxxxxxxxxxxxxxxxxxxxxxxxx"
+  domain: eclipse-che.xxxxx.lab.kubermatic.io
 ```
 
 ## Harbor setup
