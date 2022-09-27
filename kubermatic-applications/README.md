@@ -15,12 +15,14 @@ server:
     secretName: argocd-tls
   ingress:
     enabled: true
+    https: true
     hosts:
-      - host: argocd.xxxx.lab.kubermatic.io
+    - argocd.xxxx.lab.kubermatic.io
     ingressClassName: 'nginx'
     annotations:
       cert-manager.io/cluster-issuer: letsencrypt-prod
       kubernetes.io/tls-acme: 'true'
+      nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
     tls: 
     - secretName: argocd-tls
       hosts:
@@ -48,7 +50,7 @@ Sample values yaml for exposing Echo server
 
 ## Eclipse CHE setup
 > Pre-requisite:  Nginx ingress controller, cert-manager and dex/oauth setup should available on the cluster.
-> Add the redirect-uri "https://eclipse-che.xxxx.lab.kubermatic.io/oauth/callback" of Eclipse CHE under DEX "KubermaticIssuer" Client
+> Add the redirect-uri "https://eclipse-che.xxxx.lab.kubermatic.io/oauth/callback" of Eclipse CHE under DEX "kubermaticIssuer" Client
 > While adding application, provide the namespace value as "default" for Eclipse CHE operator installation as per the design. Internally it takes care of creation of "eclipse-che" namespace and resources within it.
 
 Sample values yaml for exposing Eclipse CHE 
@@ -57,11 +59,9 @@ k8s:
   ingressDomain: eclipse-che.xxxx.lab.kubermatic.io
 auth:
   identityProviderURL: "https://xxxx.lab.kubermatic.io/dex"
-  oAuthClientName: "KubermaticIssuer"
+  oAuthClientName: "kubermaticIssuer"
   oAuthSecret: "XXXXXXXXXXXXXXXXXXXXXX"
 ```
-
-## Flux2 setup
 
 ## Harbor setup
 > Pre-requisite:  Nginx ingress controller and cert-manager setup should available on the cluster.
