@@ -1,0 +1,17 @@
+# Example of an ApplicationDefinition
+apiVersion: apps.kubermatic.k8c.io/v1
+kind: ApplicationDefinition
+metadata:
+  name: eclipse-che
+spec:
+  description: A Helm chart for deploying Eclipse Che on a Kubernetes or Openshift cluster.
+  method: helm
+  versions:
+  - template:
+      source:
+        git:
+          path: components/eclipse-che
+          ref:
+            branch: main
+          remote: https://github.com/kubermatic/community-components
+    version: 7.53.0

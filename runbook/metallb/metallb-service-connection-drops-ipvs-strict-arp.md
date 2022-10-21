@@ -123,7 +123,7 @@ Received 5 response(s)
 3. restart DS: `kubectl rollout restart -n kube-system ds kube-proxy`
 
 ### KKP Custom Addon Fix:
-KKP override values by a custom addon see [kubermatic-addons/custom-addon/kube-proxy-ipvs-patch](../../kubermatic-addons/custom-addon/kube-proxy-ipvs-patch) for the kubeproxy at the customer environments.
+KKP override values by a custom addon see [kubermatic-addons/custom-addon/kube-proxy-ipvs-patch](../../kubermatic-addons/archive/kube-proxy-ipvs-patch) for the kubeproxy at the customer environments.
 - Create custom Addon image, see [kubermatic-addons](../../kubermatic-addons)
 - Use custom addon image reference in your Kubermatic Configuration
 - Update the KubermaticConfiguration - remove orig addon + add custom addon. The latest defaul values can be found at the [kubermatic github repo `docs/zz_generated.kubermaticConfiguration.yaml`](https://github.com/kubermatic/kubermatic/blob/master/docs/zz_generated.kubermaticConfiguration.yaml)

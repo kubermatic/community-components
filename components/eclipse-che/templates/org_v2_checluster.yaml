@@ -1,0 +1,23 @@
+apiVersion: org.eclipse.che/v2
+kind: CheCluster
+metadata:
+  name: eclipse-che
+  namespace: eclipse-che
+spec:
+  components:
+    cheServer:
+      extraProperties:
+         CHE_OIDC_USERNAME__CLAIM: email
+  networking:
+    auth:
+      # Public URL of the Identity Provider server (Keycloak / DEX).
+      identityProviderURL: {{ .Values.networking.auth.identityProviderURL }}
+      # Name of the Kubernetes `OAuthClient` resource used to setup identity federation on the Kubernetes side. Should match to the client id used in DEX. 
+      oAuthClientName: {{ .Values.networking.auth.oAuthClientName }}
+      # Name of the Kubernetes `OAuthClientSecret` resource used to setup identity federation on the Kubernetes side. Should match to the client secret used in DEX. 
+      oAuthSecret: {{ .Values.networking.auth.oAuthSecret }}
+    # Global ingress domain for a Kubernetes cluster.
+    domain: {{ .Values.networking.domain }}
+    # Name of a secret that will be used to setup ingress TLS termination when TLS is enabled.
+    # When the field is empty string, the default cluster certificate will be used.
+    tlsSecretName: che-tls
