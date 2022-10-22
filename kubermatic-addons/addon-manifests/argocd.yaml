@@ -4,6 +4,7 @@ metadata:
   name: argocd
 spec:
   description: Declarative continuous deployment for Kubernetes (as high availability installation).
+  shortDescription: Declarative continuous deployment for Kubernetes (as high availability installation).
   formSpec:
       - displayName: Git repository URL
         helpText: URL of the Git repository used as source (HTTP/S with username/password or SSH with SSH private key)

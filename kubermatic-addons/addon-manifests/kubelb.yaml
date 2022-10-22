@@ -4,8 +4,9 @@ metadata:
   name: kubelb
 spec:
   description: Kubelb-Agent dynamically creates load balancers and external ingress controller implementation.
+  shortDescription: Kubelb-Agent for cloud native dynamically Load Balancing
   formSpec:
-    - displayName: Kubeconf to access the KubeLB cluster
+    - displayName: Kubeconf with Service Account to access the KubeLB cluster
       internalName: kubeconf
       required: true
       type: text-area

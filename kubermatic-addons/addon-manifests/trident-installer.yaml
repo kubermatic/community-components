@@ -4,6 +4,7 @@ metadata:
   name: trident-installer
 spec:
   description: "Trident is the official StorageClass provisioner for Netapp Appliances"
+  shortDescription: NetApp Trident Storage Driver
   formSpec:
     - displayName: backend.json
       internalName: backend

@@ -4,6 +4,7 @@ metadata:
   name: flux2
 spec:
   description: Open and extensible continuous delivery solution for Kubernetes. Powered by GitOps Toolkit.
+  shortDescription: Flux v2 - Continuos Delivery GitOps Toolkit
   formSpec:
       - displayName: Git repository URL
         helpText: URL of the Git repository used as Flux source (only HTTP/S URLs are currently supported)
