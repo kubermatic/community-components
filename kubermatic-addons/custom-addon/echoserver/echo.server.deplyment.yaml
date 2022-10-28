@@ -42,18 +42,20 @@ spec:
   selector:
     app: echoserver
 ---
-apiVersion: extensions/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: echoserver
   namespace: echoserver
-  annotations:
-    kubernetes.io/ingress.class: nginx
 spec:
+  ingressClassName: nginx
   rules:
-    - http:
-        paths:
-          - path: /{{ .Variables.ingpath }}
-            backend:
-              serviceName: echoserver
-              servicePort: 80
+  - http:
+      paths:
+      - path: /{{ .Variables.ingpath }}
+        pathType: Exact
+        backend:
+          service:
+            name: echoserver
+            port:
+              number: 80

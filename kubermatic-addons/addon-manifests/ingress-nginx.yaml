@@ -5,6 +5,7 @@ metadata:
 spec:
   description: ingress-nginx is an Ingress controller for Kubernetes using NGINX as
     a reverse proxy and load balancer.
+  shortDescription: Official Kubernetes Ingress Controller
   formSpec:
     - displayName: Replicas
       internalName: replicas

@@ -1,0 +1,21 @@
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  annotations:
+{{ if .Variables.scDefault }}
+    storageclass.kubernetes.io/is-default-class: "true"
+{{ end }}
+  name: nfs
+provisioner: nfs.csi.k8s.io
+mountOptions:
+  - nconnect=8  # only supported on linux kernel version >= 5.3
+  - hard
+  - nfsvers=4.1
+parameters:
+{{ .Variables.storageClassParameters | nindent 4 }}
+  # see: https://github.com/kubernetes-csi/csi-driver-nfs/blob/master/docs/driver-parameters.md
+  #### example
+#   server: 10.252.24.36
+#   share: /nfs
+reclaimPolicy: Delete
+volumeBindingMode: WaitForFirstConsumer
