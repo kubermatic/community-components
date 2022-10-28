@@ -12,6 +12,6 @@ spec:
         git:
           path: components/eclipse-che
           ref:
-            branch: main
+            branch: master
           remote: https://github.com/kubermatic/community-components
     version: 7.53.0
