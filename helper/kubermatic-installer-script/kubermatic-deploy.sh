@@ -69,26 +69,6 @@ function deploy {
   unset TEST_NAME
 }
 
-function deployKubermaticOperator() {
-    echo "$(date -Is)" "Deploying the CRD's..."
-    kubectl apply -f "$CHART_FOLDER/kubermatic/crd/"
-    if [[ "$DEPLOY_TYPE" == master ]]; then
-      deploy kubermatic-operator kubermatic kubermatic-operator/
-
-    echo "$(date -Is)" "Apply the Kubermatic config files..."
-    #skip .yaml files with where no apiVersion is specified like the values.yaml
-    grep -l 'apiVersion' $(dirname $VALUES_FILE)/*.yaml | xargs -L1 kubectl apply -f
-    fi
-}
-
-function deployKubermaticCharts() {
-    echo "$(date -Is)" "Deploying the CRD's..."
-    kubectl apply -f "$CHART_FOLDER/kubermatic/crd/"
-    if [[ "$DEPLOY_TYPE" == master ]]; then
-      deploy kubermatic kubermatic kubermatic/
-    fi
-}
-
 function deployBackup() {
       # CI has its own Minio deployment as a proxy for GCS, so we do not install the default Helm chart here.
     if [[ -v DEPLOY_MINIO ]]; then
@@ -143,19 +123,15 @@ case "$DEPLOY_STACK" in
     fi
     ;;
 
-  kubermatic)
+  kubermatic)    
+    deploy nginx-ingress-controller nginx-ingress-controller nginx-ingress-controller/
+    deployCertManager
     if [[ "$DEPLOY_TYPE" == master ]]; then
-      deploy nginx-ingress-controller nginx-ingress-controller nginx-ingress-controller/
-      deployCertManager
       deploy    oauth oauth oauth/
     fi
-    deployBackup
-    deployKubermaticOperator
+    deployBackup    
     ;;
 
-  kubermatic-deployment-only)
-    deployKubermaticOperator
-    ;;
   cert-manager)
     deployCertManager
     ;;
