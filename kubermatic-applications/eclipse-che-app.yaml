@@ -15,3 +15,11 @@ spec:
             branch: master
           remote: https://github.com/kubermatic/community-components
     version: 7.53.0
+  # Update this to feed the default values.yaml to the application. Else set it empty {}
+  defaultValues:
+    networking:
+      auth:
+        identityProviderURL: "https://xxxxx.lab.kubermatic.io/dex"
+        oAuthClientName: "kubermaticIssuer"
+        oAuthSecret: "xxxxxxxxxxxxxxxxxxxxxxxxxxx"
+      domain: eclipse-che.xxxxx.lab.kubermatic.io

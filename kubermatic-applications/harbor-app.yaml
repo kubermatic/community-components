@@ -14,3 +14,18 @@ spec:
           chartVersion: 1.10.0
           url: https://helm.goharbor.io
     version: 2.6.0
+  # Update this to feed the default values.yaml to the application. Else set it empty {}
+  defaultValues:
+    expose:
+      ingress:
+        hosts:
+          core: harbor.xxxx.lab.kubermatic.io
+          notary: notary.xxxx.lab.kubermatic.io
+        className: "nginx"
+        annotations:
+          cert-manager.io/cluster-issuer: letsencrypt-prod
+          kubernetes.io/tls-acme: 'true'
+    externalURL: https://harbor.xxxx.lab.kubermatic.io
+    updateStrategy:
+      type: Recreate
+    harborAdminPassword: xxxxxx
