@@ -14,7 +14,7 @@ spec:
           ref:
             branch: master
           remote: https://github.com/kubermatic/community-components
-    version: 7.53.0
+    version: 7.55.0
   # Update this to feed the default values.yaml to the application. Else set it empty {}
   defaultValues:
     networking:
