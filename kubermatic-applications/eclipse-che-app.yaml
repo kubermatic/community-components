@@ -15,7 +15,8 @@ spec:
             branch: master
           remote: https://github.com/kubermatic/community-components
     version: 7.55.0
-  # Update this to feed the default values.yaml to the application. Else set it empty {}
+  # During the applicationdefinition creation time if the defaultValues is updated, then it is render for override during the application creation process from UI.
+  # By default, it is set empty.
   defaultValues:
     networking:
       auth:

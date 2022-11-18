@@ -13,7 +13,8 @@ spec:
           chartVersion: 5.4.3
           url: https://argoproj.github.io/argo-helm
     version: 2.4.11
-  # Update this to feed the default values.yaml to the application. Else set it empty {}
+  # During the applicationdefinition creation time if the defaultValues is updated, then it is render for override during the application creation process from UI.
+  # By default, it is set empty.
   defaultValues:
     server:
       certificate:

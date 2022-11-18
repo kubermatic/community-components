@@ -14,7 +14,8 @@ spec:
           chartVersion: 1.10.0
           url: https://helm.goharbor.io
     version: 2.6.0
-  # Update this to feed the default values.yaml to the application. Else set it empty {}
+  # During the applicationdefinition creation time if the defaultValues is updated, then it is render for override during the application creation process from UI.
+  # By default, it is set empty.
   defaultValues:
     expose:
       ingress:
