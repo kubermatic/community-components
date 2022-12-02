@@ -1,0 +1,62 @@
+# Tool used to sync s3 data is rclone
+# https://github.com/rclone/rclone#rclone
+rcloneS3Syncer:
+  image:
+    repository: rclone/rclone
+    pullPolicy: IfNotPresent
+    tag: "1.57.0"
+  # Create a image pull secret using below command and then add it to below value
+  # kubectl create secret docker-registry regcred --docker-server=<your-registry-server> --docker-username=<your-name> --docker-password=<your-pword> --docker-email=<your-email>
+  imagePullSecrets:
+  - name: image-pull-secret
+  cronjob:
+    schedule: "*/30 * * * *"
+    activeDeadlineSeconds: 7200
+  extra_args: {}
+# rclone has different configs options for each providers
+# In this example minio provider used as a source and azure blob storage as a target
+# Each values will be used a environment variables
+# For more details see https://rclone.org/docs/#environment-variables
+  job:
+    - name: user-cluster-backup
+      source:
+        type: "s3"
+        provider: "minio"
+        endpoint: "https://minio.minio.svc.cluster.local"
+        accessKeyID: "AKIAIOSFODNN7EXAMPLE" # Not base64 encoded
+        secretAccessKey: "wJalrXUtneFEMIK7MDENGbPxRfiyCYEXAMPLEKEY" # Not base64 encoded
+        bucket: "backup"
+        acl: "private"
+        # Note: rclone sync command not support two different s3 backends ca cert pass.
+        # so passing values here will not work. For future reference it can be used.
+        ca_bundle: ""
+        #ca_bundle: |-
+        #  -----BEGIN CERTIFICATE-----
+        #  xxxxxxxx EXAMPLE xxxxxxxxxx
+        #  -----END CERTIFICATE-----
+      target:
+        type: "azureblob"
+        account: "cldazkubermaticsandboxsa"
+        key: "aZGyxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx/IwRH5Cw4y6JxLg==" # Not base64 encoded
+        bucket: "backup"
+        # Note: rclone sync command not support two different s3 backends ca cert pass.
+        # so passing values here will not work. For future reference it can be used.
+        ca_bundle: ""
+        #ca_bundle: |-
+        #  -----BEGIN CERTIFICATE-----
+        #  xxxxxxxx EXAMPLE xxxxxxxxxx
+        #  -----END CERTIFICATE-----
+
+  resources:
+     limits:
+       cpu: 500m
+       memory: 512Mi
+     requests:
+       cpu: 200m
+       memory: 256Mi
+
+  nodeSelector: {}
+
+  tolerations: []
+
+  affinity: {}

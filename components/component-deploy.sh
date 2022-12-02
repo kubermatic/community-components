@@ -4,6 +4,7 @@ set -euo pipefail
 set +x
 
 DEPLOY_S3_SYNCER="s3-syncer"
+DEPLOY_RCLONE_S3_SYNCER="rclone-s3-syncer"
 DEPLOY_SGW="service-gateway"
 DEPLOY_CERT="cert-update-svc"
 DEPLOY_THANOS_SEED_INGRESS="thanos-seed-ingress"
@@ -68,10 +69,14 @@ case "$DEPLOY_STACK" in
     deploy s3-syncer-aws-cli s3-syncer s3/s3-syncer-aws-cli
     ;;
 
+  "$DEPLOY_RCLONE_S3_SYNCER")
+    deploy rclone-s3-syncer s3-syncer rclone-s3-syncer
+    ;;
+
   "$DEPLOY_THANOS_SEED_INGRESS")
     deploy thanos-seed-ingress monitoring thanos-seed-ingress
     ;;
-    
+
   "$DEPLOY_VMWARE_EXPORTER")
     deploy vmware-exporter monitoring vmware-exporter
     ;;

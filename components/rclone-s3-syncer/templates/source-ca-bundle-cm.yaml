@@ -1,0 +1,12 @@
+{{- range $job := $.Values.rcloneS3Syncer.job }}
+---
+{{- if eq ($job.source.ca_bundle| toString) "" }}
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: {{ $job.name }}-source-ca-cert
+data:
+  ca.crt: {{ $job.source.ca_bundle }}
+{{- end }}
+---
+{{- end }}
