@@ -1,0 +1,75 @@
+# Copyright 2020 The Kubermatic Kubernetes Platform contributors.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+apiVersion: kubermatic.k8c.io/v1
+kind: KubermaticConfiguration
+metadata:
+  name: kubermatic
+  namespace: kubermatic
+spec:
+  ingress:
+    # Domain is the base domain where the dashboard shall be available. Even with
+    # a disabled Ingress, this must always be a valid hostname.
+    # this domain must match what you configured as dex.ingress.host
+    # in the values.yaml
+    domain: kkp.example.com
+    certificateIssuer:
+      # APIGroup is the group for the resource being referenced.
+      # If APIGroup is not specified, the specified Kind must be in the core API group.
+      # For any other third-party types, APIGroup is required.
+      apiGroup: cert-manager.io/v1
+      # Kind is the type of resource being referenced
+      kind: ClusterIssuer
+      # Name is the name of resource being referenced
+      # For generating a certificate signed by a trusted root authority replace
+      # with "letsencrypt-prod".
+      name: "letsencrypt-prod"
+    className: nginx
+
+  # These secret keys configure the way components communicate with Dex.
+  auth:
+    clientID: kubermatic
+    issuerClientID: kubermaticIssuer
+    # When using letsencrypt-prod replace with "false"
+    skipTokenIssuerTLSVerify: true
+    # Update the KeyCloak realm URL to be used.
+    tokenIssuer: https://keycloak.example.com/realms/realm-id
+
+    # This must match the secret configured for the "kubermaticIssuer" client from
+    # the KeyCloak clients.
+    # Needed if the "enableOIDCKubeconfig: true" option is used in KubermaticSetting
+    issuerClientSecret: <copy value from KeyCloak>
+
+    # these need to be randomly generated. Those can be generated on the
+    # shell using:
+    # cat /dev/urandom | tr -dc A-Za-z0-9 | head -c32
+    issuerCookieKey: <random-key>
+    serviceAccountKey: <another-random-key>
+
+  featureGates:
+    UserClusterMLA: true
+    #TODO enable later
+    OIDCKubeCfgEndpoint: true
+    OpenIDAuthPlugin: true
+    KonnectivityService: true
+    TunnelingExposeStrategy: true
+
+  # Update the KeyCloak realm URL to be used with suffix `/protocol/openid-connect/auth` for "oidc_provider_url"
+  ui:
+    config: |
+      {
+        "share_kubeconfig": true,
+        "oidc_provider_url": "https://keycloak.example.com/realms/realm-id/protocol/openid-connect/auth",
+        "oidc_provider_scope": "openid email profile roles groups"
+      }

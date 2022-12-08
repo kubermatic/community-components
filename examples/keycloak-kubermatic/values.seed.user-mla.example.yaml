@@ -1,0 +1,46 @@
+iap:
+    oidc_issuer_url: https://keycloak.example.com/realms/realm-id # Update the KeyCloak realm URL to be used.
+    deployments:
+        grafana:
+            name: grafana-user-mla-seed
+            ingress:
+                host: grafana-user-mla.mla.seed.kkp.example.com
+            upstream_service: grafana.mla.svc.cluster.local
+            upstream_port: 80
+            replicas: 1
+            client_id: seed-user-mla
+            # client_secret is the "secret" from the KeyCloak client "seed-user-mla" config
+            client_secret: <copy value from KeyCloak>
+            # generate a fresh secret key here
+            encryption_key: <generate random secret key here>
+            config:
+                email_domains:
+                    - kkp.example.com
+                insecure_oidc_allow_unverified_email: "true" # TO BE Removed later if added email domain is valid and emails are verified
+                scope: openid email profile roles groups
+                pass_user_headers: true
+                skip_auth_regex:
+                    - /api/health
+        alertmanager:
+            name: alertmanager-seed-user-mla
+            ingress:
+                host: alertmanager-user-mla.mla.seed.kkp.example.com
+            upstream_service: alertmanager-proxy.mla.svc.cluster.local
+            upstream_port: 8080
+            replicas: 1
+            client_id: seed-user-mla
+            # client_secret is the "secret" from the KeyCloak client "seed-user-mla" config
+            client_secret: <copy value from KeyCloak>
+            # generate a fresh secret key here
+            encryption_key: <generate random secret key here>
+            config:
+                email_domains:
+                    - kkp.example.com
+                insecure_oidc_allow_unverified_email: "true" # TO BE Removed later if added email domain is valid and emails are verified
+                scope: openid email profile roles groups
+                skip_auth_regex:
+                    - /api/health
+                pass_user_headers: true
+    certIssuer:
+      name: letsencrypt-prod
+      kind: ClusterIssuer
