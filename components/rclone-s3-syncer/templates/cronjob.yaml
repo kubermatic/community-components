@@ -1,0 +1,68 @@
+{{- range $job := $.Values.rcloneS3Syncer.job }}
+---
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: {{ $job.name }}
+spec:
+  schedule: {{ default "*/30 * * * *" $.Values.rcloneS3Syncer.cronjob.schedule | quote }}
+  jobTemplate:
+    spec:
+      activeDeadlineSeconds: {{ default 7200 $.Values.rcloneS3Syncer.cronjob.activeDeadlineSeconds }}
+      template:
+        spec:
+          {{- with $.Values.rcloneS3Syncer.imagePullSecrets }}
+          imagePullSecrets:
+            {{- toYaml . | nindent 10 }}
+          {{- end }}
+          containers:
+          - name: s3syncer
+            image: "{{ $.Values.rcloneS3Syncer.image.repository }}:{{ $.Values.rcloneS3Syncer.image.tag | default $.Chart.AppVersion }}"
+            imagePullPolicy: {{ $.Values.rcloneS3Syncer.image.pullPolicy }}
+            resources:
+              {{- toYaml $.Values.rcloneS3Syncer.resources | nindent 14 }}
+            args:
+              {{- if $job.source.ca_bundle }}
+              - --ca-cert /etc/ssl/certs/ca.crt
+              {{- else }}
+              - --no-check-certificate
+              {{- end }}
+              - sync
+              - --progress
+              - source:$(SOURCE_BUCKET)
+              - target:$(TARGET_BUCKET)
+              {{- range $.Values.rcloneS3Syncer.extra_args }}
+              - {{ . | title }}
+              {{- end }}
+            envFrom:
+            - secretRef:
+                name: {{ $job.name }}-source-config
+            - secretRef:
+                name: {{ $job.name }}-target-config
+            {{- if $job.source.ca_bundle }}
+            volumeMounts:
+              - mountPath: /etc/ssl/certs/ca.crt
+                name: ca-cert
+                readOnly: true
+            {{- end }}
+          {{- if $job.source.ca_bundle }}
+          volumes:
+            - name: ca-cert
+              configMap:
+                name: {{ $job.name }}-source-ca-cert
+          {{- end }}
+          restartPolicy: OnFailure
+          {{- with $.Values.rcloneS3Syncer.nodeSelector }}
+          nodeSelector:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with $.Values.rcloneS3Syncer.affinity }}
+          affinity:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with $.Values.rcloneS3Syncer.tolerations }}
+          tolerations:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+---
+{{- end }}
