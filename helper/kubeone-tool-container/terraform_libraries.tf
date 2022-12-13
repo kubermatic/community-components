@@ -33,5 +33,9 @@ terraform {
       version = "~> 0.1"
       source = "kubermatic/kubermatic"
     }
+    openstack = {
+      source = "terraform-provider-openstack/openstack"
+      version = "1.47.0"
+    }
   }
 }
