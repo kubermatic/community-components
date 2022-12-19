@@ -14,4 +14,13 @@ spec:
           ref:
             branch: master
           remote: https://github.com/kubermatic/community-components
-    version: 7.53.0
+    version: 7.55.0
+  # During the applicationdefinition creation time if the defaultValues is updated, then it is render for override during the application creation process from UI.
+  # By default, it is set empty.
+  defaultValues:
+    networking:
+      auth:
+        identityProviderURL: "https://xxxxx.lab.kubermatic.io/dex"
+        oAuthClientName: "kubermaticIssuer"
+        oAuthSecret: "xxxxxxxxxxxxxxxxxxxxxxxxxxx"
+      domain: eclipse-che.xxxxx.lab.kubermatic.io

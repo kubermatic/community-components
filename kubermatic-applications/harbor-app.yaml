@@ -14,3 +14,19 @@ spec:
           chartVersion: 1.10.0
           url: https://helm.goharbor.io
     version: 2.6.0
+  # During the applicationdefinition creation time if the defaultValues is updated, then it is render for override during the application creation process from UI.
+  # By default, it is set empty.
+  defaultValues:
+    expose:
+      ingress:
+        hosts:
+          core: harbor.xxxx.lab.kubermatic.io
+          notary: notary.xxxx.lab.kubermatic.io
+        className: "nginx"
+        annotations:
+          cert-manager.io/cluster-issuer: letsencrypt-prod
+          kubernetes.io/tls-acme: 'true'
+    externalURL: https://harbor.xxxx.lab.kubermatic.io
+    updateStrategy:
+      type: Recreate
+    harborAdminPassword: xxxxxx
