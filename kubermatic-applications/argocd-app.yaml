@@ -13,3 +13,29 @@ spec:
           chartVersion: 5.4.3
           url: https://argoproj.github.io/argo-helm
     version: 2.4.11
+  # During the applicationdefinition creation time if the defaultValues is updated, then it is render for override during the application creation process from UI.
+  # By default, it is set empty.
+  defaultValues:
+    server:
+      certificate:
+        enabled: true
+        domain: argocd.xxxx.lab.kubermatic.io
+        issuer:
+          group: cert-manager.io
+          kind: ClusterIssuer
+          name: letsencrypt-prod
+        secretName: argocd-tls
+      ingress:
+        enabled: true
+        https: true
+        hosts:
+        - argocd.xxxx.lab.kubermatic.io
+        ingressClassName: 'nginx'
+        annotations:
+          cert-manager.io/cluster-issuer: letsencrypt-prod
+          kubernetes.io/tls-acme: 'true'
+          nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
+        tls: 
+        - secretName: argocd-tls
+          hosts:
+            - argocd.xxxx.lab.kubermatic.io

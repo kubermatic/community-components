@@ -15,8 +15,8 @@
 apiVersion: v2
 description: A Helm chart for deploying Eclipse Che on a Kubernetes
 name: eclipse-che
-version: 7.53.0
-appVersion: 7.53.0
+version: 7.55.0
+appVersion: 7.55.0
 keywords:
   - kubermatic
   - eclipse-che
@@ -28,4 +28,4 @@ maintainers:
 dependencies:
   - name: eclipse-che
     repository: https://eclipse-che.github.io/che-operator/charts
-    version: 7.53.0
+    version: 7.55.0
