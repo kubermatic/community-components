@@ -82,3 +82,18 @@ updateStrategy:
   type: Recreate
 harborAdminPassword: xxxxxx
 ```
+
+## Canal setup
+> If the user cluster setup is without CNI (none), in that case the canal setup can be done as an application under `kube-system` namepsace
+
+Sample values yaml for exposing Canal 
+```yaml
+# Provide the network interface to be use
+canalIface: "wt0"
+# Adjust the MTU size
+vethMTU: "1280"
+cluster:
+  network:
+    # Required. Value to be provided from Cluster.Network which is set Pods CIDR IPv4
+    podCIDRBlocks: "172.25.0.0/16"
+```
