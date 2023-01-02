@@ -45,6 +45,8 @@ RUN apt-get update && apt-get install -y\
         dnsutils\
         zsh \
         uuid-runtime \
+        iperf3 \
+        fio \
         && apt-get clean
 
 
@@ -164,10 +166,10 @@ RUN mkdir /home/${USER}/bin && cd /home/${USER}/bin && \
     # powerline go
     wget https://github.com/justjanne/powerline-go/releases/latest/download/powerline-go-linux-amd64 -O /home/${USER}/bin/powerline-go && \
     chmod +x /home/${USER}/bin/powerline-go
-COPY ./.bashrc /home/${USER}/
+COPY ./.bashrc ./.gitconfig /home/${USER}/
 
-# Install minio Operator Kubectl krew plugin
-RUN bash -ic 'kubectl krew install minio'
+# Install minio Operator Kubectl krew plugin, disk utils, resource-capacity and service-account creation
+RUN bash -ic 'kubectl krew install minio df-pv pv-migrate resource-capacity view-serviceaccount-kubeconfig'
 
 # Install fubectl dependencies
 RUN bash -ic 'kinstall'
