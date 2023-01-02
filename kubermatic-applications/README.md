@@ -82,3 +82,12 @@ updateStrategy:
   type: Recreate
 harborAdminPassword: xxxxxx
 ```
+
+## Canal setup
+> If the user cluster setup is without CNI (none), in that case the canal setup can be done as an application under `kube-system` namepsace
+
+Sample values yaml for exposing Canal 
+```yaml
+canalIface: "wt0" # Provide the network interface to be use
+vethMTU: "1280"   # Adjust the MTU size 
+```
