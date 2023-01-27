@@ -3,8 +3,8 @@ kind: AddonConfig
 metadata:
   name: kubelb
 spec:
-  description: Kubelb-Agent dynamically creates load balancers and external ingress controller implementation.
-  shortDescription: Kubelb-Agent for cloud native dynamically Load Balancing
+  description: Kubelb-ccm manages external load balancers
+  shortDescription: Kubelb-ccm for cloud native dynamically load balancing
   formSpec:
     - displayName: Kubeconf with Service Account to access the KubeLB cluster
       internalName: kubeconf
