@@ -14,7 +14,8 @@
 
 
 ARG ARCH=amd64
-FROM ${ARCH}/ubuntu:20.04
+ARG BASE_IMAGE=ubuntu:20.04
+FROM ${ARCH}/${BASE_IMAGE}
 
 ENV GO111MODULE on
 # Install KubeOne
@@ -135,15 +136,15 @@ RUN LAZYGIT_VERSION=v0.34 && \
 RUN git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf && ~/.fzf/install
 
 # Install zsh, oh-my-zsh, powerlevel10k
-COPY ./.zshrc /root/
-COPY ./.p10k.zsh /root/
+COPY .zshrc /root/
+COPY .p10k.zsh /root/
 RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended --keep-zshrc && \
     git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k && \
     git clone --depth=1 https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions && \
     git clone --depth=1 https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting && \
     git clone --depth=1 https://github.com/kubermatic/fubectl.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/fubectl
 
-COPY ./.bashrc /root/
+COPY .bashrc /root/
 
 ARG USER=kubermatic
 RUN useradd -rm -d /home/${USER} -s /bin/bash -g root -G sudo -u 1000 ${USER}
@@ -164,7 +165,7 @@ RUN mkdir /home/${USER}/bin && cd /home/${USER}/bin && \
     # powerline go
     wget https://github.com/justjanne/powerline-go/releases/latest/download/powerline-go-linux-amd64 -O /home/${USER}/bin/powerline-go && \
     chmod +x /home/${USER}/bin/powerline-go
-COPY ./.bashrc /home/${USER}/
+COPY .bashrc /home/${USER}/
 
 # Install minio Operator Kubectl krew plugin
 RUN bash -ic 'kubectl krew install minio'
