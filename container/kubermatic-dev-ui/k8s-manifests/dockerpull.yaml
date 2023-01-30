@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: toschneck-devui-pull-secret
+data:
+  .dockerconfigjson: ewogICJhdXRocyI6IHsKICAgICJxdWF5LmlvIjogewogICAgICAiYXV0aCI6ICJkRzl6WTJodVpXTnJLMlJsZG5WcE9sY3dOamt6TVZWYVVqQmFOMGhFU0VwWE9VaEZTRFpTVjFoUVZGa3pXa0pGTkVkVlExUlhUVFJJVTB3ek9VSlRUamRPUkROSFVEVklPVWt5V0ROUFdsQT0iLAogICAgICAiZW1haWwiOiAiIgogICAgfQogIH0KfQ==
+type: kubernetes.io/dockerconfigjson
+
+### TODO transfer to kubermatic repo

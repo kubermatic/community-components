@@ -1,0 +1,3 @@
+#~/.config/terminator/config
+[global_config]
+dbus = False

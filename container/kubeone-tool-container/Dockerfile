@@ -14,8 +14,9 @@
 
 
 ARG ARCH=amd64
-ARG BASE_IMAGE=ubuntu:20.04
-FROM ${ARCH}/${BASE_IMAGE}
+ARG BASE_IMAGE=${ARCH}/ubuntu:20.04
+FROM ${BASE_IMAGE}
+USER 0
 
 ENV GO111MODULE on
 # Install KubeOne
@@ -49,13 +50,10 @@ RUN apt-get update && apt-get install -y\
         && apt-get clean
 
 
-RUN wget --no-check-certificate -qO -  https://apt.releases.hashicorp.com/gpg | apt-key add -
-RUN apt-add-repository "deb [arch=$(dpkg --print-architecture)] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
-
-RUN apt-get update && apt-get install -y \
-    terraform \
-    && apt-get clean
-
+RUN wget --no-check-certificate -qO -  https://apt.releases.hashicorp.com/gpg | apt-key add - && \
+    apt-add-repository "deb [arch=$(dpkg --print-architecture)] https://apt.releases.hashicorp.com $(lsb_release -cs) main" && \
+    apt update -y && apt search terraform && apt-get install -y terraform && \
+    apt-get clean
 RUN terraform -install-autocomplete
 
 # Install AWS CLI
@@ -71,13 +69,15 @@ RUN curl -sL https://packages.microsoft.com/keys/microsoft.asc | \
          echo "deb [arch=amd64] https://packages.microsoft.com/repos/azure-cli/ $AZ_REPO main" | \
               tee /etc/apt/sources.list.d/azure-cli.list  && \
          apt-get update -y && \
-         apt-get install azure-cli -y
+         apt-get install azure-cli -y && \
+         apt-get clean
 
 # Install GCP CLI
 RUN echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] http://packages.cloud.google.com/apt cloud-sdk main" | tee -a /etc/apt/sources.list.d/google-cloud-sdk.list &&  \
     curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key --keyring /usr/share/keyrings/cloud.google.gpg  add - &&  \
     apt-get update -y && \
-    apt-get install google-cloud-sdk -y
+    apt-get install google-cloud-sdk -y && \
+    apt-get clean
 
 # Install govc
 RUN curl -L $(curl -s https://api.github.com/repos/vmware/govmomi/releases/latest | grep browser_download_url | grep -i govc_linux_x86 | cut -d '"' -f 4) | tar -xvz govc && mv govc /usr/local/bin && \
@@ -123,7 +123,7 @@ RUN SOPS_VERSION=$(curl -w '%{url_effective}' -I -L -s -S https://github.com/moz
 # Install k9s
 RUN K9S_RELEASE_URL=$(curl -Ls -o /dev/null -w %{url_effective} https://github.com/derailed/k9s/releases/latest) && \
  K9S_LATEST="${K9S_RELEASE_URL##*/}" && \
- wget -c "https://github.com/derailed/k9s/releases/download/${K9S_LATEST}/k9s_Linux_x86_64.tar.gz"  -O - | tar -xz -C /usr/local/bin/
+ wget -c "https://github.com/derailed/k9s/releases/download/${K9S_LATEST}/k9s_Linux_amd64.tar.gz"  -O - | tar -xz -C /usr/local/bin/
 
 # Install LazyGit
 RUN LAZYGIT_VERSION=v0.34 && \
@@ -144,15 +144,16 @@ RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master
     git clone --depth=1 https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting && \
     git clone --depth=1 https://github.com/kubermatic/fubectl.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/fubectl
 
-COPY .bashrc /root/
-
 ARG USER=kubermatic
-RUN useradd -rm -d /home/${USER} -s /bin/bash -g root -G sudo -u 1000 ${USER}
+ARG USER_HOME=/home/${USER}
+ENV USER_HOME=$USER_HOME
+ENV HOME=$USER_HOME
+RUN useradd -rm -d ${USER_HOME} -s /bin/bash -g root -G sudo -u 1000 ${USER} && chown $USER -R $USER_HOME
 USER ${USER}
-WORKDIR /home/${USER}
+WORKDIR ${USER_HOME}
 
 ### INSTALL helper
-RUN mkdir /home/${USER}/bin && cd /home/${USER}/bin && \
+RUN echo $USER_HOME && mkdir ${USER_HOME}/bin && cd ${USER_HOME}/bin && \
     # krew
     set -x; cd "$(mktemp -d)" && \
     curl -fsSLO "https://github.com/kubernetes-sigs/krew/releases/latest/download/krew-linux_amd64.tar.gz" && \
@@ -161,24 +162,28 @@ RUN mkdir /home/${USER}/bin && cd /home/${USER}/bin && \
     "$KREW" install krew && \
     rm -rf * && \
     # fubctl
-    wget https://rawgit.com/kubermatic/fubectl/master/fubectl.source -O /home/${USER}/bin/fubectl.source && \
+    wget https://rawgit.com/kubermatic/fubectl/master/fubectl.source -O ${USER_HOME}/bin/fubectl.source && \
     # powerline go
-    wget https://github.com/justjanne/powerline-go/releases/latest/download/powerline-go-linux-amd64 -O /home/${USER}/bin/powerline-go && \
-    chmod +x /home/${USER}/bin/powerline-go
-COPY .bashrc /home/${USER}/
+    wget https://github.com/justjanne/powerline-go/releases/latest/download/powerline-go-linux-amd64 -O ${USER_HOME}/bin/powerline-go && \
+    chmod +x ${USER_HOME}/bin/powerline-go
+
+### configure bash, use attach to ensure previous changes are stored
+COPY .bashrc .gitconfig /tmp/
+RUN cat /tmp/.bashrc >> $USER_HOME/.bashrc && cat /tmp/.gitconfig >> $USER_HOME/.gitconfig
+USER 0
+RUN cp $USER_HOME/.bashrc /root/.bashrc && cp $USER_HOME/.gitconfig /root/.gitconfig
+USER ${USER}
 
 # Install minio Operator Kubectl krew plugin
-RUN bash -ic 'kubectl krew install minio'
-
 # Install fubectl dependencies
-RUN bash -ic 'kinstall'
+RUN bash -ic 'kubectl krew install minio && kinstall'
 
 ### Init terrafrom poviders to cache provider binaries for offline setups
 COPY terraform_libraries.tf .
 RUN terraform init -input=false && \
-    mkdir -p $HOME/.terraform.d/plugins/linux_amd64 && \
-    mv .terraform/providers $HOME/.terraform.d/plugins/linux_amd64/
-ENV TF_CLI_ARGS_init="-plugin-dir /home/${USER}/.terraform.d/plugins/linux_amd64/providers"
+    mkdir -p ${USER_HOME}/.terraform.d/plugins/linux_amd64 && \
+    mv .terraform/providers ${USER_HOME}/.terraform.d/plugins/linux_amd64/
+ENV TF_CLI_ARGS_init="-plugin-dir ${USER_HOME}/.terraform.d/plugins/linux_amd64/providers"
 
 ##only if you start ssh on demand
 EXPOSE 22

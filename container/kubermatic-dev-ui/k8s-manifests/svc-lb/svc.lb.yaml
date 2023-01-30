@@ -1,0 +1,26 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    application: kubermatic-dev-ui
+  name: kubermatic-dev-ui
+spec:
+  externalName: kubermatic-dev-ui
+  ports:
+  - name: http-port-tcp
+    protocol: TCP
+    port: 6901
+    targetPort: 6901
+#    nodePort: 32001
+  - name: vnc-port-tcp
+    protocol: TCP
+    port: 5901
+    targetPort: 5901
+#    nodePort: 32002
+  selector:
+    application: kubermatic-dev-ui
+#  type: NodePort
+  #### connect by: http://NODEIP:NODEPORT/?password=vncpassword
+# Use type loadbalancer if needed
+  type: LoadBalancer
