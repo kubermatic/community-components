@@ -1,0 +1,56 @@
+{{ range .Values.kubermaticDevUI.namespaces.list }}
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: kubermatic-dev-ui
+    app-instance: {{ $.Values.kubermaticDevUI.namespaces.prefix }}-{{ .name }}
+  namespace: {{ $.Values.kubermaticDevUI.namespaces.prefix }}-{{ .name }}
+  name: kubermatic-dev-ui
+spec:
+  ports:
+  - name: http-port-tcp
+    protocol: TCP
+    port: 6901
+    targetPort: 6901
+  - name: vnc-port-tcp
+    protocol: TCP
+    port: 5901
+    targetPort: 5901
+  selector:
+    application: kubermatic-dev-ui
+#  type: NodePort
+  #### connect by: http://NODEIP:NODEPORT/?password=vncpassword
+# Use type loadbalancer if needed
+#  type: LoadBalancer
+
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  labels:
+    app: kubermatic-dev-ui
+    app-instance: {{ $.Values.kubermaticDevUI.namespaces.prefix }}-{{ .name }}
+  namespace: {{ $.Values.kubermaticDevUI.namespaces.prefix }}-{{ .name }}
+  annotations:
+    cert-manager.io/cluster-issuer: {{ $.Values.kubermaticDevUI.ingress.clusterIssuer }}
+  name: kubermatic-dev-ui
+spec:
+  ingressClassName: {{ $.Values.kubermaticDevUI.ingress.ingressClassName }}
+  rules:
+  - host: {{ .name }}.{{ $.Values.kubermaticDevUI.ingress.domain }}
+    http:
+      paths:
+      - backend:
+          service:
+            name: kubermatic-dev-ui
+            port:
+              name: http-port-tcp
+        path: /
+        pathType: Prefix
+  tls:
+  - hosts:
+    - {{ .name }}.{{ $.Values.kubermaticDevUI.ingress.domain }}
+    secretName: {{ .name }}-ing-ui-tls
+---
+{{ end }}

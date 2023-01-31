@@ -32,6 +32,30 @@ spec:
       terminationGracePeriodSeconds: 5
       imagePullSecrets:
         - name: toschneck-devui-pull-secret
+      initContainers:
+        - image: bitnami/git
+          name: git
+          env:
+            - name: GIT_FOLDER
+              value: minimize-to-maximize
+            - name: GIT_REPO_URL
+              value: https://github.com/kubermatic-labs/minimize-to-maximize.git
+          command:
+            - bash
+            - -c
+            - |
+              set -euo pipefail
+              if [ -d "/mnt/${GIT_FOLDER}" ]; then
+                cd /mnt/${GIT_FOLDER}
+                git fetch
+              else
+                cd /mnt
+                git clone ${GIT_REPO_URL}
+              fi
+              echo "...done"
+          volumeMounts:
+            - name: workspace
+              mountPath: /mnt
       containers:
       - name: kubermatic-dev-ui
 #        image: consol/debian-xfce-vnc@sha256:108675d167724b9f0ecbda8464ff66c8fbe42ccd0eb5647c4f8fc8205a9c136d

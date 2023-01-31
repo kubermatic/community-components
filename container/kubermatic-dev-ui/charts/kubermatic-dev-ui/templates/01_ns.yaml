@@ -1,0 +1,10 @@
+{{ range .Values.kubermaticDevUI.namespaces.list }}
+apiVersion: v1
+kind: Namespace
+metadata:
+  labels:
+    app: kubermatic-dev-ui
+    app-instance: {{ $.Values.kubermaticDevUI.namespaces.prefix }}-{{ .name }}
+  name: {{ $.Values.kubermaticDevUI.namespaces.prefix }}-{{ .name }}
+---
+{{ end }}
