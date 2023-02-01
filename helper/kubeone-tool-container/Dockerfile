@@ -14,7 +14,12 @@
 
 
 ARG ARCH=amd64
+ARG OS=linux
 FROM ${ARCH}/ubuntu:20.04
+# FIXME: Validate every software to see if it offers darwin and arm64 builds and replace hardcoded values with variables
+# Added args again since args before FROM are not available after FROM statement [Ref: https://docs.docker.com/engine/reference/builder/#understand-how-arg-and-from-interact]
+ARG ARCH
+ARG OS
 
 ENV GO111MODULE on
 # Install KubeOne
@@ -48,7 +53,6 @@ RUN apt-get update && apt-get install -y\
         iperf3 \
         fio \
         && apt-get clean
-
 
 RUN wget --no-check-certificate -qO -  https://apt.releases.hashicorp.com/gpg | apt-key add -
 RUN apt-add-repository "deb [arch=$(dpkg --print-architecture)] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
@@ -125,6 +129,11 @@ RUN SOPS_VERSION=$(curl -w '%{url_effective}' -I -L -s -S https://github.com/moz
 RUN K9S_RELEASE_URL=$(curl -Ls -o /dev/null -w %{url_effective} https://github.com/derailed/k9s/releases/latest) && \
  K9S_LATEST="${K9S_RELEASE_URL##*/}" && \
  wget -c "https://github.com/derailed/k9s/releases/download/${K9S_LATEST}/k9s_Linux_x86_64.tar.gz"  -O - | tar -xz -C /usr/local/bin/
+
+RUN CILIUM_CLI_VERSION=$(curl -s https://raw.githubusercontent.com/cilium/cilium-cli/master/stable.txt) && \
+curl -L --remote-name-all https://github.com/cilium/cilium-cli/releases/download/${CILIUM_CLI_VERSION}/cilium-${OS}-${ARCH}.tar.gz && \
+sudo tar -C /usr/local/bin -xzvf cilium-${OS}-${ARCH}.tar.gz && \
+rm cilium-${OS}-${ARCH}.tar.gz
 
 # Install LazyGit
 RUN LAZYGIT_VERSION=v0.34 && \
