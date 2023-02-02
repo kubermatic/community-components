@@ -1,0 +1,26 @@
+# Example of an ApplicationDefinition
+apiVersion: apps.kubermatic.k8c.io/v1
+kind: ApplicationDefinition
+metadata:
+  name: canal
+spec:
+  description: A Helm chart for deploying Canal on a Kubernetes cluster.
+  method: helm
+  versions:
+  - template:
+      source:
+        git:
+          path: components/canal
+          ref:
+            branch: master
+          remote: https://github.com/kubermatic/community-components
+    version: 3.23.3
+  # During the applicationdefinition creation time if the defaultValues is updated, then it is render for override during the application creation process from UI.
+  # By default, it is set empty.
+  defaultValues:
+    canalIface: "wt0"
+    vethMTU: "1280"
+    cluster:
+      network:
+        # Required. Value to be provided from Cluster.Network which is set Pods CIDR IPv4
+        podCIDRBlocks: "172.25.0.0/16"

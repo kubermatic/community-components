@@ -1,0 +1,22 @@
+canalIface: "wt0"
+vethMTU: "1280"
+calicoNode:
+  image: quay.io/calico/node:v3.23.3
+calicoCNI:
+  image: quay.io/calico/cni:v3.23.3
+calicoKubeControllers:
+  image: quay.io/calico/kube-controllers:v3.23.3
+flannel:
+  image: quay.io/coreos/flannel:v0.15.1
+cluster:
+  cniPlugin:
+    type: canal
+    version: v3.23
+  network:
+    # Required. Value to be provided from Cluster.Network which is set Pods CIDR IPv4
+    podCIDRBlocks: ""
+    # Set to true when IPv6 is enabled.
+    dualStack: false
+    # Value to be provided from Cluster.Network which is set Pods CIDR IPv6
+    podCIDRIPv6: ""
+  features: []
