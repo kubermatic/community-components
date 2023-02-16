@@ -1,5 +1,5 @@
 ##### kubeadm installation
-FROM ubuntu:20.04
+FROM amd64/rockylinux:8
 
 ### for dind kubeadm
 ### docker run -it --privileged cruizba/ubuntu-dind
@@ -7,9 +7,8 @@ FROM ubuntu:20.04
 # TODO fix systemd startup
 #FROM cruizba/ubuntu-dind
 
-RUN apt-get update && apt-get install -y sudo apt-utils && apt-get clean
+ARG K8S_VERSION
+
 COPY kubeadm-generator-install.sh /kubeadm-install.sh
-ARG K8S_VERSION=1.18.10
+
 RUN chmod +x /kubeadm-install.sh && /kubeadm-install.sh ${K8S_VERSION}
-
-

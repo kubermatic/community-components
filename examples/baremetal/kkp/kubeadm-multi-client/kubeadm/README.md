@@ -38,8 +38,8 @@ docker build -t local/kubeadm --build-arg K8S_VERSION=1.19.3 . \
 Now copy the setup script to the target node, install kubeadm and join the cluster:
 
 ```bash
-scp kubeadm-setup-ubuntu.sh ubuntu@TARGET_HOST_IP:/home/ubuntu/
-ssh ubuntu@TARGET_HOST_IP
+scp kubeadm-setup-rockylinux.sh root@TARGET_HOST_IP:/home/root/
+ssh root@TARGET_HOST_IP
 ```
 ```bash
 ### install kubeadm
