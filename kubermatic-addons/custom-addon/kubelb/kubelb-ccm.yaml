@@ -1,0 +1,202 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  labels:
+    app.kubernetes.io/component: ccm
+    app.kubernetes.io/name: kubelb-ccm
+    app.kubernetes.io/part-of: kubelb
+    control-plane: kubelb-ccm
+  name: kubelb
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  labels:
+    app.kuberentes.io/instance: kubelb
+    app.kubernetes.io/component: rbac
+    app.kubernetes.io/name: serviceaccount
+    app.kubernetes.io/part-of: kubelb
+  name: kubelb
+  namespace: kubelb
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  labels:
+    app.kubernetes.io/component: rbac
+    app.kubernetes.io/instance: leader-election-role
+    app.kubernetes.io/name: role
+    app.kubernetes.io/part-of: kubelb
+  name: leader-election-role
+  namespace: kubelb
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - configmaps
+  verbs:
+  - get
+  - list
+  - watch
+  - create
+  - update
+  - patch
+  - delete
+- apiGroups:
+  - coordination.k8s.io
+  resources:
+  - leases
+  verbs:
+  - get
+  - list
+  - watch
+  - create
+  - update
+  - patch
+  - delete
+- apiGroups:
+  - ""
+  resources:
+  - events
+  verbs:
+  - create
+  - patch
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  creationTimestamp: null
+  name: kubelb-ccm
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - nodes
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - services
+  verbs:
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - services/status
+  verbs:
+  - get
+  - patch
+  - update
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  labels:
+    app.kubernetes.io/component: rbac
+    app.kubernetes.io/instance: leader-election-rolebinding
+    app.kubernetes.io/name: rolebinding
+    app.kubernetes.io/part-of: kubelb
+  name: leader-election-rolebinding
+  namespace: kubelb
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: leader-election-role
+subjects:
+- kind: ServiceAccount
+  name: kubelb
+  namespace: kubelb
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: kubelb-ccm
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: kubelb-ccm
+subjects:
+- kind: ServiceAccount
+  name: kubelb
+  namespace: kubelb
+---
+apiVersion: v1
+data:
+  kubelb: {{ .Variables.kubeconf | b64enc }}
+kind: Secret
+metadata:
+  name: kubelb-c6cbhcm8m2
+  namespace: kubelb
+type: Opaque
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/component: ccm
+    app.kubernetes.io/name: kubelb-ccm
+    app.kubernetes.io/part-of: kubelb
+    control-plane: kubelb-ccm
+  name: kubelb-ccm
+  namespace: kubelb
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      control-plane: kubelb-ccm
+  template:
+    metadata:
+      annotations:
+        kubectl.kubernetes.io/default-container: kubelb-ccm
+      labels:
+        control-plane: kubelb-ccm
+    spec:
+      containers:
+      - args:
+        - --enable-leader-election
+        - --node-address-type=InternalIP
+        - --cluster-name=cluster-{{ .Cluster.Name}}
+        image: quay.io/kubermatic/kubelb-ccm:v0.2.0-beta.0
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: 8081
+          initialDelaySeconds: 15
+          periodSeconds: 20
+        name: kubelb-ccm
+        readinessProbe:
+          httpGet:
+            path: /readyz
+            port: 8081
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        resources:
+          requests:
+            cpu: 10m
+            memory: 64Mi
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - ALL
+          runAsUser: 65532
+        volumeMounts:
+        - mountPath: /home/nonroot/.kube
+          name: kubelb-cluster
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
+      serviceAccountName: kubelb
+      terminationGracePeriodSeconds: 10
+      volumes:
+      - name: kubelb-cluster
+        secret:
+          secretName: kubelb-c6cbhcm8m2

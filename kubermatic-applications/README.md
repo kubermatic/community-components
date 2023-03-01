@@ -88,6 +88,12 @@ harborAdminPassword: xxxxxx
 
 Sample values yaml for exposing Canal 
 ```yaml
-canalIface: "wt0" # Provide the network interface to be use
-vethMTU: "1280"   # Adjust the MTU size 
+# Provide the network interface to be use
+canalIface: "wt0"
+# Adjust the MTU size
+vethMTU: "1280"
+cluster:
+  network:
+    # Required. Value to be provided from Cluster.Network which is set Pods CIDR IPv4
+    podCIDRBlocks: "172.25.0.0/16"
 ```

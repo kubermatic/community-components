@@ -20,4 +20,7 @@ spec:
   defaultValues:
     canalIface: "wt0"
     vethMTU: "1280"
-
+    cluster:
+      network:
+        # Required. Value to be provided from Cluster.Network which is set Pods CIDR IPv4
+        podCIDRBlocks: "172.25.0.0/16"

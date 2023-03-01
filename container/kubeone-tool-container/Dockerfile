@@ -14,8 +14,11 @@
 
 
 ARG ARCH=amd64
+ARG OS=linux
 ARG BASE_IMAGE=${ARCH}/ubuntu:20.04
 FROM ${BASE_IMAGE}
+# FIXME: Validate every software to see if it offers darwin and arm64 builds and replace hardcoded values with variables
+# Added args again since args before FROM are not available after FROM statement [Ref: https://docs.docker.com/engine/reference/builder/#understand-how-arg-and-from-interact]
 USER 0
 
 ENV GO111MODULE on
@@ -47,12 +50,13 @@ RUN apt-get update && apt-get install -y\
         dnsutils\
         zsh \
         uuid-runtime \
+        iperf3 \
+        fio \
         && apt-get clean
-
 
 RUN wget --no-check-certificate -qO -  https://apt.releases.hashicorp.com/gpg | apt-key add - && \
     apt-add-repository "deb [arch=$(dpkg --print-architecture)] https://apt.releases.hashicorp.com $(lsb_release -cs) main" && \
-    apt update -y && apt search terraform && apt-get install -y terraform && \
+    apt update -y && apt-get install -y terraform && \
     apt-get clean
 RUN terraform -install-autocomplete
 
@@ -125,6 +129,11 @@ RUN K9S_RELEASE_URL=$(curl -Ls -o /dev/null -w %{url_effective} https://github.c
  K9S_LATEST="${K9S_RELEASE_URL##*/}" && \
  wget -c "https://github.com/derailed/k9s/releases/download/${K9S_LATEST}/k9s_Linux_amd64.tar.gz"  -O - | tar -xz -C /usr/local/bin/
 
+RUN CILIUM_CLI_VERSION=$(curl -s https://raw.githubusercontent.com/cilium/cilium-cli/master/stable.txt) && \
+curl -L --remote-name-all https://github.com/cilium/cilium-cli/releases/download/${CILIUM_CLI_VERSION}/cilium-${OS}-${ARCH}.tar.gz && \
+sudo tar -C /usr/local/bin -xzvf cilium-${OS}-${ARCH}.tar.gz && \
+rm cilium-${OS}-${ARCH}.tar.gz
+
 # Install LazyGit
 RUN LAZYGIT_VERSION=v0.34 && \
     mkdir /tmp/lazygit-inst && cd /tmp/lazygit-inst && \
@@ -174,9 +183,9 @@ USER 0
 RUN cp $USER_HOME/.bashrc /root/.bashrc && cp $USER_HOME/.gitconfig /root/.gitconfig
 USER ${USER}
 
-# Install minio Operator Kubectl krew plugin
+# Install minio Operator Kubectl krew plugin, disk utils, resource-capacity and service-account creation
 # Install fubectl dependencies
-RUN bash -ic 'kubectl krew install minio && kinstall'
+RUN bash -ic 'kubectl krew install minio df-pv pv-migrate resource-capacity view-serviceaccount-kubeconfig && kinstall'
 
 ### Init terrafrom poviders to cache provider binaries for offline setups
 COPY terraform_libraries.tf .
