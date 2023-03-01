@@ -19,6 +19,8 @@ ARG BASE_IMAGE=${ARCH}/ubuntu:20.04
 FROM ${BASE_IMAGE}
 # FIXME: Validate every software to see if it offers darwin and arm64 builds and replace hardcoded values with variables
 # Added args again since args before FROM are not available after FROM statement [Ref: https://docs.docker.com/engine/reference/builder/#understand-how-arg-and-from-interact]
+ARG ARCH
+ARG OS
 USER 0
 
 ENV GO111MODULE on

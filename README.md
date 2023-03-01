@@ -82,9 +82,10 @@ customization.
 ## Containers
 Some useful containers to work with KubeOne and KKP
 
-| Name                                                       | Description                                                               |
-|------------------------------------------------------------|---------------------------------------------------------------------------|
-| [kubeone-tool-container](container/kubeone-tool-container) | A docker container with various tools to work with KubeOne and Kubernetes |
+| Name                                                       | Description                                                                                                              |
+|------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------|
+| [kubeone-tool-container](container/kubeone-tool-container) | A docker container with various tools to work with KubeOne and Kubernetes                                                |
+| [kubermatic-dev-ui](container/kubermatic-dev-ui)           | Complete DEV UI Container including KubeOne and various tools to work with KubeOne, KKP and Kubernetes via a Frontend UI |
 
 ## Helper
 
