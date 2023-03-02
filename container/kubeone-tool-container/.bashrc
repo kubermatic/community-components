@@ -52,3 +52,6 @@ complete -C /usr/bin/terraform terraform
 
 ### kubeone autocompletion
 source <(kubeone completion bash)
+
+### echo version nicely on startup
+figlet "KubeOne - $(kubeone version | jq -r .kubeone.gitVersion)" | /usr/games/lolcat

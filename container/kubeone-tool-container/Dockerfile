@@ -54,6 +54,7 @@ RUN apt-get update && apt-get install -y\
         uuid-runtime \
         iperf3 \
         fio \
+        figlet lolcat \
         && apt-get clean
 
 RUN wget --no-check-certificate -qO -  https://apt.releases.hashicorp.com/gpg | apt-key add - && \
