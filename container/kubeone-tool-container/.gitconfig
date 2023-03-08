@@ -1,3 +1,7 @@
+[core]
+        editor = vim
+        autocrlf = input
+        excludesfile = ~/.gitignore
 [alias]
         co = checkout
         ci = commit
@@ -22,3 +26,5 @@
         helper = store
 [fetch]
         prune = true
+[pull]
+        rebase = false

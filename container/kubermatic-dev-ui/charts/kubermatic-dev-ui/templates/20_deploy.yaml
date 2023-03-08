@@ -1,0 +1,104 @@
+{{ range .Values.kubermaticDevUI.namespaces.list }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  labels:
+    app: kubermatic-dev-ui
+    app-instance: {{ $.Values.kubermaticDevUI.namespaces.prefix }}-{{ .name }}
+  namespace: {{ $.Values.kubermaticDevUI.namespaces.prefix }}-{{ .name }}
+  name: kubermatic-dev-ui-workspace
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ $.Values.kubermaticDevUI.namespaces.storage.size }}
+---
+#### POD config (run one time)
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: kubermatic-dev-ui
+    app-instance: {{ $.Values.kubermaticDevUI.namespaces.prefix }}-{{ .name }}
+  namespace: {{ $.Values.kubermaticDevUI.namespaces.prefix }}-{{ .name }}
+  name: kubermatic-dev-ui
+spec:
+  # 1 Pods should exist at all times.
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      application: kubermatic-dev-ui
+  template:
+    metadata:
+      labels:
+        application: kubermatic-dev-ui
+    spec:
+      terminationGracePeriodSeconds: 5
+      imagePullSecrets:
+        - name: toschneck-devui-pull-secret
+      {{ if eq $.Values.kubermaticDevUI.init.enabled true}}
+      initContainers:
+        - image: bitnami/git
+          name: git
+          env:
+            - name: GIT_FOLDER
+              value: {{ $.Values.kubermaticDevUI.init.git.folder }}
+            - name: GIT_REPO_URL
+              value: {{ $.Values.kubermaticDevUI.init.git.url }}
+          command:
+            - bash
+            - -c
+            - |
+              set -euo pipefail
+              if [ -d "/mnt/${GIT_FOLDER}" ]; then
+                cd /mnt/${GIT_FOLDER}
+                git fetch
+              else
+                git clone ${GIT_REPO_URL} /mnt/${GIT_FOLDER}
+              fi
+              echo "...done"
+          volumeMounts:
+            - name: workspace
+              mountPath: /mnt
+      {{ end}}
+      containers:
+        - name: kubermatic-dev-ui
+          image: {{ $.Values.kubermaticDevUI.image.repository }}:{{ $.Values.kubermaticDevUI.image.tag }}
+          imagePullPolicy: {{ $.Values.kubermaticDevUI.image.pullPolicy}}
+          volumeMounts:
+            - mountPath: /headless/mnt
+              name: workspace
+          args:
+            - --wait
+          #        - /bin/bash
+          #        - -c
+          #        - 'trap : TERM INT; sleep infinity & wait'
+          ### make normal UI startup to connect via: oc rsh <pod-name> bash
+          #- '--tail-log'
+          ## checks that vnc server is up and running
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 6901
+              scheme: HTTP
+          ### checks if http-vnc connection is working
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 6901
+              scheme: HTTP
+            initialDelaySeconds: 10
+            timeoutSeconds: 10
+          resources:
+{{ toYaml $.Values.kubermaticDevUI.resources | indent 12 }}
+          securityContext:
+{{ toYaml $.Values.kubermaticDevUI.securityContext | indent 12 }}
+      volumes:
+        - name: workspace
+          persistentVolumeClaim:
+            claimName: kubermatic-dev-ui-workspace
+---
+{{ end }}

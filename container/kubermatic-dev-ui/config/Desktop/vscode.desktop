@@ -1,0 +1,10 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=vscode
+Comment=
+Exec=/usr/local/bin/code
+Icon=/apps/vscode/VSCode-linux-x64/resources/app/resources/linux/code.png
+Path=
+Terminal=false
+StartupNotify=false

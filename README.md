@@ -79,6 +79,14 @@ customization.
 | [flux2-app](kubermatic-applications/flux2-app.yaml)             | Flux GitOps sync tool for application deployment          |
 | [harbor-app](kubermatic-applications/harbor-app.yaml)           | Harbor App for user Clusters                              |
 
+## Containers
+Some useful containers to work with KubeOne and KKP
+
+| Name                                                       | Description                                                                                                              |
+|------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------|
+| [kubeone-tool-container](container/kubeone-tool-container) | A docker container with various tools to work with KubeOne and Kubernetes                                                |
+| [kubermatic-dev-ui](container/kubermatic-dev-ui)           | Complete DEV UI Container including KubeOne and various tools to work with KubeOne, KKP and Kubernetes via a Frontend UI |
+
 ## Helper
 
 List of helper scripts and tools
@@ -86,7 +94,6 @@ List of helper scripts and tools
 | Name                                                                                            | Description                                                                                                                                                                                                      |
 |-------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | [git-crypt](./helper/git-crypt)                                                                 | [git-crypt](https://github.com/AGWA/git-crypt) is a tooling to encrypt git repositories based GPG keys                                                                                                           |
-| [kubeone-tool-container](./helper/kubeone-tool-container)                                       | A docker container with various tools to work with KubeOne and Kubernetes                                                                                                                                        |
 | [kubeone-makefile](helper/kubeone-makefile/Makefile)                                            | Contains a template `Makefile` to manage KubeOne deployments                                                                                                                                                     |
 | [kubermatic-installer-script](helper/kubermatic-installer-script)                               | Contains a standalone usage of [kubermatic - deploy.sh](https://github.com/kubermatic/kubermatic/blob/master/hack/ci/deploy.sh) repo installation script for own installations.                                  |
 | [kubermatic-makefile](helper/kubermatic-makefile/Makefile)                                      | Contains a template `Makefile` to manage kubermatic deployments                                                                                                                                                  |

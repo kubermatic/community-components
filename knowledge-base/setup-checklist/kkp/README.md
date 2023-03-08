@@ -39,7 +39,7 @@ To install KKP at customer environment, we need access from external to (direct 
 - LoadBalancer (API Servers, Ingress, etc.), Master / Worker Nodes network for testing and potential debugging
 - Access to potential used DNS servers and firewall settings
 - Tooling:
-  a) Use out tooling container `quay.io/kubermatic-labs/kubeone-tooling`, see [helper/kubeone-tool-container](../../../helper/kubeone-tool-container)
+  a) Use out tooling container `quay.io/kubermatic-labs/kubeone-tooling`, see [helper/kubeone-tool-container](../../../container/kubeone-tool-container)
   b) or install helper tools: [kubeone](https://github.com/kubermatic/kubeone), git, kubectl, helm, terraform
     - optional: yq, jq, [fubectl](https://github.com/kubermatic/fubectl)
 

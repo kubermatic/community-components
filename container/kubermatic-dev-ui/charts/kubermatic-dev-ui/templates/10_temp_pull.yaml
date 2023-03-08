@@ -1,0 +1,14 @@
+{{ range .Values.kubermaticDevUI.namespaces.list }}
+apiVersion: v1
+kind: Secret
+metadata:
+  labels:
+    app: kubermatic-dev-ui
+    app-instance: {{ $.Values.kubermaticDevUI.namespaces.prefix }}-{{ .name }}
+  name: toschneck-devui-pull-secret
+  namespace: {{ $.Values.kubermaticDevUI.namespaces.prefix }}-{{ .name }}
+data:
+  .dockerconfigjson: ewogICJhdXRocyI6IHsKICAgICJxdWF5LmlvIjogewogICAgICAiYXV0aCI6ICJkRzl6WTJodVpXTnJLMlJsZG5WcE9sY3dOamt6TVZWYVVqQmFOMGhFU0VwWE9VaEZTRFpTVjFoUVZGa3pXa0pGTkVkVlExUlhUVFJJVTB3ek9VSlRUamRPUkROSFVEVklPVWt5V0ROUFdsQT0iLAogICAgICAiZW1haWwiOiAiIgogICAgfQogIH0KfQ==
+type: kubernetes.io/dockerconfigjson
+---
+{{ end }}
