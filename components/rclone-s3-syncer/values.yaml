@@ -37,15 +37,8 @@ rcloneS3Syncer:
       target:
         type: "azureblob"
         account: "cldazkubermaticsandboxsa"
-        key: "aZGyxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx/IwRH5Cw4y6JxLg==" # Not base64 encoded
+        sas_url: "https://xxx.blob.core.windows.net/?xxxx"
         bucket: "backup"
-        # Note: rclone sync command not support two different s3 backends ca cert pass.
-        # so passing values here will not work. For future reference it can be used.
-        ca_bundle: ""
-        #ca_bundle: |-
-        #  -----BEGIN CERTIFICATE-----
-        #  xxxxxxxx EXAMPLE xxxxxxxxxx
-        #  -----END CERTIFICATE-----
 
   resources:
      limits:
