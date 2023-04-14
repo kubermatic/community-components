@@ -138,23 +138,11 @@ sudo tar -C /usr/local/bin -xzvf cilium-${OS}-${ARCH}.tar.gz && \
 rm cilium-${OS}-${ARCH}.tar.gz
 
 # Install LazyGit
-RUN LAZYGIT_VERSION=v0.34 && \
+RUN LAZYGIT_VERSION=0.37.0 && \
     mkdir /tmp/lazygit-inst && cd /tmp/lazygit-inst && \
-    curl -sL https://github.com/jesseduffield/lazygit/releases/download/v0.34/lazygit_0.34_Linux_x86_64.tar.gz | tar -xvz && \
+    curl -sL https://github.com/jesseduffield/lazygit/releases/download/v${LAZYGIT_VERSION}/lazygit_${LAZYGIT_VERSION}_Linux_x86_64.tar.gz | tar -xvz && \
     mv lazygit /usr/local/bin && \
     cd .. && rm -rf /tmp/lazygit-inst
-
-# Install fzf manually since apt-get install does not install bash completion
-RUN git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf && ~/.fzf/install
-
-# Install zsh, oh-my-zsh, powerlevel10k
-COPY .zshrc /root/
-COPY .p10k.zsh /root/
-RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended --keep-zshrc && \
-    git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k && \
-    git clone --depth=1 https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions && \
-    git clone --depth=1 https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting && \
-    git clone --depth=1 https://github.com/kubermatic/fubectl.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/fubectl
 
 ARG USER=kubermatic
 ARG USER_HOME=/home/${USER}
@@ -163,6 +151,18 @@ ENV HOME=$USER_HOME
 RUN useradd -rm -d ${USER_HOME} -s /bin/bash -g root -G sudo -u 1000 ${USER} && chown $USER -R $USER_HOME
 USER ${USER}
 WORKDIR ${USER_HOME}
+
+# Install fzf manually since apt-get install does not install bash completion
+RUN git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf && ~/.fzf/install
+
+# Install zsh, oh-my-zsh, powerlevel10k
+COPY .zshrc ${USER_HOME}
+COPY .p10k.zsh ${USER_HOME}
+RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended --keep-zshrc && \
+    git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k && \
+    git clone --depth=1 https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions && \
+    git clone --depth=1 https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting && \
+    git clone --depth=1 https://github.com/kubermatic/fubectl.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/fubectl
 
 ### INSTALL helper
 RUN echo $USER_HOME && mkdir ${USER_HOME}/bin && cd ${USER_HOME}/bin && \
