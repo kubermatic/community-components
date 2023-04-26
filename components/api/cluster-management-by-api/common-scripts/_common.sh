@@ -92,13 +92,25 @@ deleteRequest(){
     -H  "authorization: Bearer ${KKP_TOKEN}"
 }
 
+export HEALTH_STATUS_KEY="HealthStatusUp"
+setHealthStatusKey() {
+  # health API returns 1 (int) to mark apiserver & other components heathy before 
+  # KKP 2.20 and HealthStatusUp (string) from KKP 2.20
+  apiServerStatus=$(getRequest "/projects/${KKP_PROJECT}/clusters/${cluster_id}/health" | jq .apiserver)
+  #regex to check if the value is 0 or 1
+  re='^[0-1]+$'
+  if [[ $apiServerStatus =~ $re ]] ; then
+    export HEALTH_STATUS_KEY=1
+  fi
+}
 
 ######### Check cluster is healthy & reachable
 checkClusterHealth() {
   cluster_id=${1}
-  # check response doesn't contain any other value as 1
+  setHealthStatusKey
   getRequest "/projects/${KKP_PROJECT}/clusters/${cluster_id}/health" \
       | jq .[] | grep -v 1 \
+      | jq .[] | grep -v ${HEALTH_STATUS_KEY} \
       && echo "cluster not healthy" && return 1
   ### check status code as well
   local code=200
