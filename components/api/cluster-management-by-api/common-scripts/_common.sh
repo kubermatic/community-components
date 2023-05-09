@@ -92,14 +92,30 @@ deleteRequest(){
     -H  "authorization: Bearer ${KKP_TOKEN}"
 }
 
+checkKKPVersion() {
+  if KKP_API=${KKP_API/v2/v1} getRequest "/version" | jq .api | grep -v 2.20 | grep -v 2.1; then
+    echo "KKP version supported!"
+  else
+    KKP_API=${KKP_API/v2/v1} getRequest "/version"
+    echo "KKP version not supported!"
+    return 1
+  fi
+}
 
+export HEALTH_STATUS_KEY="HealthStatusUp"
 ######### Check cluster is healthy & reachable
 checkClusterHealth() {
   cluster_id=${1}
-  # check response doesn't contain any other value as 1
+  ### check cluster health
   getRequest "/projects/${KKP_PROJECT}/clusters/${cluster_id}/health" \
-      | jq .[] | grep -v 1 \
-      && echo "cluster not healthy" && return 1
+      | jq .apiserver | grep -v ${HEALTH_STATUS_KEY} \
+      && echo "cluster apiserver not healthy" && return 1
+  getRequest "/projects/${KKP_PROJECT}/clusters/${cluster_id}/health" \
+      | jq .machineController | grep -v ${HEALTH_STATUS_KEY} \
+      && echo "cluster machine controller not healthy" && return 1
+  getRequest "/projects/${KKP_PROJECT}/clusters/${cluster_id}/health" \
+        | jq .operatingSystemManager | grep -v ${HEALTH_STATUS_KEY} \
+        && echo "cluster machine controller not healthy" && return 1
   ### check status code as well
   local code=200
   local status=$(curl -k -X GET \
@@ -112,14 +128,16 @@ checkClusterHealth() {
 }
 
 waitForClusterHealth() {
-  cluster_id=${1}
-  while ! checkClusterHealth ${cluster_id}
-  do
-    getRequest "/projects/${KKP_PROJECT}/clusters/${cluster_id}/health" \
-     | jq
-    echo ".... wait for healthy cluster" && sleep 5
-  done
-  echo "Cluster $cluster_id healthy!"
+  if checkKKPVersion; then
+    cluster_id=${1}
+    while ! checkClusterHealth ${cluster_id}
+    do
+      getRequest "/projects/${KKP_PROJECT}/clusters/${cluster_id}/health" \
+       | jq
+      echo ".... wait for healthy cluster" && sleep 5
+    done
+    echo "Cluster $cluster_id healthy!"
+  else return 1; fi
 }
 
 function check_continue() {
