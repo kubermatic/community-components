@@ -92,26 +92,30 @@ deleteRequest(){
     -H  "authorization: Bearer ${KKP_TOKEN}"
 }
 
-export HEALTH_STATUS_KEY="HealthStatusUp"
-setHealthStatusKey() {
-  # health API returns 1 (int) to mark apiserver & other components heathy before 
-  # KKP 2.20 and HealthStatusUp (string) from KKP 2.20
-  apiServerStatus=$(getRequest "/projects/${KKP_PROJECT}/clusters/${cluster_id}/health" | jq .apiserver)
-  #regex to check if the value is 0 or 1
-  re='^[0-1]+$'
-  if [[ $apiServerStatus =~ $re ]] ; then
-    export HEALTH_STATUS_KEY=1
+checkKKPVersion() {
+  if KKP_API=${KKP_API/v2/v1} getRequest "/version" | jq .api | grep -v 2.20 | grep -v 2.1; then
+    echo "KKP version supported!"
+  else
+    KKP_API=${KKP_API/v2/v1} getRequest "/version"
+    echo "KKP version not supported!"
+    return 1
   fi
 }
 
+export HEALTH_STATUS_KEY="HealthStatusUp"
 ######### Check cluster is healthy & reachable
 checkClusterHealth() {
   cluster_id=${1}
-  setHealthStatusKey
+  ### check cluster health
   getRequest "/projects/${KKP_PROJECT}/clusters/${cluster_id}/health" \
-      | jq .[] | grep -v 1 \
-      | jq .[] | grep -v ${HEALTH_STATUS_KEY} \
-      && echo "cluster not healthy" && return 1
+      | jq .apiserver | grep -v ${HEALTH_STATUS_KEY} \
+      && echo "cluster apiserver not healthy" && return 1
+  getRequest "/projects/${KKP_PROJECT}/clusters/${cluster_id}/health" \
+      | jq .machineController | grep -v ${HEALTH_STATUS_KEY} \
+      && echo "cluster machine controller not healthy" && return 1
+  getRequest "/projects/${KKP_PROJECT}/clusters/${cluster_id}/health" \
+        | jq .operatingSystemManager | grep -v ${HEALTH_STATUS_KEY} \
+        && echo "cluster machine controller not healthy" && return 1
   ### check status code as well
   local code=200
   local status=$(curl -k -X GET \
@@ -124,14 +128,16 @@ checkClusterHealth() {
 }
 
 waitForClusterHealth() {
-  cluster_id=${1}
-  while ! checkClusterHealth ${cluster_id}
-  do
-    getRequest "/projects/${KKP_PROJECT}/clusters/${cluster_id}/health" \
-     | jq
-    echo ".... wait for healthy cluster" && sleep 5
-  done
-  echo "Cluster $cluster_id healthy!"
+  if checkKKPVersion; then
+    cluster_id=${1}
+    while ! checkClusterHealth ${cluster_id}
+    do
+      getRequest "/projects/${KKP_PROJECT}/clusters/${cluster_id}/health" \
+       | jq
+      echo ".... wait for healthy cluster" && sleep 5
+    done
+    echo "Cluster $cluster_id healthy!"
+  else return 1; fi
 }
 
 function check_continue() {
