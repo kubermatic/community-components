@@ -3,6 +3,9 @@
 set -euo pipefail
 set +x
 
+BASEDIR=$(dirname "$0")
+source $BASEDIR/../hack/lib.sh
+
 DEPLOY_S3_SYNCER="s3-syncer"
 DEPLOY_RCLONE_S3_SYNCER="rclone-s3-syncer"
 DEPLOY_SGW="service-gateway"
@@ -19,7 +22,7 @@ fi
 
 VALUES_FILE=$(realpath "$1")
 if [[ ! -f "$VALUES_FILE" ]]; then
-    echo -e "$(date -Is)" "'values.yaml' in folder not found! \nCONTENT $VALUES_FILE:\n`ls -l $VALUES_FILE/..`"
+    echodate -e "'values.yaml' in folder not found! \nCONTENT $VALUES_FILE:\n`ls -l $VALUES_FILE/..`"
     exit 1
 fi
 
@@ -30,7 +33,7 @@ fi
 
 CHART_FOLDER=$(realpath "$3")
 if [[ ! -d "$CHART_FOLDER" ]]; then
-    echo "$(date -Is)" "CHART_FOLDER not found! $CHART_FOLDER"
+    echodate "CHART_FOLDER not found! $CHART_FOLDER"
     exit 1
 fi
 
@@ -52,14 +55,29 @@ function deploy {
     echo "chart not found! $path"
     exit 1
   fi
+
+  echodate "Fetching dependencies for chart $name ..."
+  requiresUpdate=false
+  chartname=$(yq eval .name $path/Chart.yaml )
+  i=0
+  for url in $(yq eval '.dependencies[]|select(.repository != null)|.repository' $path/Chart.yaml); do
+    i=$((i + 1))
+    helm repo add ${chartname}-dep-${i} ${url}
+    requiresUpdate=true
+  done
+
+  if $requiresUpdate; then
+    helm repo update
+  fi
+
   TEST_NAME="[Helm] Deploy chart $name into namespace $namespace"
-  echo "$(date -Is)" "Upgrading $TEST_NAME ..."
+  echodate "Upgrading $TEST_NAME ..."
   helm upgrade --create-namespace --install --wait $HELM_EXTRA_ARGS --timeout $timeout --values "$VALUES_FILE" --values "$VALUE_FILE_OVERRIDE" --namespace "$namespace" "$name" "$path"
 
   unset TEST_NAME
 }
 
-echo "$(date -Is)" "Deploying $DEPLOY_STACK stack..."
+echodate "Deploying $DEPLOY_STACK stack..."
 case "$DEPLOY_STACK" in
   "$DEPLOY_SGW")
     deploy service-gateway service-gateway-server service-gateway
