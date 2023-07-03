@@ -132,7 +132,7 @@ data:
   kubelb: {{ .Variables.kubeconf | b64enc }}
 kind: Secret
 metadata:
-  name: kubelb-c6cbhcm8m2
+  name: kubelb-cluster-kubeconfig
   namespace: kubelb
 type: Opaque
 ---
@@ -199,4 +199,4 @@ spec:
       volumes:
       - name: kubelb-cluster
         secret:
-          secretName: kubeconfig
+          secretName: kubelb-cluster-kubeconfig
