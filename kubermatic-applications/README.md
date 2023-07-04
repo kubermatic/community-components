@@ -97,3 +97,29 @@ cluster:
     # Required. Value to be provided from Cluster.Network which is set Pods CIDR IPv4
     podCIDRBlocks: "172.25.0.0/16"
 ```
+
+## [Sysdig Secure](https://sysdig.com/products/secure/) Integration
+
+1. Setup a demo account at: https://sysdig.com/start-free/
+1. After you login to the UI: https://eu1.app.sysdig.com/secure/#/data-sources/agents?setupModalEnv=Kubernetes&installContentDisplayType=tabular
+1. The generated access key you could then add to the Sysdig Agent via the following values
+
+```
+    global:
+      sysdig:
+        # get from sysdig portal: https://eu1.app.sysdig.com/secure/#/data-sources/agents?setupModalEnv=Kubernetes&installContentDisplayType=tabular
+        accessKey: xxxxx___TODO-ADD-KEY___xxxx
+        region: eu1
+      clusterConfig:
+        # give a name for sysdig portal
+        name: xxxxx___TODO-ADD_CLUSTER_NAME___xxxx
+      kspm:
+        deploy: true
+    nodeAnalyzer:
+      secure:
+        vulnerabilityManagement:
+          newEngineOnly: true
+      nodeAnalyzer:
+        benchmarkRunner:
+          deploy: false
+```
