@@ -97,6 +97,8 @@ plugins=(
   zsh-syntax-highlighting
 )
 
+ZSH_DISABLE_COMPFIX=true
+
 source $ZSH/oh-my-zsh.sh
 
 # User configuration
@@ -135,4 +137,4 @@ export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"
 alias kdebug='kcmd bash nicolaka/netshoot'
 
 ### kubeone autocompletion
-source <(kubeone completion bash)
+source <(kubeone completion zsh)
