@@ -163,7 +163,7 @@ spec:
         - --enable-leader-election
         - --node-address-type=InternalIP
         - --cluster-name=cluster-{{ .Cluster.Name}}
-        image: quay.io/kubermatic/kubelb-ccm:v0.3.11
+        image: quay.io/kubermatic/kubelb-ccm:v0.3.12
         livenessProbe:
           httpGet:
             path: /healthz
