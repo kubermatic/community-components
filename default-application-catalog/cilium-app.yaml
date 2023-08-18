@@ -1,0 +1,18 @@
+apiVersion: apps.kubermatic.k8c.io/v1
+kind: ApplicationDefinition
+metadata:
+  name: cilium
+spec:
+  description: Cilium is eBPF-based Networking, Security, and Observability.
+  method: helm
+  versions:
+  - template:
+      source:
+        helm:
+          chartName: cilium
+          chartVersion: 1.14.1
+          url: https://helm.cilium.io/
+    version: 1.14.1
+  # During the applicationdefinition creation time if the defaultValues is updated, then it is render for override during the application creation process from UI.
+  # By default, it is set empty.
+  defaultValues: {}

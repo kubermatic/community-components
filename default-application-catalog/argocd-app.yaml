@@ -1,0 +1,18 @@
+apiVersion: apps.kubermatic.k8c.io/v1
+kind: ApplicationDefinition
+metadata:
+  name: argocd
+spec:
+  description: Argo CD - Declarative, GitOps Continuous Delivery Tool for Kubernetes.
+  method: helm
+  versions:
+  - template:
+      source:
+        helm:
+          chartName: argo-cd
+          chartVersion: 5.5.12
+          url: https://argoproj.github.io/argo-helm
+    version: v2.4.14
+  # During the applicationdefinition creation time if the defaultValues is updated, then it is render for override during the application creation process from UI.
+  # By default, it is set empty.
+  defaultValues: {}
