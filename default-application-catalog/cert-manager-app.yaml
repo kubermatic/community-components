@@ -17,5 +17,3 @@ spec:
   # By default, it is set empty.
   defaultValues:
     installCRDs: true
-
-  
