@@ -9,7 +9,7 @@ spec:
   - template:
       source:
         helm:
-          chartName: falcosecurity
+          chartName: falco
           chartVersion: 3.5.0
           url: https://falcosecurity.github.io/charts
     version: 0.35.1

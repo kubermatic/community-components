@@ -9,7 +9,7 @@ spec:
   - template:
       source:
         helm:
-          chartName: istio
+          chartName: istiod
           chartVersion: 1.18.2
           url: https://istio-release.storage.googleapis.com/charts
     version: 1.18.2
