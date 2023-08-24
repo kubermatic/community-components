@@ -15,4 +15,29 @@ spec:
     version: v2.4.14
   # During the applicationdefinition creation time if the defaultValues is updated, then it is render for override during the application creation process from UI.
   # By default, it is set empty.
-  defaultValues: {}
+  # Assumption - LetsEncrypt clusterissuer named `letsencrypt-prod` is used for certificates management.
+  # Update the Domain name with appropriate value.
+  defaultValues:
+    server:
+      certificate:
+        enabled: true
+        domain: argocd.xxxx.xxx
+        issuer:
+          group: cert-manager.io
+          kind: ClusterIssuer
+          name: letsencrypt-prod
+        secretName: argocd-tls
+      ingress:
+        enabled: true
+        https: true
+        hosts:
+        - argocd.xxxx.xxx
+        ingressClassName: 'nginx'
+        annotations:
+          cert-manager.io/cluster-issuer: letsencrypt-prod
+          kubernetes.io/tls-acme: 'true'
+          nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
+        tls: 
+        - secretName: argocd-tls
+          hosts:
+            - argocd.xxxx.xxx
