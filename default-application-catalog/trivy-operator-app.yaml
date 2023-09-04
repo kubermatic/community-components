@@ -13,8 +13,7 @@ spec:
           chartVersion: 0.15.1
           url: https://aquasecurity.github.io/helm-charts/
     version: 0.15.1
-  # During the applicationdefinition creation time if the defaultValues is updated, then it is render for override during the application creation process from UI.
-  # By default, it is set empty.
   defaultValues:
     trivy:
+      # To specfy that Trivy should ignore all unfixed vulnerabilities, set `ignoredUnfixed` flag to `true`
       ignoreUnfixed: true

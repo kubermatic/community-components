@@ -13,6 +13,4 @@ spec:
           chartVersion: 0.7.0
           url: https://aquasecurity.github.io/helm-charts/
     version: 0.37.2
-  # During the applicationdefinition creation time if the defaultValues is updated, then it is render for override during the application creation process from UI.
-  # By default, it is set empty.
   defaultValues: {}

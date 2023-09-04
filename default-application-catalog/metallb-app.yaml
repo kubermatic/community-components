@@ -13,6 +13,4 @@ spec:
           chartVersion: 0.13.10
           url: https://metallb.github.io/metallb
     version: v0.13.10
-  # During the applicationdefinition creation time if the defaultValues is updated, then it is render for override during the application creation process from UI.
-  # By default, it is set empty.
   defaultValues: {}
