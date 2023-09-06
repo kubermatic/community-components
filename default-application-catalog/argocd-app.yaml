@@ -13,8 +13,6 @@ spec:
           chartVersion: 5.5.12
           url: https://argoproj.github.io/argo-helm
     version: v2.4.14
-  # Assumption - LetsEncrypt clusterissuer named `letsencrypt-prod` is used for certificates management.
-  # Update the Domain name with appropriate value.
   defaultValues:
     server:
       service:
