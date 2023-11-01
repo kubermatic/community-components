@@ -1,0 +1,21 @@
+apiVersion: apps.kubermatic.k8c.io/v1
+kind: ApplicationDefinition
+metadata:
+  name: trivy-operator
+spec:
+  description: The Trivy-Operator leverages trivy security tools by incorporating their outputs into Kubernetes CRDs (Custom Resource Definitions) and from there, making security reports accessible through the Kubernetes API.
+  method: helm
+  versions:
+  - template:
+      source:
+        helm:
+          chartName: trivy-operator
+          chartVersion: 0.18.1
+          url: https://aquasecurity.github.io/helm-charts/
+    version: 0.16.1
+  defaultValues:
+    ignoreUnfixed: true
+    podAnnotations:
+      prometheus.io/path: /metrics
+      prometheus.io/port: "8080"
+      prometheus.io/scrape: "true"
