@@ -31,6 +31,6 @@
     "maxReplicas": null
   },
   "annotations": {
-    "k8c.io/operating-system-profile": "osp-ubuntu"
+    "k8c.io/operating-system-profile": "${osp_name}"
   }
 }

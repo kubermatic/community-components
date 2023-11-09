@@ -8,10 +8,10 @@ To access KKP Rest API, an API token of type `Editor` will get needed for this e
 
 ## Example
 
-1. create a `terraform.tfvars`, based on [terraform.example.tfvars](./terraform.example.tfvars)
+1. create a `terraform.tfvars`, based on in example [terraform.kubevirt.example.tfvars](./terraform.kubevirt.example.tfvars)
 ```bash
 cd custom-components/terraform-kkp-cluster-provider
-cp terraform.example.tfvars terraform.tfvars
+cp terraform.kubevirt.example.tfvars terraform.tfvars
 
 # adjust variables, and add API Token 
 vim terraform.tfvars
@@ -149,7 +149,9 @@ No modules.
 | <a name="input_credential_preset_name"></a> [credential\_preset\_name](#input\_credential\_preset\_name) | Preset to use while creating the user cluster | `string` | `"TODO-ADD-PRESET-NAME"` | no |
 | <a name="input_dc"></a> [dc](#input\_dc) | Datacenter name at a Kubermatic Seed | `string` | `"fra-prod"` | no |
 | <a name="input_kubernetes_version"></a> [kubernetes\_version](#input\_kubernetes\_version) | User Cluster Kubernetes Version | `string` | `"1.26.9"` | no |
-| <a name="input_kubevirt_machine"></a> [kubevirt\_machine](#input\_kubevirt\_machine) | A selection of parameter for a kubevirt machine object | <pre>object({<br>    replicas     = number<br>    cpus         = number<br>    memory       = string<br>    disk_size    = string<br>    os_image_url = string<br>    primary_disk_storage_class = string<br>  })</pre> | <pre>{<br>  "cpus": 8,<br>  "disk_size": "150Gi",<br>  "memory": "32768Mi",<br>  "os_image_url": "http://TODO.your.image.url/vms/ubuntu-22.04.img",<br>  "primary_disk_storage_class": "TODO_YOUR_STORAGE_CLASS",<br>  "replicas": 5<br>}</pre> | no |
+| <a name="input_kubevirt_machine_spec"></a> [kubevirt\_machine\_spec](#input\_kubevirt\_machine\_spec) | A selection of parameter for a kubevirt machine object specification. | <pre>object({<br>    cpus         = number<br>    memory       = string<br>    disk_size    = string<br>    os_image_url = string<br>    primary_disk_storage_class = string<br>  })</pre> | <pre>{<br>  "cpus": 8,<br>  "disk_size": "150Gi",<br>  "memory": "32768Mi",<br>  "os_image_url": "http://TODO.your.image.url/vms/ubuntu-22.04.img",<br>  "primary_disk_storage_class": "TODO_YOUR_STORAGE_CLASS"<br>}</pre> | no |
+| <a name="input_machine_osp_name"></a> [machine\_osp\_name](#input\_machine\_osp\_name) | Name of the selected Operating System Profile (OSP) for the machine controller | `string` | `"osp-ubuntu"` | no |
+| <a name="input_machine_replica"></a> [machine\_replica](#input\_machine\_replica) | Replica of initial created Machines | `number` | `2` | no |
 | <a name="input_project_id"></a> [project\_id](#input\_project\_id) | KKP Project Id | `string` | `"TODO_PROJECT_ID"` | no |
 
 ## Outputs

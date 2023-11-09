@@ -66,10 +66,22 @@ variable "cni_version" {
   type        = string
   default     = "1.13.8"
 }
-variable "kubevirt_machine" {
-  description = "A selection of parameter for a kubevirt machine object"
+
+variable "machine_replica" {
+  description = "Replica of initial created Machines"
+  type = number
+  default = 2
+}
+
+variable "machine_osp_name" {
+  description = "Name of the selected Operating System Profile (OSP) for the machine controller"
+  type = string
+  default = "osp-ubuntu"
+}
+
+variable "kubevirt_machine_spec" {
+  description = "A selection of parameter for a kubevirt machine object specification."
   type = object({
-    replicas     = number
     cpus         = number
     memory       = string
     disk_size    = string
@@ -77,7 +89,6 @@ variable "kubevirt_machine" {
     primary_disk_storage_class = string
   })
   default = {
-    replicas     = 5
     cpus         = 8
     memory       = "32768Mi"
     disk_size    = "150Gi"

@@ -38,12 +38,13 @@ locals {
     {
       "machine_name" : "${var.cluster_name}-node",
       "kubernetes_version" : var.kubernetes_version,
-      "replicas" : var.kubevirt_machine.replicas,
-      "cpus" : var.kubevirt_machine.cpus,
-      "memory" : var.kubevirt_machine.memory,
-      "disk_size" : var.kubevirt_machine.disk_size,
-      "primaryDiskOSImage" : var.kubevirt_machine.os_image_url,
-      "primaryDiskStorageClass" : var.kubevirt_machine.primary_disk_storage_class
+      "replicas" : var.machine_replica,
+      "osp_name" : var.machine_osp_name
+      "cpus" : var.kubevirt_machine_spec.cpus,
+      "memory" : var.kubevirt_machine_spec.memory,
+      "disk_size" : var.kubevirt_machine_spec.disk_size,
+      "primaryDiskOSImage" : var.kubevirt_machine_spec.os_image_url,
+      "primaryDiskStorageClass" : var.kubevirt_machine_spec.primary_disk_storage_class
     }
   )
   addon_spec = file("${path.module}/${var.cluster_spec_folder}/addon.json")
