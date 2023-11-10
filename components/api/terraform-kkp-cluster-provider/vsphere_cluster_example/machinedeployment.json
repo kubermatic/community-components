@@ -4,9 +4,9 @@
     "template": {
       "cloud": {
         "vsphere": {
-          "cpus": "${cpus}",
-          "memory": "${memory}",
-          "diskSizeGB": "${disk_size}",
+          "cpus": ${cpus},
+          "memory": ${memory},
+          "diskSizeGB": ${disk_size},
           "template": "${template_vm}"
         }
       },
