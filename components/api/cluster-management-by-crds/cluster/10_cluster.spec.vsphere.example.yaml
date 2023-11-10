@@ -1,0 +1,122 @@
+apiVersion: kubermatic.k8c.io/v1
+kind: Cluster
+metadata:
+  annotations:
+    user: tobias.schneck@kubermatic.com
+    kubermatic.io/initial-machinedeployment-request: |
+      {
+        "metadata": {
+          "name": "xxx-crd-cluster-id-init-worker-node",
+          "namespace": "kube-system",
+          "annotations": {
+            "k8c.io/operating-system-profile": "osp-ubuntu"
+          },
+          "finalizers": [
+            "foregroundDeletion"
+          ]
+        },
+        "spec": {
+          "replicas": 2,
+          "selector": {
+            "matchLabels": {
+              "machine": "xxx-crd-cluster-id-init-worker-node"
+            }
+          },
+          "template": {
+            "metadata": {
+              "creationTimestamp": null,
+              "labels": {
+                "machine": "xxx-crd-cluster-id-init-worker-node"
+              }
+            },
+            "spec": {
+              "metadata": {
+                "creationTimestamp": null,
+                "labels": {}
+              },
+              "providerSpec": {
+                "value": {
+                  "sshPublicKeys": [],
+                  "caPublicKey": "",
+                  "cloudProvider": "vsphere",
+                  "cloudProviderSpec": {
+                    "templateVMName": "kkp-ubuntu-22.04",
+                    "cpus": 2,
+                    "memoryMB": 4096,
+                    "diskSizeGB": 10,
+                    "allowInsecure": true
+                  },
+                  "operatingSystem": "ubuntu",
+                  "operatingSystemSpec": {
+                    "distUpgradeOnBoot": false
+                  }
+                }
+              },
+              "versions": {
+                "kubelet": ""
+              }
+            }
+          }
+        }
+      }
+  labels:
+    is-credential-preset: "true"
+    cluster-md-cleanup-hourly: "false"
+    cost-center: "123"
+    project-id: dl6kxzf8br
+    sig: pre-sales
+    type: demo
+  name: xxx-crd-cluster-id
+spec:
+  cloud:
+    dc: vsphere
+    providerName: vsphere
+    vsphere:
+      credentialsReference:
+        name: credentials-xxx-crd-cluster-id
+        namespace: kubermatic
+      datastore: vsan
+      folder: /Hamburg/vm/Kubermatic-dev/xxx-crd-cluster-id
+      password: ""
+      storagePolicy: ""
+      username: ""
+      vmNetName: /Hamburg/network/Default Network
+##### DEFAULTING could be skipped
+#  clusterNetwork:
+#    dnsDomain: cluster.local
+#    ipFamily: IPv4
+#    ipvs:
+#      strictArp: true
+#    konnectivityEnabled: true
+#    nodeCidrMaskSizeIPv4: 24
+#    nodeLocalDNSCacheEnabled: true
+#    pods:
+#      cidrBlocks:
+#      - 172.25.0.0/16
+#    proxyMode: ipvs
+#    services:
+#      cidrBlocks:
+#      - 10.240.16.0/20
+  cniPlugin:
+    type: canal
+    version: v3.24
+  containerRuntime: containerd
+  enableOperatingSystemManager: true
+  enableUserSSHKeyAgent: true
+  exposeStrategy: NodePort
+  features:
+    apiserverNetworkPolicy: true
+    etcdLauncher: true
+    externalCloudProvider: true
+    vsphereCSIClusterID: true
+  humanReadableName: xxx-crd-cluster-id
+  kubernetesDashboard:
+    enabled: true
+  mla:
+    loggingEnabled: true
+    monitoringEnabled: true
+  opaIntegration:
+    enabled: true
+    webhookTimeoutSeconds: 10
+  pause: false
+  version: 1.26.9
