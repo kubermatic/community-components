@@ -69,30 +69,54 @@ variable "cni_version" {
 
 variable "machine_replica" {
   description = "Replica of initial created Machines"
-  type = number
-  default = 2
+  type        = number
+  default     = 2
 }
 
 variable "machine_osp_name" {
   description = "Name of the selected Operating System Profile (OSP) for the machine controller"
-  type = string
-  default = "osp-ubuntu"
+  type        = string
+  default     = "osp-ubuntu"
+}
+
+
+# CLOUD PROVIDER Specifics
+variable "cloud_provider" {
+  description = "Defines cloud provider to use: Possible Values in the moment `kubevirt`, `vsphere`"
+  type        = string
+  default     = "kubevirt"
 }
 
 variable "kubevirt_machine_spec" {
   description = "A selection of parameter for a kubevirt machine object specification."
-  type = object({
-    cpus         = number
-    memory       = string
-    disk_size    = string
-    os_image_url = string
+  type        = object({
+    cpus                       = number
+    memory                     = string
+    disk_size                  = string
+    os_image_url               = string
     primary_disk_storage_class = string
   })
   default = {
-    cpus         = 8
-    memory       = "32768Mi"
-    disk_size    = "150Gi"
-    os_image_url = "http://TODO.your.image.url/vms/ubuntu-22.04.img"
+    cpus                       = 2
+    memory                     = "8192Mi"
+    disk_size                  = "20Gi"
+    os_image_url               = "http://TODO.your.image.url/vms/ubuntu-22.04.img"
     primary_disk_storage_class = "TODO_YOUR_STORAGE_CLASS"
+  }
+}
+
+variable "vsphere_machine_spec" {
+  description = "A selection of parameter for the vSphere machine object specification."
+  type        = object({
+    cpus        = number
+    memory      = number
+    disk_size   = number
+    template_vm = string
+  })
+  default = {
+    cpus        = 2
+    memory      = 8192
+    disk_size   = 20
+    template_vm = "kkp-ubuntu-22.04"
   }
 }

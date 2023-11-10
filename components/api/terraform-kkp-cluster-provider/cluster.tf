@@ -22,6 +22,7 @@ provider "restapi" {
 }
 
 locals {
+  # CLUSTER specs
   cluster_spec = templatefile(
     "${path.module}/${var.cluster_spec_folder}/cluster.json",
     {
@@ -33,20 +34,38 @@ locals {
       "cni_version" : var.cni_version
     }
   )
-  machine_spec = templatefile(
-    "${path.module}/${var.cluster_spec_folder}/machinedeployment.json",
-    {
-      "machine_name" : "${var.cluster_name}-node",
-      "kubernetes_version" : var.kubernetes_version,
-      "replicas" : var.machine_replica,
-      "osp_name" : var.machine_osp_name
+
+  # MACHINE Specs
+  machine_common = {
+    "machine_name" : "${var.cluster_name}-node",
+    "kubernetes_version" : var.kubernetes_version,
+    "replicas" : var.machine_replica,
+    "osp_name" : var.machine_osp_name
+  }
+  machine_cloud_provider_spec_map = {
+    kubevirt = {
       "cpus" : var.kubevirt_machine_spec.cpus,
       "memory" : var.kubevirt_machine_spec.memory,
       "disk_size" : var.kubevirt_machine_spec.disk_size,
       "primaryDiskOSImage" : var.kubevirt_machine_spec.os_image_url,
       "primaryDiskStorageClass" : var.kubevirt_machine_spec.primary_disk_storage_class
+    },
+    vsphere = {
+      "cpus" : var.vsphere_machine_spec.cpus,
+      "memory" : var.vsphere_machine_spec.memory,
+      "disk_size" : var.vsphere_machine_spec.disk_size,
+      "template_vm" : var.vsphere_machine_spec.template_vm,
     }
+  }
+  machine_spec = templatefile(
+    "${path.module}/${var.cluster_spec_folder}/machinedeployment.json",
+    merge(
+      local.machine_common,
+      lookup(local.machine_cloud_provider_spec_map, var.cloud_provider )
+    )
   )
+
+  # ADDON Spec
   addon_spec = file("${path.module}/${var.cluster_spec_folder}/addon.json")
 }
 
