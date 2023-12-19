@@ -35,6 +35,7 @@ Dedicated components for customer purposes.
 | [AWS EKS -D kubeOne demo](./examples/amazon-eks-d)                                        | an example for creating a Cluster running Amazon EKS-D                                                                                                                                                                                                                   |
 | [Bare Metal - KubeOne Static Hosts](./examples/baremetal/kubeone/vsphere-static-machines) | Example how to managed static bare metal workers. The "bare metal" workers are simulated with vSphere by terraform automation                                                                                                                                            |
 | [Bare Metal - KKP and kubeadm join implementation examples](examples/baremetal/kkp)       | Example how to use [kubeadm](https://kubernetes.io/docs/setup/independent/install-kubeadm/) to join the KKP managed controlplan: [1 Manual Example](examples/baremetal/kkp/kubadm-manual), [2 SSH Multi Client join script](examples/baremetal/kkp/kubeadm-multi-client) |
+| [Baremetal node provisioning with OSM](examples/baremetal/kkp/kubeadm-osm/README.md)      | This method allows you to provision a baremetal machine as a Kubernetes node, using the provisioning logic of OSM as provided by the specific OSP.                                                                                                                       |
 
 ## Kubermatic Addons
 
