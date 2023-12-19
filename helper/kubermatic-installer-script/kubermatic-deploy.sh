@@ -2,6 +2,9 @@
 # Kubermatic Deployment script based on helm3
 set -euo pipefail
 
+BASEDIR=$(dirname "$0")
+source $BASEDIR/../../hack/lib.sh
+
 if [[ $# -lt 1 ]] || [[ "$1" == "--help" ]]; then
   echo "Usage: $(basename \"$0\") (master|seed) path/to/VALUES_FILES path/to/CHART_FOLDER (monitoring|logging|backup|kubermatic|kubermatic-deployment-only)"
   echo "FYI: kubermatic|kubermatic-deployment-only is deprecated due to new kubermatic-installer binary"
@@ -19,12 +22,12 @@ fi
 
 VALUES_FILE=$(realpath "$2")
 if [[ ! -f "$VALUES_FILE" ]]; then
-    echo -e "$(date -Is)" "'values.yaml' in folder not found! \nCONTENT $VALUES_FILE:\n`ls -l $VALUES_FILE/..`"
+    echodate "'values.yaml' in folder not found! \nCONTENT $VALUES_FILE:\n`ls -l $VALUES_FILE/..`"
     exit 1
 fi
 CHART_FOLDER=$(realpath "$3")
 if [[ ! -d "$CHART_FOLDER" ]]; then
-    echo "$(date -Is)" "CHART_FOLDER not found! $CHART_FOLDER"
+    echodate "CHART_FOLDER not found! $CHART_FOLDER"
     exit 1
 fi
 ### verification is checked in case expresion
@@ -56,14 +59,28 @@ function deploy {
     inital_revision="$(helm history $name --output=json | jq '.Releases[0].Revision')"
   fi
 
-  echo "$(date -Is)" "Upgrading [$namespace] $name ..."
+  echodate "Fetching dependencies for chart $name ..."
+  requiresUpdate=false
+  chartname=$(yq eval .name $path/Chart.yaml )
+  i=0
+  for url in $(yq eval '.dependencies[]|select(.repository != null)|.repository' $path/Chart.yaml); do
+    i=$((i + 1))
+    helm repo add ${chartname}-dep-${i} ${url}
+    requiresUpdate=true
+  done
+
+  if $requiresUpdate; then
+    helm repo update
+  fi
+
+  echodate "Upgrading [$namespace] $name ..."
   kubectl create namespace "$namespace" || true
   helm dependency build $path
   helm upgrade --install --wait --timeout $timeout $MASTER_FLAG --values "$VALUES_FILE" --namespace "$namespace" "$name" "$path"
 
   if [[ -v CANARY_DEPLOYMENT ]]; then
     TEST_NAME="[Helm] Rollback chart $name"
-    echo "$(date -Is)" "Rolling back $name to revision $inital_revision as this was only a canary deployment"
+    echodate "Rolling back $name to revision $inital_revision as this was only a canary deployment"
     helm rollback --wait --timeout "$timeout" "$name" "$inital_revision"
   fi
   unset TEST_NAME
@@ -95,13 +112,14 @@ function deployIAP() {
       if grep -q oidc_issuer_url "$VALUES_FILE"; then
         deploy iap iap iap/
       else
-        echo "$(date -Is)" "Skipping IAP deployment because discovery_url is unset in values file"
+        echodate "Skipping IAP deployment because discovery_url is unset in values file"
       fi
     fi
 }
 
 
-echo "$(date -Is)" "Deploying $DEPLOY_STACK stack..."
+echodate "Deploying $DEPLOY_STACK stack..."
+
 case "$DEPLOY_STACK" in
   monitoring)
     deployIAP
@@ -123,13 +141,13 @@ case "$DEPLOY_STACK" in
     fi
     ;;
 
-  kubermatic)    
+  kubermatic)
     deploy nginx-ingress-controller nginx-ingress-controller nginx-ingress-controller/
     deployCertManager
     if [[ "$DEPLOY_TYPE" == master ]]; then
       deploy    oauth oauth oauth/
     fi
-    deployBackup    
+    deployBackup
     ;;
 
   cert-manager)

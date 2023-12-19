@@ -1,0 +1,38 @@
+apiVersion: apps.kubermatic.k8c.io/v1
+kind: ApplicationDefinition
+metadata:
+  name: hivemq
+spec:
+  description: HiveMQ is an MQTT broker and a client based messaging platform designed for the fast, efficient and reliable movement of data to and from connected IoT devices. It uses the MQTT protocol for instant, bi-directional push of data between your device and your enterprise systems. 
+  method: helm
+  versions:
+  - template:
+      source:
+        helm:
+          chartName: hivemq-operator
+          chartVersion: 0.11.19
+          url: https://hivemq.github.io/helm-charts
+    version: 4.16.0
+  # https://docs.hivemq.com/operator/4.10/kubernetes-operator/configuration.html#basic
+  defaultValues:
+    # Kubernetes version v1.21 deprecated Pod Security Policies and Kubernetes version v1.25 removes 'Pod Security Policies' entirely. 
+    # To run the HiveMQ Kubernetes Operator on Kubernetes v1.25, you must disable the deprecated Pod Security Policy setting in the global section of your operator configuration before you upgrade to Kubernetes v1.25 or higher. 
+    global:
+      rbac:
+        pspEnabled: false
+    hivemq:
+      cpu: '1'
+      ephemeralStorage: 2Gi
+      memory: 2Gi
+      nodeCount: '2'
+      ports:
+        - expose: true
+          name: mqtt
+          patch:
+            - '[{"op":"add","path":"/spec/type","value":"LoadBalancer"}]'
+          port: 1883
+        - expose: true
+          name: cc
+          patch:
+            - '[{"op":"add","path":"/spec/sessionAffinity","value":"ClientIP"}]'
+          port: 8080
