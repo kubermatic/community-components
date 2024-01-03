@@ -5,7 +5,7 @@ export AWS_DEFAULT_REGION="eu-central-1"
 export RESTIC_REPOSITORY="s3:http://127.0.0.1:9000/kubermatic-master-backups"
 export AWS_ACCESS_KEY_ID="<look at minio section in values.yaml>"
 export AWS_SECRET_ACCESS_KEY="<look at minio section in values.yaml>"
-export RESTIC_PASSWORD="vjTkgmX6inho"
+export RESTIC_PASSWORD="<configured in restic-config secret of backup-restic KubeOne addon>"
 
 
 ## Port forward minio
