@@ -1,4 +1,4 @@
-{{- if .Values.vmware-exporter.service.enabled -}}
+{{- if .Values.service.enabled -}}
 apiVersion: v1
 kind: Service
 metadata:
@@ -8,15 +8,15 @@ metadata:
     chart: {{ template "vmware-exporter.chart" . }}
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
-{{- with .Values.vmware-exporter.service.annotations }} 
+{{- with .Values.service.annotations }} 
   annotations: 
 {{ toYaml . | indent 4 }} 
 {{- end }} 
 spec:
-  type: {{ .Values.vmware-exporter.service.type }}
+  type: {{ .Values.service.type }}
   ports:
-    - port: {{ .Values.vmware-exporter.service.port }}
-      targetPort: {{ .Values.vmware-exporter.service.targetport }}
+    - port: {{ .Values.service.port }}
+      targetPort: {{ .Values.service.targetport }}
       protocol: TCP
       name: http
   selector:

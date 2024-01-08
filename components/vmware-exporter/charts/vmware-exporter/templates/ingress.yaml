@@ -1,7 +1,7 @@
-{{- if .Values.vmware-exporter.ingress.enabled -}}
+{{- if .Values.ingress.enabled -}}
 {{- $fullName := include "vmware-exporter.fullname" . -}}
-{{- $servicePort := .Values.vmware-exporter.service.port -}}
-{{- $ingressPath := .Values.vmware-exporter.ingress.path -}}
+{{- $servicePort := .Values.service.port -}}
+{{- $ingressPath := .Values.ingress.path -}}
 {{- if semverCompare ">=1.14-0" .Capabilities.KubeVersion.GitVersion -}}
 apiVersion: networking.k8s.io/v1beta1
 {{- else -}}
@@ -15,14 +15,14 @@ metadata:
     chart: {{ template "vmware-exporter.chart" . }}
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
-{{- with .Values.vmware-exporter.ingress.annotations }}
+{{- with .Values.ingress.annotations }}
   annotations:
 {{ toYaml . | indent 4 }}
 {{- end }}
 spec:
-{{- if .Values.vmware-exporter.ingress.tls }}
+{{- if .Values.ingress.tls }}
   tls:
-  {{- range .Values.vmware-exporter.ingress.tls }}
+  {{- range .Values.ingress.tls }}
     - hosts:
       {{- range .hosts }}
         - {{ . }}
@@ -31,7 +31,7 @@ spec:
   {{- end }}
 {{- end }}
   rules:
-  {{- range .Values.vmware-exporter.ingress.hosts }}
+  {{- range .Values.ingress.hosts }}
     - host: {{ . }}
       http:
         paths:

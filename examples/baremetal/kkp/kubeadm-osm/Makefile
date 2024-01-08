@@ -1,0 +1,2 @@
+bootstrap:
+	./local-bootstrap.sh
