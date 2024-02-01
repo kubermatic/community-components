@@ -2680,7 +2680,7 @@ data:
       "uid": "ed9d4bbf8801a8f79194b2ce6ead0ffcb8f9952a",
       "version": 17
     }
-  vsphere-esci.json: |
+  vsphere-esxi.json: |
     {
       "annotations": {
         "list": [
@@ -3421,7 +3421,7 @@ data:
           "pluginVersion": "6.4.1",
           "targets": [
             {
-              "expr": "(vmware_host_cpu_usagemhz_average{host_name=~\"$esxhost\"}) * 100 / (vmware_host_cpu_max{host_name=~\"$esxhost\"})",
+              "expr": "(vmware_host_cpu_usagemhz_average{host_name=~\"$esxhost\"}) * 100 / on() group_right() (vmware_host_cpu_max{host_name=~\"$esxhost\"})",
               "format": "time_series",
               "instant": false,
               "intervalFactor": 1,
@@ -3685,12 +3685,12 @@ data:
           "steppedLine": false,
           "targets": [
             {
-              "expr": "(vmware_host_cpu_usagemhz_average{host_name=~\"$esxhost\"}) * 100 / (vmware_host_cpu_max{host_name=~\"$esxhost\"})",
+              "expr": "(vmware_host_cpu_usagemhz_average{host_name=~\"$esxhost\"}) * 100 / on() group_right() (vmware_host_cpu_max{host_name=~\"$esxhost\"})",
               "legendFormat": "Cpu Usage",
               "refId": "B"
             },
             {
-              "expr": "(vmware_host_cpu_demand_average{host_name=~\"$esxhost\"}) * 100 / (vmware_host_cpu_max{host_name=~\"$esxhost\"})",
+              "expr": "(vmware_host_cpu_demand_average{host_name=~\"$esxhost\"}) * 100 / on() group_right() (vmware_host_cpu_max{host_name=~\"$esxhost\"})",
               "legendFormat": "CPU Demand",
               "refId": "A"
             }
@@ -3891,7 +3891,7 @@ data:
               "refId": "A"
             },
             {
-              "expr": "(vmware_host_mem_active_average{host_name=~\"$esxhost\"})/1024 * 100 / (vmware_host_memory_max{host_name=~\"$esxhost\"})",
+              "expr": "(vmware_host_mem_active_average{host_name=~\"$esxhost\"})/1024 * 100 / on() group_right() (vmware_host_memory_max{host_name=~\"$esxhost\"})",
               "legendFormat": "Memory Active",
               "refId": "B"
             }
@@ -5141,7 +5141,7 @@ data:
           "pluginVersion": "6.4.1",
           "targets": [
             {
-              "expr": "vmware_vm_cpu_usagemhz_average{vm_name=~\"$vm\"}/vmware_vm_max_cpu_usage{vm_name=~\"$vm\"}*100",
+              "expr": "vmware_vm_cpu_usagemhz_average{vm_name=~\"$vm\"}/on() group_right() vmware_vm_max_cpu_usage{vm_name=~\"$vm\"}*100",
               "format": "time_series",
               "instant": false,
               "intervalFactor": 1,
@@ -5425,7 +5425,7 @@ data:
           "tableColumn": "",
           "targets": [
             {
-              "expr": "(vmware_vm_mem_usage_average{vm_name=~\"$vm\"}) * 100 / (vmware_vm_memory_max{vm_name=~\"$vm\"})",
+              "expr": "(vmware_vm_mem_usage_average{vm_name=~\"$vm\"}) * 100 / on() group_right() (vmware_vm_memory_max{vm_name=~\"$vm\"})",
               "format": "time_series",
               "instant": false,
               "intervalFactor": 1,
@@ -5619,7 +5619,7 @@ data:
           "steppedLine": false,
           "targets": [
             {
-              "expr": "vmware_vm_cpu_usagemhz_average{vm_name=~\"$vm\"}/vmware_vm_max_cpu_usage{vm_name=~\"$vm\"}*100",
+              "expr": "vmware_vm_cpu_usagemhz_average{vm_name=~\"$vm\"}/on() group_right() vmware_vm_max_cpu_usage{vm_name=~\"$vm\"}*100",
               "format": "time_series",
               "intervalFactor": 1,
               "legendFormat": "Cpu Usage",
@@ -5811,7 +5811,7 @@ data:
           "steppedLine": false,
           "targets": [
             {
-              "expr": "(vmware_vm_mem_usage_average{vm_name=~\"$vm\"}) * 100 / (vmware_vm_memory_max{vm_name=~\"$vm\"})",
+              "expr": "(vmware_vm_mem_usage_average{vm_name=~\"$vm\"}) * 100 / on() group_right() (vmware_vm_memory_max{vm_name=~\"$vm\"})",
               "format": "time_series",
               "intervalFactor": 1,
               "legendFormat": "Memory Usage",
