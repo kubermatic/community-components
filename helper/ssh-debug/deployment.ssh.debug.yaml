@@ -4,7 +4,6 @@ metadata:
   labels:
     app: ssh-debug
   name: ssh-debug
-  namespace: default
 spec:
   replicas: 1
   selector:
@@ -34,13 +33,9 @@ spec:
         resources: {}
         volumeMounts:
           - mountPath: /tmp/.ssh
-            name: ssh-key
+            name: ssh-files
             readOnly: true
       volumes:
-        - name: ssh-key
+        - name: ssh-files
           secret:
-            secretName: ssh-key
-            items:
-              - key: id_rsa
-                path: id_rsa
----
+            secretName: ssh-files
