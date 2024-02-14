@@ -1,7 +1,7 @@
 ## See https://github.com/kubermatic/kubeone/releases
-UI_VERSION ?= 0.1.0
+UI_VERSION ?= 0.1.1
 
-KUBEONE_VERSION ?= 1.5.6
+KUBEONE_VERSION ?= 1.6.0
 ### TODO transfer to kubermatic repo
 DOCKER_REPO ?= 'quay.io/toschneck/kubermatic-dev-ui'
 FINAL_TAG ?= ${UI_VERSION}

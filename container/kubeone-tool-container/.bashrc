@@ -20,7 +20,7 @@ function _update_ps1() {
         export POWERLINE_THEME=default
         #export POWERLINE_THEME=low-contrast
     fi
-    PS1="$(powerline-go -theme $POWERLINE_THEME -cwd-max-depth 5 -newline -modules "termtitle,kube,venv,user,host,ssh,cwd,perms,git,hg,jobs,exit,root,vgo" -error $?)"
+    PS1="$(/bin/powerline-go -theme $POWERLINE_THEME -cwd-max-depth 5 -newline -modules "termtitle,kube,venv,user,host,ssh,cwd,perms,git,hg,jobs,exit,root,vgo" -error $?)"
 }
 export TERM="xterm-256color"
 if [ "$TERM" != "linux" ]; then
@@ -39,7 +39,7 @@ alias kdebug='kcmd bash nicolaka/netshoot'
 source <(helm completion bash)
 
 ##### fubectl
-[ -f $HOME/bin/fubectl.source ] && source $HOME/bin/fubectl.source
+[ -f /bin/fubectl.source ] && source /bin/fubectl.source
 
 # fzf
 [ -f ~/.fzf.bash ] && source ~/.fzf.bash

@@ -144,6 +144,15 @@ RUN LAZYGIT_VERSION=0.37.0 && \
     mv lazygit /usr/local/bin && \
     cd .. && rm -rf /tmp/lazygit-inst
 
+# Install ngrok
+RUN curl -s https://ngrok-agent.s3.amazonaws.com/ngrok.asc | sudo tee /etc/apt/trusted.gpg.d/ngrok.asc >/dev/null && echo "deb https://ngrok-agent.s3.amazonaws.com buster main" | sudo tee /etc/apt/sources.list.d/ngrok.list && sudo apt update && sudo apt install ngrok
+
+### INSTALL helper
+RUN wget https://rawgit.com/kubermatic/fubectl/master/fubectl.source -O /bin/fubectl.source && \
+    # powerline go
+    wget https://github.com/justjanne/powerline-go/releases/latest/download/powerline-go-linux-amd64 -O /bin/powerline-go && \
+    chmod +x /bin/powerline-go
+
 ARG USER=kubermatic
 ARG USER_HOME=/home/${USER}
 ENV USER_HOME=$USER_HOME
@@ -164,7 +173,7 @@ RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master
     git clone --depth=1 https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting && \
     git clone --depth=1 https://github.com/kubermatic/fubectl.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/fubectl
 
-### INSTALL helper
+### INSTALL krew
 RUN echo $USER_HOME && mkdir ${USER_HOME}/bin && cd ${USER_HOME}/bin && \
     # krew
     set -x; cd "$(mktemp -d)" && \
@@ -172,12 +181,7 @@ RUN echo $USER_HOME && mkdir ${USER_HOME}/bin && cd ${USER_HOME}/bin && \
     tar -zxvf krew*.tar.gz && \
     KREW=./krew-"$(uname | tr '[:upper:]' '[:lower:]')_$(uname -m | sed -e 's/x86_64/amd64/' -e 's/arm.*$/arm/')" && \
     "$KREW" install krew && \
-    rm -rf * && \
-    # fubctl
-    wget https://rawgit.com/kubermatic/fubectl/master/fubectl.source -O ${USER_HOME}/bin/fubectl.source && \
-    # powerline go
-    wget https://github.com/justjanne/powerline-go/releases/latest/download/powerline-go-linux-amd64 -O ${USER_HOME}/bin/powerline-go && \
-    chmod +x ${USER_HOME}/bin/powerline-go
+    rm -rf *
 
 ### configure bash, use attach to ensure previous changes are stored
 COPY .bashrc .gitconfig /tmp/
