@@ -1,0 +1,62 @@
+name: podcronjob.rules
+rules:
+- alert: KubernetesCronjobSuspended
+  expr: kube_cronjob_spec_suspend{} != 0
+  annotations:
+    message: "CronJob {{ $labels.namespace }}/{{ $labels.cronjob }} is suspended\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
+  for: 0m
+  labels:
+    severity: warning
+    resource: '{{ $labels.name }}'
+    env: 'XXXXX'
+    seed_cluster: 'YYYYY'
+- alert: KubernetesJobFailed
+  expr: kube_job_status_failed{} > 0
+  for: 0m
+  annotations:
+    message: "Job {{$labels.namespace}}/{{$labels.exported_job}} failed to complete\n  VALUE = {{ $value }}\n  LABELS ={{ $labels }}" 
+  labels:
+    severity: critical
+    resource: '{{ $labels.name }}'
+    env: 'XXXXX'
+    seed_cluster: 'YYYYY'
+- alert: KubernetesPodNotHealthy
+  expr: sum by (namespace, pod) (kube_pod_status_phase{phase=~"Pending|Unknown|Failed"}) > 0
+  annotations:
+    message: "Pod has been in a non-ready state for longer than 30 minutes.\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
+  for: 30m
+  labels:
+    severity: critical
+    resource: '{{ $labels.name }}'
+    env: 'XXXXX'
+    seed_cluster: 'YYYYY'
+- alert: KubernetesPodTooManyRestarts
+  expr: increase(kube_pod_container_status_restarts_total{}[1m]) > 3
+  annotations:
+    message: "Kubernetes pod too many restarts.\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
+  for: 2m
+  labels:
+    severity: critical
+    resource: '{{ $labels.name }}'
+    env: 'XXXXX'
+    seed_cluster: 'YYYYY'
+- alert: KubernetesPodOOMKilled
+  expr: (kube_pod_container_status_restarts_total{} - kube_pod_container_status_restarts_total{} offset 10m >= 1) and ignoring (reason) min_over_time(kube_pod_container_status_last_terminated_reason{reason="OOMKilled"}[10m]) == 1
+  annotations:
+    message: "Container {{ $labels.container }} in pod {{ $labels.namespace }}/{{ $labels.pod }} has been OOMKilled {{ $value }} times in the last 10 minutes.\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
+  for: 0m
+  labels:
+    severity: critical
+    resource: '{{ $labels.name }}'
+    env: 'XXXXX'
+    seed_cluster: 'YYYYY'
+- alert: KubernetesPodInPendingState
+  expr: kube_pod_status_phase{phase=~"Pending|Unknown"} > 0
+  annotations:
+    message: "Pod {{ $labels.namespace }}/{{ $labels.pod }} is in pending/unknown state for more than 1 hr.\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
+  for: 60m
+  labels:
+    severity: critical
+    resource: '{{ $labels.name }}'
+    env: 'XXXXX'
+    seed_cluster: 'YYYYY'
