@@ -14,6 +14,7 @@ kind: Pod
 metadata:
   name: my-pod
 spec:
+  terminationGracePeriodSeconds: 1
   containers:
     - name: busybox
       image: busybox:1.32.0
