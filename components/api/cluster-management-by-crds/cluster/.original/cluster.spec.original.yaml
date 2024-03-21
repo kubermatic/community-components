@@ -1,0 +1,212 @@
+apiVersion: kubermatic.k8c.io/v1
+kind: Cluster
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"kubermatic.k8c.io/v1","clusterLabels":{"is-credential-preset":"true","project-id":"dl6kxzf8br","type":"demo"},"credential":"credential-vsphere-sig-vsphere","kind":"ClusterTemplate","metadata":{"annotations":{"kubermatic.io/initial-machinedeployment-request":"{\n  \"metadata\": {\n    \"name\": \"sig-vsphere-mla-node\",\n    \"namespace\": \"kube-system\",\n    \"creationTimestamp\": null,\n    \"annotations\": {\n      \"k8c.io/operating-system-profile\": \"osp-ubuntu\"\n    },\n    \"finalizers\": [\n      \"foregroundDeletion\"\n    ]\n  },\n  \"spec\": {\n    \"replicas\": 2,\n    \"selector\": {\n      \"matchLabels\": {\n        \"machine\": \"sig-vsphere-mla\"\n      }\n    },\n    \"template\": {\n      \"metadata\": {\n        \"creationTimestamp\": null,\n        \"labels\": {\n          \"machine\": \"sig-vsphere-mla\"\n        }\n      },\n      \"spec\": {\n        \"metadata\": {\n          \"creationTimestamp\": null,\n          \"labels\": {}\n        },\n        \"providerSpec\": {\n          \"value\": {\n            \"sshPublicKeys\": [],\n            \"caPublicKey\": \"\",\n            \"cloudProvider\": \"vsphere\",\n            \"cloudProviderSpec\": {\n              \"templateVMName\": \"kkp-ubuntu-22.04\",\n              \"vmNetName\": \"\",\n              \"cpus\": 2,\n              \"memoryMB\": 4096,\n              \"diskSizeGB\": 10,\n              \"allowInsecure\": true\n            },\n            \"operatingSystem\": \"ubuntu\",\n            \"operatingSystemSpec\": {\n              \"distUpgradeOnBoot\": false\n            },\n            \"network\": {\n              \"cidr\": \"\",\n              \"gateway\": \"\",\n              \"dns\": {\n                \"servers\": null\n              },\n              \"ipFamily\": \"IPv4\"\n            }\n          }\n        },\n        \"versions\": {\n          \"kubelet\": \"\"\n        }\n      }\n    }\n  },\n  \"status\": {}\n}\n","presetName":"kubermatic-new-dc","user":"tobias.schneck@kubermatic.com"},"labels":{"is-credential-preset":"true","name":"sig-vsphere-mla-cluster","project-id":"dl6kxzf8br","scope":"global"},"name":"sig-vsphere-mla"},"spec":{"cloud":{"dc":"vsphere","providerName":"vsphere","vsphere":{"credentialsReference":{"name":"credential-vsphere-sig-vsphere","namespace":"kubermatic"},"datastore":"vsan","folder":"","infraManagementUser":{},"password":"","storagePolicy":"","username":"","vmNetName":"/Hamburg/network/Default Network"}},"clusterNetwork":{"dnsDomain":"cluster.local","ipFamily":"IPv4","ipvs":{"strictArp":true},"konnectivityEnabled":true,"nodeCidrMaskSizeIPv4":24,"nodeLocalDNSCacheEnabled":true,"pods":{"cidrBlocks":["172.25.0.0/16"]},"proxyMode":"ipvs","services":{"cidrBlocks":["10.240.16.0/20"]}},"cniPlugin":{"type":"canal","version":"v3.24"},"containerRuntime":"containerd","enableOperatingSystemManager":true,"enableUserSSHKeyAgent":true,"exposeStrategy":"NodePort","humanReadableName":"sig-vsphere-mla","kubernetesDashboard":{"enabled":true},"mla":{"loggingEnabled":true,"monitoringEnabled":true},"opaIntegration":{"enabled":true,"webhookTimeoutSeconds":10},"pause":false,"version":"1.25.9"}}
+    presetName: kubermatic-new-dc
+    user: tobias.schneck@kubermatic.com
+  creationTimestamp: "2023-11-09T11:09:55Z"
+  finalizers:
+  - kubermatic.k8c.io/alertmanager
+  - kubermatic.k8c.io/cleanup-credentials-secrets
+  - kubermatic.k8c.io/cleanup-etcdbackupconfigs
+  - kubermatic.k8c.io/cleanup-kubermatic-constraints
+  - kubermatic.k8c.io/cleanup-namespace
+  - kubermatic.k8c.io/cleanup-usersshkeys-cluster-ids
+  - kubermatic.k8c.io/cleanup-vsphere-folder
+  - kubermatic.k8c.io/delete-nodes
+  - kubermatic.k8c.io/mla
+  generation: 4
+  labels:
+    cluster-md-cleanup-hourly: "false"
+    cost-center: "123"
+    is-credential-preset: "true"
+    project-id: dl6kxzf8br
+    sig: pre-sales
+    template-instance-id: dl6kxzf8br-sig-vsphere-mla-jz9wb2t2h7
+    type: demo
+  name: p462m4j465
+  resourceVersion: "993514904"
+  uid: d39d2a33-ec6f-40a6-a51d-0cf6361b8ea3
+spec:
+  cloud:
+    dc: vsphere
+    providerName: vsphere
+    vsphere:
+      credentialsReference:
+        name: credential-vsphere-p462m4j465
+        namespace: kubermatic
+      datastore: vsan
+      folder: /Hamburg/vm/Kubermatic-dev/p462m4j465
+      password: ""
+      storagePolicy: ""
+      username: ""
+      vmNetName: /Hamburg/network/Default Network
+  clusterNetwork:
+    dnsDomain: cluster.local
+    ipFamily: IPv4
+    ipvs:
+      strictArp: true
+    konnectivityEnabled: true
+    nodeCidrMaskSizeIPv4: 24
+    nodeLocalDNSCacheEnabled: true
+    pods:
+      cidrBlocks:
+      - 172.25.0.0/16
+    proxyMode: ipvs
+    services:
+      cidrBlocks:
+      - 10.240.16.0/20
+  cniPlugin:
+    type: canal
+    version: v3.24
+  componentsOverride:
+    apiserver:
+      nodePortRange: 30000-32767
+      replicas: 2
+    controllerManager:
+      leaderElection: {}
+      replicas: 1
+    etcd:
+      clusterSize: 3
+      diskSize: 5Gi
+    konnectivityProxy: {}
+    nodePortProxyEnvoy:
+      resources: {}
+    prometheus: {}
+    scheduler:
+      leaderElection: {}
+      replicas: 1
+  containerRuntime: containerd
+  enableOperatingSystemManager: true
+  enableUserSSHKeyAgent: true
+  exposeStrategy: NodePort
+  features:
+    apiserverNetworkPolicy: true
+    etcdLauncher: true
+    externalCloudProvider: true
+    vsphereCSIClusterID: true
+  humanReadableName: sig-vsphere-mla-p462m4j465
+  kubernetesDashboard:
+    enabled: true
+  mla:
+    loggingEnabled: true
+    monitoringEnabled: true
+  oidc: {}
+  opaIntegration:
+    enabled: true
+    webhookTimeoutSeconds: 10
+  pause: false
+  version: 1.25.9
+status:
+  address:
+    adminToken: xxmfjs.xfn4xfg47sxhj6vw
+    externalName: p462m4j465.alpha-europe-west1-c.run-2.lab.kubermatic.io
+    internalURL: apiserver-external.cluster-p462m4j465.svc.cluster.local.
+    ip: 35.241.213.147
+    port: 31093
+    url: https://p462m4j465.alpha-europe-west1-c.run-2.lab.kubermatic.io:31093
+  conditions:
+    AddonControllerReconciledSuccessfully:
+      kubermaticVersion: v2.23.6
+      lastHeartbeatTime: "2023-11-09T11:11:03Z"
+      status: "True"
+    AddonInstallerControllerReconciledSuccessfully:
+      kubermaticVersion: v2.23.6
+      lastHeartbeatTime: "2023-11-09T11:11:00Z"
+      lastTransitionTime: "2023-11-09T11:11:00Z"
+      status: "True"
+    BackupControllerReconciledSuccessfully:
+      kubermaticVersion: v2.23.6
+      lastHeartbeatTime: "2023-11-09T11:09:55Z"
+      status: "True"
+    CloudControllerReconciledSuccessfully:
+      kubermaticVersion: v2.23.6
+      lastHeartbeatTime: "2023-11-09T11:09:57Z"
+      status: "True"
+    ClusterControllerReconciledSuccessfully:
+      kubermaticVersion: v2.23.6
+      lastHeartbeatTime: "2023-11-09T11:10:06Z"
+      lastTransitionTime: "2023-11-09T11:10:06Z"
+      status: "True"
+    ClusterInitialized:
+      kubermaticVersion: v2.23.6
+      lastHeartbeatTime: "2023-11-09T11:12:23Z"
+      message: Cluster has been initialized successfully
+      status: "True"
+    EtcdClusterInitialized:
+      kubermaticVersion: v2.23.6
+      lastHeartbeatTime: "2023-11-09T11:10:51Z"
+      message: Etcd Cluster has been initialized successfully
+      status: "True"
+    IPAMControllerReconciledSuccessfully:
+      kubermaticVersion: v2.23.6
+      lastHeartbeatTime: "2023-11-09T11:09:56Z"
+      status: "True"
+    MLAControllerReconciledSuccessfully:
+      kubermaticVersion: v2.23.6
+      lastHeartbeatTime: "2023-11-09T11:09:57Z"
+      lastTransitionTime: "2023-11-09T11:09:57Z"
+      status: "True"
+    MachineDeploymentReconciledSuccessfully:
+      kubermaticVersion: v2.23.6
+      lastHeartbeatTime: "2023-11-09T11:09:55Z"
+      status: "True"
+    MonitoringControllerReconciledSuccessfully:
+      kubermaticVersion: v2.23.6
+      lastHeartbeatTime: "2023-11-09T11:12:12Z"
+      status: "True"
+    SeedResourcesUpToDate:
+      kubermaticVersion: v2.23.6
+      lastHeartbeatTime: "2023-11-09T11:12:22Z"
+      lastTransitionTime: "2023-11-09T11:12:22Z"
+      message: All control plane components are up to date
+      reason: ClusterUpdateSuccessful
+      status: "True"
+    UpdateControllerReconciledSuccessfully:
+      kubermaticVersion: v2.23.6
+      lastHeartbeatTime: "2023-11-09T11:09:55Z"
+      status: "True"
+    UpdateProgress:
+      kubermaticVersion: v2.23.6
+      lastHeartbeatTime: "2023-11-09T11:10:07Z"
+      message: No update in progress, cluster has reached its desired version.
+      reason: UpToDate
+      status: "True"
+  extendedHealth:
+    alertmanagerConfig: HealthStatusUp
+    apiserver: HealthStatusUp
+    applicationController: HealthStatusUp
+    cloudProviderInfrastructure: HealthStatusUp
+    controller: HealthStatusUp
+    etcd: HealthStatusUp
+    gatekeeperAudit: HealthStatusUp
+    gatekeeperController: HealthStatusUp
+    konnectivity: HealthStatusUp
+    kubernetesDashboard: HealthStatusUp
+    logging: HealthStatusUp
+    machineController: HealthStatusUp
+    mlaGateway: HealthStatusUp
+    monitoring: HealthStatusUp
+    operatingSystemManager: HealthStatusUp
+    scheduler: HealthStatusUp
+    userClusterControllerManager: HealthStatusUp
+  inheritedLabels:
+    cluster-md-cleanup-hourly: "false"
+    cost-center: "123"
+    sig: pre-sales
+  lastProviderReconciliation: "2023-11-09T11:09:57Z"
+  namespaceName: cluster-p462m4j465
+  phase: Running
+  resourceUsage:
+    cpu: "4"
+    memory: 8192M
+    storage: 20G
+  userEmail: tobias.schneck@kubermatic.com
+  versions:
+    apiserver: 1.25.9
+    controlPlane: 1.25.9
+    controllerManager: 1.25.9
+    oldestNodeVersion: 1.25.9
+    scheduler: 1.25.9

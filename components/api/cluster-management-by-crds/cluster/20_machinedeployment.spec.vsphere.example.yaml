@@ -1,0 +1,46 @@
+apiVersion: cluster.k8s.io/v1alpha1
+kind: MachineDeployment
+metadata:
+  annotations:
+    k8c.io/operating-system-profile: osp-ubuntu
+  name: xxx-crd-cluster-id-extra-worker
+  namespace: kube-system
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      machine: xxx-crd-cluster-id-extra-worker
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+    type: RollingUpdate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        machine: xxx-crd-cluster-id-extra-worker
+    spec:
+      metadata:
+        creationTimestamp: null
+        labels:
+          system/cluster: xxx-crd-cluster-id
+          system/project: dl6kxzf8br
+      providerSpec:
+        value:
+          cloudProvider: vsphere
+          cloudProviderSpec:
+            allowInsecure: true
+            cpus: 2
+            datacenter: Hamburg
+            datastore: vsan
+            folder: /Hamburg/vm/Kubermatic-dev/xxx-crd-cluster-id
+            diskSizeGB: 10
+            memoryMB: 4096
+            resourcePool: ""
+            templateVMName: kkp-ubuntu-22.04
+          operatingSystem: ubuntu
+          operatingSystemSpec:
+            distUpgradeOnBoot: false
+      versions:
+        kubelet: 1.26.9

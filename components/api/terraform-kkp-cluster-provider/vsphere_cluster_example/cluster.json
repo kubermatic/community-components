@@ -1,0 +1,48 @@
+{
+  "name": "${cluster_name}",
+  "spec": {
+    "cloud": {
+      "vsphere": {},
+      "dc": "${dc}"
+    },
+    "version": "${kubernetes_version}",
+    "auditLogging": {
+      "enabled": false,
+      "policyPreset": ""
+    },
+    "opaIntegration": {},
+    "kubernetesDashboard": {
+      "enabled": true
+    },
+    "mla": {
+      "loggingEnabled": true,
+      "monitoringEnabled": true
+    },
+    "enableUserSSHKeyAgent": true,
+    "enableOperatingSystemManager": true,
+    "containerRuntime": "containerd",
+    "clusterNetwork": {
+      "ipFamily": "IPv4",
+      "proxyMode": "ebpf",
+      "pods": {
+        "cidrBlocks": [
+          "172.26.0.0/16"
+        ]
+      },
+      "services": {
+        "cidrBlocks": [
+          "10.241.0.0/20"
+        ]
+      },
+      "nodeCidrMaskSizeIPv4": 24,
+      "nodeLocalDNSCacheEnabled": true,
+      "konnectivityEnabled": true,
+      "nodeCidrMaskSizeIPv6": null
+    },
+    "cniPlugin": {
+      "type": "${cni_plugin}",
+      "version": "${cni_version}"
+    }
+  },
+  "credential": "${credential}"
+}
