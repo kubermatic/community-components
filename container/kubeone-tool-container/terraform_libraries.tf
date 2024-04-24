@@ -2,19 +2,19 @@ terraform {
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = "~> 3.45.0"
+      version = "~> 4.1.0"
     }
     google = {
       source  = "hashicorp/google"
-      version = "~> 3.71.0"
+      version = "~> 4.27.0"
     }
     vsphere = {
       source  = "hashicorp/vsphere"
-      version = "~> 2.0.1"
+      version = "~> 2.1.1"
     }
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = "~> 2.63.0"
+      version = "~> 3.10.0"
     }
     helm = {
       version = "~> 2.6"
@@ -36,6 +36,10 @@ terraform {
     openstack = {
       source = "terraform-provider-openstack/openstack"
       version = "1.47.0"
+    }
+    time = {
+      source = "hashicorp/time"
+      version = "0.11.1"
     }
   }
 }
