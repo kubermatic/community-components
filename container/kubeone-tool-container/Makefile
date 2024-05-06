@@ -1,5 +1,5 @@
 ## See https://github.com/kubermatic/kubeone/releases
-KUBEONE_VERSION ?= 1.7.3
+KUBEONE_VERSION ?= 1.7.4
 DOCKER_REPO ?= 'quay.io/kubermatic-labs/kubeone-tooling'
 FINAL_TAG ?= ${KUBEONE_VERSION}
 TAG_DATE ?= ${KUBEONE_VERSION}-$(shell date -I)
