@@ -28,8 +28,10 @@ spec:
           chmod 0600 /root/.ssh/*
           ls -lah /root/.ssh
           service ssh restart
-
+          
+          tail -f /etc/os-release
           #Optional: your ngrok command to join
+          ## TODO remove tail if needed
           #ngrok config add-authtoken xxxx-YOUR-TOKEN-xxxx
           #ngrok tunnel --log stdout --label edge=xxxx-your-edge-label 22
         image: quay.io/kubermatic-labs/kubeone-tooling:1.7.2-2024-02-14
