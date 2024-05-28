@@ -84,7 +84,7 @@ diff cluster/10_cluster.spec.vsphere.example.yaml my-cluster/mycluster.spec.yaml
 
 ## Clustertemplate Management
 
-Another option is to manage the [`ClusterTempalte`](https://docs.kubermatic.com/kubermatic/v2.23/references/crds/#clustertemplate) object. Therefore, a non initialized template get created and separate instance object creates a copy of it. **BUT** any change to the clustertempalte will **NOT** get applied to the instance.
+Another option is to manage the [`ClusterTemplate`](https://docs.kubermatic.com/kubermatic/v2.23/references/crds/#clustertemplate) object. Therefore, a non initialized template get created and separate instance object creates a copy of it. **BUT** any change to the clustertemplate will **NOT** get applied to the instance.
 ```bash
 # connect to target seed
 export KUBECONFIG=seed-cluster-kubeconfig
