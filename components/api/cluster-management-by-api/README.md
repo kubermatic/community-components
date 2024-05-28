@@ -1,6 +1,22 @@
-# Cluster Provisioning by API
+# Cluster Provisioning by API via Bash/Curl
 
-In the following repo you find an example how to manage your KKP user clusters by using the KKP API. For easy start how the scripts works, take a look into the example [`example-run-env`](./example-run-env) folder. 
+In the following folders, you find an example how to manage your KKP user clusters by using the KKP API.
+
+## Architecture
+
+Using the given example inside of any GitOps Tooling, the following workflow is given:
+
+![KKP REST-API via Bash/Curl Architecture Overview](../.assets/kkp-rest-api-bash-arch.drawio.png)
+> Image Source: local [kkp-rest-API-Terraform-Cluster-CRD-Architecture-Drawing.drawio.xml](../.assets/kkp-rest-API-Terraform-Cluster-CRD-Architecture-Drawing.drawio.xml) or [Google Drive](https://drive.google.com/file/d/1G8-AerEndAkR17ON4DOIrOAb_-OxEVnH/view?usp=sharing)
+
+1) Use Authentication Token provided by the [KKP Service Accounts](https://docs.kubermatic.com/kubermatic/main/architecture/concept/kkp-concepts/service-account/using-service-account/)
+2) Talk to the [KKP Rest API](https://docs.kubermatic.com/kubermatic/main/references/rest-api-reference/) with the given payload, what have been rendered by the terraform module
+3) Kubermatic API transfers the API JSON payload to [Cluster](https://docs.kubermatic.com/kubermatic/main/references/crds/#cluster) object and applies it against the matching Seed Cluster Kubernetes API endpoint.
+4) Seed Controller Managers use the [ClusterSpec](https://docs.kubermatic.com/kubermatic/main/references/crds/#clusterspec) and create the necessary specs for the Control Plan creation of a [KP user cluster](https://docs.kubermatic.com/kubermatic/main/architecture/#user-cluster)
+5) Containerized Control Plane objects spins up (Deployments & StatefulSets) and seed controller manager creates necessary external cloud provider resources (e.g., a security group at the external cloud).
+
+## Example
+For easy start how the scripts works, take a look into the example [`example-run-env`](./example-run-env) folder. 
 ```bash
 cd example-run-env
 make help 
@@ -38,17 +54,17 @@ make help:
 
 Examples of API Usage:
 - E2E Tests: https://github.com/kubermatic/kubermatic/blob/master/pkg/test/e2e/utils/client.go#L454 
-- Terraform Provider: https://github.com/kubermatic/terraform-provider-kubermatic/blob/master/kubermatic/resource_cluster.go
-- CLI `kkpctl`
+- [Terraform REST API Provider](../terraform-kkp-cluster-provider/README.md)
+- [Kubermatic Go library](https://github.com/kubermatic/go-kubermatic)
+- Terraform Provider c: https://github.com/kubermatic/terraform-provider-kubermatic/blob/master/kubermatic/resource_cluster.go
+- CLI `kkpctl` kkp-rest-api-terraform-provider-arch
   - [Blog: KKPCTL: The Command Line Tool for Kubermatic Kubernetes Platform](https://www.kubermatic.com/blog/kkpctl-the-command-line-tool-for-kubermatic-kubernetes-platform/)
   - [Github: cedi/kkpctl](https://github.com/cedi/kkpctl)
-
 
 ## Planned Improvements:
 - https://github.com/kubermatic/kubermatic/issues/6414
   - Service Account API v2 (personalized access)
   - Manage User Cluster by Cluster Objects (end user facing)
-- Feature Complete Terraform provider
 
 ## Declarative Stable API Objects
 - JSON: Every support call from the KKP Rest API [REST-API Reference](https://docs.kubermatic.com/kubermatic/master/references/rest_api_reference/)

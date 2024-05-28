@@ -1,0 +1,9 @@
+{
+  "name": "ingress-nginx",
+  "spec": {
+    "variables": {
+      "replicas": "2"
+    },
+    "continuouslyReconcile": true
+  }
+}

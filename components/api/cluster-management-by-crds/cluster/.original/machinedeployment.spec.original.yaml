@@ -1,0 +1,80 @@
+apiVersion: cluster.k8s.io/v1alpha1
+kind: MachineDeployment
+metadata:
+  annotations:
+    k8c.io/operating-system-profile: osp-ubuntu
+    machinedeployment.clusters.k8s.io/revision: "1"
+  creationTimestamp: "2023-11-09T13:05:35Z"
+  finalizers:
+  - foregroundDeletion
+  - kubermatic.io/cleanup-operating-system-configs
+  generateName: xxx-crd-cluster-id-worker-
+  generation: 1
+  name: xxx-crd-cluster-id-worker-56f7z
+  namespace: kube-system
+  resourceVersion: "4529"
+  uid: 9b4445bd-6e06-41fc-ac48-40c7baad54b6
+spec:
+  minReadySeconds: 0
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 1
+  selector:
+    matchLabels:
+      machine: md-xxx-crd-cluster-id-whjqsqgkpl
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+    type: RollingUpdate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        machine: md-xxx-crd-cluster-id-whjqsqgkpl
+    spec:
+      metadata:
+        creationTimestamp: null
+        labels:
+          system/cluster: xxx-crd-cluster-id
+          system/project: dl6kxzf8br
+      providerSpec:
+        value:
+          caPublicKey: ""
+          cloudProvider: vsphere
+          cloudProviderSpec:
+            allowInsecure: true
+            cluster: Kubermatic
+            cpus: 2
+            datacenter: Hamburg
+            datastore: vsan
+            datastoreCluster: ""
+            diskSizeGB: 10
+            folder: /Hamburg/vm/Kubermatic-dev/xxx-crd-cluster-id
+            memoryMB: 4096
+            networks: null
+            password: ""
+            resourcePool: ""
+            templateVMName: kkp-ubuntu-22.04
+            username: ""
+            vmAntiAffinity: null
+            vmNetName: /Hamburg/network/Default Network
+            vsphereURL: ""
+          network:
+            cidr: ""
+            dns:
+              servers: null
+            gateway: ""
+            ipFamily: IPv4
+          operatingSystem: ubuntu
+          operatingSystemSpec:
+            distUpgradeOnBoot: false
+          sshPublicKeys: []
+      versions:
+        kubelet: 1.26.9
+status:
+  availableReplicas: 1
+  observedGeneration: 1
+  readyReplicas: 1
+  replicas: 1
+  updatedReplicas: 1

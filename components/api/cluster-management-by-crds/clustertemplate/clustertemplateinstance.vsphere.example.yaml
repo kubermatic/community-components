@@ -1,0 +1,14 @@
+apiVersion: kubermatic.k8c.io/v1
+kind: ClusterTemplateInstance
+metadata:
+  annotations:
+    owner: tobias.schneck@kubermatic.com
+  labels:
+    project-id: dl6kxzf8br
+    template-id: cluster-template-crd-example-vsphere
+  name: cluster-template-instance-crd-example-vsphere
+spec:
+  clusterTemplateID: cluster-template-crd-example-vsphere
+  clusterTemplateName: cluster-template-crd-example-vsphere
+  projectID: dl6kxzf8br
+  replicas: 1
