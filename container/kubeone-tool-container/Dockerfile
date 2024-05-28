@@ -28,34 +28,34 @@ ENV GO111MODULE on
 ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update && apt-get install -y\
-        bash-completion \
-        python3-crcmod \
-        ca-certificates \
-        curl \
-        apt-transport-https \
-        lsb-release \
-        gnupg \
-        unzip \
-        upx-ucl \
-        openssh-server \
-        sudo \
-        vim \
-        make \
-        git-crypt \
-        git \
-        fonts-powerline \
-        tmux \
-        software-properties-common \
-        iputils-ping \
-        locate \
-        netcat \
-        dnsutils\
-        zsh \
-        uuid-runtime \
-        iperf3 \
-        fio \
-        figlet lolcat \
-        && apt-get clean
+    bash-completion \
+    python3-crcmod \
+    ca-certificates \
+    curl \
+    apt-transport-https \
+    lsb-release \
+    gnupg \
+    unzip \
+    upx-ucl \
+    openssh-server \
+    sudo \
+    vim \
+    make \
+    git-crypt \
+    git \
+    fonts-powerline \
+    tmux \
+    software-properties-common \
+    iputils-ping \
+    locate \
+    netcat \
+    dnsutils\
+    zsh \
+    uuid-runtime \
+    iperf3 \
+    fio \
+    figlet lolcat \
+    && apt-get clean
 
 RUN wget --no-check-certificate -qO -  https://apt.releases.hashicorp.com/gpg | apt-key add - && \
     apt-add-repository "deb [arch=$(dpkg --print-architecture)] https://apt.releases.hashicorp.com $(lsb_release -cs) main" && \
@@ -65,22 +65,22 @@ RUN terraform -install-autocomplete
 
 # Install AWS CLI
 RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" && \
-unzip awscliv2.zip && \
-./aws/install
+    unzip awscliv2.zip && \
+    ./aws/install
 
 # Install Azure CLI
 RUN curl -sL https://packages.microsoft.com/keys/microsoft.asc | \
-         gpg --dearmor | \
-          tee /etc/apt/trusted.gpg.d/microsoft.gpg > /dev/null  && \
-         AZ_REPO=$(lsb_release -cs) && \
-         echo "deb [arch=amd64] https://packages.microsoft.com/repos/azure-cli/ $AZ_REPO main" | \
-              tee /etc/apt/sources.list.d/azure-cli.list  && \
-         apt-get update -y && \
-         apt-get install azure-cli -y && \
-         apt-get clean
+    gpg --dearmor | \
+    tee /etc/apt/trusted.gpg.d/microsoft.gpg > /dev/null  && \
+    AZ_REPO=$(lsb_release -cs) && \
+    echo "deb [arch=amd64] https://packages.microsoft.com/repos/azure-cli/ $AZ_REPO main" | \
+    tee /etc/apt/sources.list.d/azure-cli.list  && \
+    apt-get update -y && \
+    apt-get install azure-cli -y && \
+    apt-get clean
 
 # Install GCP CLI
-RUN echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] http://packages.cloud.google.com/apt cloud-sdk main" | tee -a /etc/apt/sources.list.d/google-cloud-sdk.list &&  \
+RUN echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] http://packages.cloud.google.com/apt cloud-sdk main" | sudo tee -a /etc/apt/sources.list.d/google-cloud-sdk.list &&  \
     curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key --keyring /usr/share/keyrings/cloud.google.gpg  add - &&  \
     apt-get update -y && \
     apt-get install google-cloud-sdk -y && \
@@ -91,8 +91,8 @@ RUN curl -L $(curl -s https://api.github.com/repos/vmware/govmomi/releases/lates
     chmod +x /usr/local/bin/govc
 
 # Install Kubectl & Helm & and fubectl depedencies
-RUN curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add - && \
-    echo "deb https://apt.kubernetes.io/ kubernetes-xenial main" | tee -a /etc/apt/sources.list.d/kubernetes.list && \
+RUN echo "deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.27/deb/ /" | sudo tee /etc/apt/sources.list.d/kubernetes.list && \
+    mkdir -p /etc/apt/keyrings && curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.27/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg && \
     #helm
     curl -s https://baltocdn.com/helm/signing.asc | sudo apt-key add - && \
     echo "deb https://baltocdn.com/helm/stable/debian/ all main" | tee  -a /etc/apt/sources.list.d/helm-stable-debian.list && \
@@ -102,8 +102,8 @@ RUN curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add 
 
 # Install Yq
 RUN RELEASE_URL=$(curl -Ls -o /dev/null -w %{url_effective} https://github.com/mikefarah/yq/releases/latest) && \
- YQ_LATEST="${RELEASE_URL##*/}" && \
- wget https://github.com/mikefarah/yq/releases/download/$YQ_LATEST/yq_linux_amd64 -O /usr/bin/yq && chmod +x /usr/bin/yq
+    YQ_LATEST="${RELEASE_URL##*/}" && \
+    wget https://github.com/mikefarah/yq/releases/download/$YQ_LATEST/yq_linux_amd64 -O /usr/bin/yq && chmod +x /usr/bin/yq
 
 # Install velero
 RUN mkdir /tmp/velero-inst && cd /tmp/velero-inst \
@@ -114,28 +114,28 @@ RUN mkdir /tmp/velero-inst && cd /tmp/velero-inst \
 # Install KubeOne
 ARG kubeone_version
 RUN VERSION=$kubeone_version && \
- curl -LO "https://github.com/kubermatic/kubeone/releases/download/v${VERSION}/kubeone_${VERSION}_linux_amd64.zip" && \
- unzip kubeone_${VERSION}_linux_amd64.zip -d kubeone_${VERSION}_linux_amd64 && \
- mv kubeone_${VERSION}_linux_amd64/kubeone /usr/local/bin
+    curl -LO "https://github.com/kubermatic/kubeone/releases/download/v${VERSION}/kubeone_${VERSION}_linux_amd64.zip" && \
+    unzip kubeone_${VERSION}_linux_amd64.zip -d kubeone_${VERSION}_linux_amd64 && \
+    mv kubeone_${VERSION}_linux_amd64/kubeone /usr/local/bin
 
 # Install kustomize
 RUN curl -s "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh"  | bash && \
- mv kustomize /usr/local/bin
+    mv kustomize /usr/local/bin
 
 # Install Sops
 RUN SOPS_VERSION=$(curl -w '%{url_effective}' -I -L -s -S https://github.com/mozilla/sops/releases/latest -o /dev/null | sed -e 's|.*/v||') && \
- curl -LO https://github.com/mozilla/sops/releases/download/v${SOPS_VERSION}/sops-v${SOPS_VERSION}.linux && \
- install -o root -g root -m 0755 sops-v${SOPS_VERSION}.linux /usr/local/bin/sops
+    curl -LO https://github.com/mozilla/sops/releases/download/v${SOPS_VERSION}/sops-v${SOPS_VERSION}.linux && \
+    install -o root -g root -m 0755 sops-v${SOPS_VERSION}.linux /usr/local/bin/sops
 
 # Install k9s
 RUN K9S_RELEASE_URL=$(curl -Ls -o /dev/null -w %{url_effective} https://github.com/derailed/k9s/releases/latest) && \
- K9S_LATEST="${K9S_RELEASE_URL##*/}" && \
- wget -c "https://github.com/derailed/k9s/releases/download/${K9S_LATEST}/k9s_Linux_amd64.tar.gz"  -O - | tar -xz -C /usr/local/bin/
+    K9S_LATEST="${K9S_RELEASE_URL##*/}" && \
+    wget -c "https://github.com/derailed/k9s/releases/download/${K9S_LATEST}/k9s_Linux_amd64.tar.gz"  -O - | tar -xz -C /usr/local/bin/
 
 RUN CILIUM_CLI_VERSION=$(curl -s https://raw.githubusercontent.com/cilium/cilium-cli/master/stable.txt) && \
-curl -L --remote-name-all https://github.com/cilium/cilium-cli/releases/download/${CILIUM_CLI_VERSION}/cilium-${OS}-${ARCH}.tar.gz && \
-sudo tar -C /usr/local/bin -xzvf cilium-${OS}-${ARCH}.tar.gz && \
-rm cilium-${OS}-${ARCH}.tar.gz
+    curl -L --remote-name-all https://github.com/cilium/cilium-cli/releases/download/${CILIUM_CLI_VERSION}/cilium-${OS}-${ARCH}.tar.gz && \
+    sudo tar -C /usr/local/bin -xzvf cilium-${OS}-${ARCH}.tar.gz && \
+    rm cilium-${OS}-${ARCH}.tar.gz
 
 # Install LazyGit
 RUN LAZYGIT_VERSION=0.37.0 && \
@@ -143,6 +143,15 @@ RUN LAZYGIT_VERSION=0.37.0 && \
     curl -sL https://github.com/jesseduffield/lazygit/releases/download/v${LAZYGIT_VERSION}/lazygit_${LAZYGIT_VERSION}_Linux_x86_64.tar.gz | tar -xvz && \
     mv lazygit /usr/local/bin && \
     cd .. && rm -rf /tmp/lazygit-inst
+
+# Install ngrok
+RUN curl -s https://ngrok-agent.s3.amazonaws.com/ngrok.asc | sudo tee /etc/apt/trusted.gpg.d/ngrok.asc >/dev/null && echo "deb https://ngrok-agent.s3.amazonaws.com buster main" | sudo tee /etc/apt/sources.list.d/ngrok.list && sudo apt update && sudo apt install ngrok
+
+### INSTALL helper
+RUN wget https://rawgit.com/kubermatic/fubectl/master/fubectl.source -O /bin/fubectl.source && \
+    # powerline go
+    wget https://github.com/justjanne/powerline-go/releases/latest/download/powerline-go-linux-amd64 -O /bin/powerline-go && \
+    chmod +x /bin/powerline-go
 
 ARG USER=kubermatic
 ARG USER_HOME=/home/${USER}
@@ -164,7 +173,7 @@ RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master
     git clone --depth=1 https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting && \
     git clone --depth=1 https://github.com/kubermatic/fubectl.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/fubectl
 
-### INSTALL helper
+### INSTALL krew
 RUN echo $USER_HOME && mkdir ${USER_HOME}/bin && cd ${USER_HOME}/bin && \
     # krew
     set -x; cd "$(mktemp -d)" && \
@@ -172,12 +181,7 @@ RUN echo $USER_HOME && mkdir ${USER_HOME}/bin && cd ${USER_HOME}/bin && \
     tar -zxvf krew*.tar.gz && \
     KREW=./krew-"$(uname | tr '[:upper:]' '[:lower:]')_$(uname -m | sed -e 's/x86_64/amd64/' -e 's/arm.*$/arm/')" && \
     "$KREW" install krew && \
-    rm -rf * && \
-    # fubctl
-    wget https://rawgit.com/kubermatic/fubectl/master/fubectl.source -O ${USER_HOME}/bin/fubectl.source && \
-    # powerline go
-    wget https://github.com/justjanne/powerline-go/releases/latest/download/powerline-go-linux-amd64 -O ${USER_HOME}/bin/powerline-go && \
-    chmod +x ${USER_HOME}/bin/powerline-go
+    rm -rf *
 
 ### configure bash, use attach to ensure previous changes are stored
 COPY .bashrc .gitconfig /tmp/
