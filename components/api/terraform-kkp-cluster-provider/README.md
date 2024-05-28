@@ -6,6 +6,22 @@ The provider json templates under For more Information,
 
 To access KKP Rest API, an API token of type `Editor` will get needed for this example, see [Using Service Accounts](https://docs.kubermatic.com/kubermatic/main/architecture/concept/kkp-concepts/service-account/using-service-account/)
 
+## Architecture
+
+Using the given example inside of any GitOps Tooling, the following workflow is given:
+
+![KKP REST-API Terraform Provider Architecture Overview](../.assets/kkp-rest-api-terraform-provider-arch.png)
+> Image Source: local [kkp-rest-API-Terraform-Cluster-CRD-Architecture-Drawing.drawio.xml](../.assets/kkp-rest-API-Terraform-Cluster-CRD-Architecture-Drawing.drawio.xml) or [Google Drive](https://drive.google.com/file/d/1G8-AerEndAkR17ON4DOIrOAb_-OxEVnH/view?usp=sharing)
+
+> Image Source: local [kkp-rest-API-Terraform-Cluster-CRD-Architecture-Drawing.drawio.xml](../.assets/kkp-rest-API-Terraform-Cluster-CRD-Architecture-Drawing.drawio.xml) or [Google Drive](https://drive.google.com/file/d/1G8-AerEndAkR17ON4DOIrOAb_-OxEVnH/view?usp=sharing)
+
+1) Use Authentication Token provided by the [KKP Service Accounts](https://docs.kubermatic.com/kubermatic/main/architecture/concept/kkp-concepts/service-account/using-service-account/) as Headers of the curl request.
+2) Talk to the [KKP Rest API](https://docs.kubermatic.com/kubermatic/main/references/rest-api-reference/) with the given payload, what have been rendered by the terraform module
+3) Kubermatic API transfers the API JSON payload to [Cluster](https://docs.kubermatic.com/kubermatic/main/references/crds/#cluster) object and applies it against the matching Seed Cluster Kubernetes API endpoint.
+4) Seed Controller Managers use the [ClusterSpec](https://docs.kubermatic.com/kubermatic/main/references/crds/#clusterspec) and create the necessary specs for the Control Plan creation of a [KP user cluster](https://docs.kubermatic.com/kubermatic/main/architecture/#user-cluster)
+5) Containerized Control Plane objects spins up (Deployments & StatefulSets) and seed controller manager creates necessary external cloud provider resources (e.g., a security group at the external cloud).
+
+
 ## Example
 
 1. create a `terraform.tfvars`, based on in example [terraform.kubevirt.example.tfvars](./terraform.kubevirt.example.tfvars)

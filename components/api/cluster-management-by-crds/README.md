@@ -8,6 +8,18 @@ Basically in this example we show, how to manage cluster by using something like
 
 For a more git-ops declarative way with multi-tenant, check the [KKP Rest-API](https://docs.kubermatic.com/kubermatic/main/references/rest-api-reference/) and your [terraform-kkp-cluster-provider](../terraform-kkp-cluster-provider/README.md).
 
+## Architecture
+
+Using the given example inside of any GitOps Tooling, the following workflow is given:
+
+![KKP Cluster Apply via CRD Architecture Overview](../.assets/kkp-cluster-apply-via-crd-arch.png)
+> Image Source: local [kkp-rest-API-Terraform-Cluster-CRD-Architecture-Drawing.drawio.xml](../.assets/kkp-rest-API-Terraform-Cluster-CRD-Architecture-Drawing.drawio.xml) or [Google Drive](https://drive.google.com/file/d/1G8-AerEndAkR17ON4DOIrOAb_-OxEVnH/view?usp=sharing)
+
+1) Use `kubectl` with a generated service account authentication token (or personalized account) within a regular `kubeconfig`. The service account should at least have access to the target seed and the required `Cluster` or `ClusterTemplate` objects you want to manage.
+2) The applied [Cluster](https://docs.kubermatic.com/kubermatic/main/references/crds/#cluster) object get verified and persistently stored within the matching Seed Cluster Kubernetes API endpoint.
+3) Seed Controller Managers use the [ClusterSpec](https://docs.kubermatic.com/kubermatic/main/references/crds/#clusterspec) and create the necessary specs for the Control Plan creation of a [KP user cluster](https://docs.kubermatic.com/kubermatic/main/architecture/#user-cluster)
+4) Containerized Control Plane objects spins up (Deployments & StatefulSets) and seed controller manager creates necessary external cloud provider resources (e.g., a security group at the external cloud).
+
 ## Cluster CRD
 At KKP you could manage your clusters with a `cluster` object. But this cluster object lives in the seed, where you need access. Additional to the `cluster` object, you will need also a `machinedeployment` to create nodes. This can be done via the `kubermatic.io/initial-machinedeployment-request` annotation or as a separate step after the cluster is created.
 
@@ -17,8 +29,6 @@ More information about the specs, you find at:
 * [MachineController > MachineDeployment Examples](https://github.com/kubermatic/machine-controller/tree/main/examples)
 
 ### Example Apply a Cluster
-
-*TODO add diagramm picture*
 
 **Note: Expect the values of [`./cluster/*.yaml`](./cluster) files have been adjusted**
 ```bash
@@ -84,7 +94,7 @@ diff cluster/10_cluster.spec.vsphere.example.yaml my-cluster/mycluster.spec.yaml
 
 ## Clustertemplate Management
 
-Another option is to manage the [`ClusterTemplate`](https://docs.kubermatic.com/kubermatic/v2.23/references/crds/#clustertemplate) object. Therefore, a non initialized template get created and separate instance object creates a copy of it. **BUT** any change to the clustertemplate will **NOT** get applied to the instance.
+Another option is to manage the [`ClusterTemplate`](https://docs.kubermatic.com/kubermatic/main/references/crds/#clustertemplate) object. Therefore, a non initialized template get created and separate instance object creates a copy of it. **BUT** any change to the clustertemplate will **NOT** get applied to the instance.
 ```bash
 # connect to target seed
 export KUBECONFIG=seed-cluster-kubeconfig
