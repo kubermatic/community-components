@@ -12,7 +12,7 @@ echo "Check cluster exists: $cluster_name"
 project_response=$(getRequest "/projects/${KKP_PROJECT}/clusters")
 echo "RESPONSE:" && echo $project_response| jq
 
-cluster_id=$(echo $project_response | jq -r ".[] | select(.name == \"${cluster_name}\") | .id")
+cluster_id=$(echo $project_response | jq -r ".clusters" | jq -r ".[] | select(.name == \"${cluster_name}\") | .id" || echo $project_response | jq -r ".[] | select(.name == \"${cluster_name}\") | .id")
 
 if [[ -z "$cluster_id" ]]; then
   echo "Create Cluster $cluster_name"
@@ -25,6 +25,7 @@ else
   cat ${KKP_CLUSTER_PAYLOAD} | jq .cluster
   response=$(cat ${KKP_CLUSTER_PAYLOAD} | jq .cluster | \
     patchRequest "/projects/${KKP_PROJECT}/clusters/${cluster_id}" "-")
+  echo "Patch Cluster Response $cluster_id:" $response
 fi
 
 
@@ -46,4 +47,9 @@ ${SCRIPT_FOLDER}/kubeconfig-get.sh  $cluster_id
 echo "-------------------------"
 echo "Deploy Addons"
 ${SCRIPT_FOLDER}/addon-deploy.sh  $cluster_id
+echo "-------------------------"
+
+echo "-------------------------"
+echo "Deploy User-MLA Alerts"
+${SCRIPT_FOLDER}/alertmanager-rules-deploy.sh  $cluster_id
 echo "-------------------------"

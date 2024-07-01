@@ -1,0 +1,67 @@
+name: customnodeexporter
+rules:
+- alert: NodeHighCpuLoad
+  annotations:
+    summary: Node high CPU load (node {{ $labels.node_name }})
+    description: "CPU load is > 70%\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
+  expr: sum by (node_name) (avg by (mode, node_name) (rate(node_cpu_seconds_total{mode!="idle"}[8h]))) > 0.7
+  for: 10m
+  labels:
+    severity: warning
+    resource: '{{ $labels.name }}'
+    service: custom-node-exporter
+    env: 'XXXXX'
+    cloud: 'ZZZZZ'
+    seed_cluster: 'YYYYY'
+- alert: NodeOutOfMemory
+  expr: node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes * 100 < 10
+  for: 10m
+  labels:
+    severity: warning
+    resource: '{{ $labels.name }}'
+    service: custom-node-exporter
+    env: 'XXXXX'
+    cloud: 'ZZZZZ'
+    seed_cluster: 'YYYYY'
+  annotations:
+    summary: Node out of memory (node {{ $labels.node_name }})
+    description: "Node memory is filling up (< 10% left)\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
+- alert: NodeMemoryUnderMemoryPressure
+  expr: rate(node_vmstat_pgmajfault[1m]) > 1000
+  for: 2m
+  labels:
+    severity: warning
+    resource: '{{ $labels.name }}'
+    service: custom-node-exporter
+    env: 'XXXXX'
+    cloud: 'ZZZZZ'
+    seed_cluster: 'YYYYY'
+  annotations:
+    summary: Node memory under memory pressure (node {{ $labels.node_name }})
+    description: "The node is under heavy memory pressure. High rate of major page faults\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
+- alert: NodeMemoryIsUnderUtilized
+  expr: 100 - (rate(node_memory_MemAvailable_bytes[30m]) / node_memory_MemTotal_bytes * 100) < 20
+  for: 1w
+  labels:
+    severity: info
+    resource: '{{ $labels.name }}'
+    service: custom-node-exporter
+    env: 'XXXXX'
+    cloud: 'ZZZZZ'
+    seed_cluster: 'YYYYY'
+  annotations:
+    summary: Node Memory is under utilized (node {{ $labels.node_name }})
+    description: "Node memory is < 20% for 1 week. Consider reducing memory space.\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
+- alert: NodeSystemdServiceCrashed
+  expr: node_systemd_unit_state{state="failed"} == 1
+  for: 0m
+  labels:
+    severity: warning
+    resource: '{{ $labels.name }}'
+    service: custom-node-exporter
+    env: 'XXXXX'
+    cloud: 'ZZZZZ'
+    seed_cluster: 'YYYYY'
+  annotations:
+    summary: Node systemd service crashed (node {{ $labels.node_name }})
+    description: "systemd service crashed\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"

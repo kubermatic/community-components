@@ -1,0 +1,50 @@
+name: metallb.rules
+rules:
+- alert: MetalLBStaleConfig
+  annotations:
+    message: '{{ $labels.job }} - MetalLB {{ $labels.container }} on {{ $labels.pod
+      }} has a stale config for > 1 minute'
+  expr: metallb_k8s_client_config_stale_bool{job="kubernetes-pods"} == 1
+  for: 1m
+  labels:
+    severity: warning
+    resource: '{{ $labels.name }}'
+    service: metallb
+    env: 'XXXXX'
+    seed_cluster: 'YYYYY'
+- alert: MetalLBConfigNotLoaded
+  annotations:
+    message: '{{ $labels.job }} - MetalLB {{ $labels.container }} on {{ $labels.pod
+      }} has not loaded for > 1 minute'
+  expr: metallb_k8s_client_config_loaded_bool{job="kubernetes-pods"} == 0
+  for: 1m
+  labels:
+    severity: warning
+    resource: '{{ $labels.name }}'
+    service: metallb
+    env: 'XXXXX'
+    seed_cluster: 'YYYYY'
+- alert: MetalLBAddressPoolExhausted
+  annotations:
+    message: '{{ $labels.job }} - MetalLB {{ $labels.container }} on {{ $labels.pod
+      }} has exhausted address pool {{ $labels.pool }} for > 1 minute'
+  expr: metallb_allocator_addresses_in_use_total >= on(pool) metallb_allocator_addresses_total
+  for: 1m
+  labels:
+    severity: alert
+    resource: '{{ $labels.name }}'
+    service: metallb
+    env: 'XXXXX'
+    seed_cluster: 'YYYYY'
+- alert: MetalLBBGPSessionDown
+  annotations:
+    message: '{{ $labels.job }} - MetalLB {{ $labels.container }} on {{ $labels.pod
+      }} has BGP session {{ $labels.peer }} down for > 1 minute'
+  expr: metallb_bgp_session_up{job="kubernetes-pods"} == 0
+  for: 1m
+  labels:
+    severity: alert
+    resource: '{{ $labels.name }}'
+    service: metallb
+    env: 'XXXXX'
+    seed_cluster: 'YYYYY'
