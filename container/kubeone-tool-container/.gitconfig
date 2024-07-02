@@ -28,3 +28,5 @@
         prune = true
 [pull]
         rebase = false
+[safe]
+        directory = /home/kubermatic/mnt
