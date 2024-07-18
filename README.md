@@ -72,16 +72,17 @@ Configuration and tooling for common
 used [KKP - Guides - Application](https://docs.kubermatic.com/kubermatic/main/tutorials-howtos/applications/) for user cluster
 customization.
 
-| Name                                                                | Description                                               |
-|---------------------------------------------------------------------|-----------------------------------------------------------|
-| [README.md - Values](kubermatic-applications/README.md)             | Sample values yaml for the Applications                   |
-| [argocd-app](kubermatic-applications/argocd-app.yaml)               | Argo CD - Declarative Continuous Delivery for Kubernetes. |
-| [echoserver-app](kubermatic-applications/echoserver-app.yaml)       | Echo Server Example App                                   |
-| [eclipse-che-app](kubermatic-applications/eclipse-che-app.yaml)     | Preconfigured Eclipse Che IDE App                         |
-| [flux2-app](kubermatic-applications/flux2-app.yaml)                 | Flux GitOps sync tool for application deployment          |
-| [harbor-app](kubermatic-applications/harbor-app.yaml)               | Harbor App for user Clusters                              |
-| [sysdig-secure-app](kubermatic-applications/sysdig-secure-app.yaml) | [Sysdig Secure](https://sysdig.com/products/secure/) Integration for KKP User Clusters       |
-| [hivemq-app](kubermatic-applications/hivemq-app.yaml)               | HiveMQ Operator App to manage HiveMQ clusters in KKP user clusters                           |
+| Name                                                                | Description                                                                                 |
+|---------------------------------------------------------------------|---------------------------------------------------------------------------------------------|
+| [README.md - Values](kubermatic-applications/README.md)             | Sample values yaml for the Applications                                                     |
+| [argocd-app](kubermatic-applications/argocd-app.yaml)               | Argo CD - Declarative Continuous Delivery for Kubernetes.                                   |
+| [echoserver-app](kubermatic-applications/echoserver-app.yaml)       | Echo Server Example App                                                                     |
+| [eclipse-che-app](kubermatic-applications/eclipse-che-app.yaml)     | Preconfigured Eclipse Che IDE App                                                           |
+| [external-dns-app](kubermatic-applications/external-dns-app.yaml)   | Using externalDNS to manage DNS Entries in an automated way in scope of an KKP user cluster |
+| [flux2-app](kubermatic-applications/flux2-app.yaml)                 | Flux GitOps sync tool for application deployment                                            |
+| [harbor-app](kubermatic-applications/harbor-app.yaml)               | Harbor App for user Clusters                                                                |
+| [sysdig-secure-app](kubermatic-applications/sysdig-secure-app.yaml) | [Sysdig Secure](https://sysdig.com/products/secure/) Integration for KKP User Clusters      |
+| [hivemq-app](kubermatic-applications/hivemq-app.yaml)               | HiveMQ Operator App to manage HiveMQ clusters in KKP user clusters                          |
 
 ## Containers
 Some useful containers to work with KubeOne and KKP
