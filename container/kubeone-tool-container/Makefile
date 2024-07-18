@@ -1,9 +1,9 @@
 ## See https://github.com/kubermatic/kubeone/releases
-KUBEONE_VERSION ?= 1.8.0
+KUBEONE_VERSION ?= 1.8.1
 DOCKER_REPO ?= 'quay.io/kubermatic-labs/kubeone-tooling'
 FINAL_TAG ?= ${KUBEONE_VERSION}
 TAG_DATE ?= ${KUBEONE_VERSION}-$(shell date -I)
-BASE_IMAGE ?= amd64/ubuntu:20.04
+BASE_IMAGE ?= amd64/ubuntu:22.04
 CONTAINER_USER ?= kubermatic
 CONTAINER_USER_HOME ?= /home/kubermatic
 .PHONY: docker-release docker-build

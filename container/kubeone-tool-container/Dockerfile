@@ -15,7 +15,7 @@
 
 ARG ARCH=amd64
 ARG OS=linux
-ARG BASE_IMAGE=${ARCH}/ubuntu:20.04
+ARG BASE_IMAGE=${ARCH}/ubuntu:22.04
 FROM ${BASE_IMAGE}
 # FIXME: Validate every software to see if it offers darwin and arm64 builds and replace hardcoded values with variables
 # Added args again since args before FROM are not available after FROM statement [Ref: https://docs.docker.com/engine/reference/builder/#understand-how-arg-and-from-interact]
@@ -124,8 +124,8 @@ RUN curl -s "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/
 
 # Install Sops
 RUN SOPS_VERSION=$(curl -w '%{url_effective}' -I -L -s -S https://github.com/mozilla/sops/releases/latest -o /dev/null | sed -e 's|.*/v||') && \
-    curl -LO https://github.com/mozilla/sops/releases/download/v${SOPS_VERSION}/sops-v${SOPS_VERSION}.linux && \
-    install -o root -g root -m 0755 sops-v${SOPS_VERSION}.linux /usr/local/bin/sops
+    curl -LO https://github.com/getsops/sops/releases/download/v${SOPS_VERSION}/sops-v${SOPS_VERSION}.linux.amd64 && \
+    install -o root -g root -m 0755 sops-v${SOPS_VERSION}.linux.amd64 /usr/local/bin/sops
 
 # Install k9s
 RUN K9S_RELEASE_URL=$(curl -Ls -o /dev/null -w %{url_effective} https://github.com/derailed/k9s/releases/latest) && \
@@ -146,6 +146,12 @@ RUN LAZYGIT_VERSION=0.37.0 && \
 
 # Install ngrok
 RUN curl -s https://ngrok-agent.s3.amazonaws.com/ngrok.asc | sudo tee /etc/apt/trusted.gpg.d/ngrok.asc >/dev/null && echo "deb https://ngrok-agent.s3.amazonaws.com buster main" | sudo tee /etc/apt/sources.list.d/ngrok.list && sudo apt update && sudo apt install ngrok
+
+# Install OpenStack CLI
+RUN     apt-get update -y && \
+        apt-get install python3-pip -y && \
+        apt-get clean && \
+        pip install --no-cache-dir python-openstackclient
 
 ### INSTALL helper
 RUN wget https://rawgit.com/kubermatic/fubectl/master/fubectl.source -O /bin/fubectl.source && \
@@ -192,7 +198,7 @@ USER ${USER}
 
 # Install minio Operator Kubectl krew plugin, disk utils, resource-capacity and service-account creation
 # Install fubectl dependencies
-RUN bash -ic 'kubectl krew install minio df-pv pv-migrate resource-capacity view-serviceaccount-kubeconfig && kinstall'
+RUN bash -ic 'kubectl krew install minio df-pv pv-migrate resource-capacity view-serviceaccount-kubeconfig virt && kinstall'
 
 ### Init terrafrom poviders to cache provider binaries for offline setups
 COPY terraform_libraries.tf .
