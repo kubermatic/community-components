@@ -31,6 +31,7 @@ spec:
     clusterName: TODO-ADJUST-YOUR NAME
     global:
       imageCredentials:
+        create: true
         username: TODO-USER
         password: TODO-SECRET
   documentationURL: https://docs.aquasec.com
