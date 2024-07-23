@@ -22,7 +22,7 @@ spec:
           # Max number of retries was exceeded. Last error: can not build dependencies: the lock file (Chart.lock) is out of sync with the dependencies file (Chart.yaml). Please update the dependencies. Please check your configuration or contact your KKP Administrator.
           # remote: https://github.com/aquasecurity/aqua-helm
     version: '2022.4'
-  defaultValues: |
+  defaultValues:
     webhooks:
       #tested with cert-manager version 1.14.1
       certManager: true
@@ -33,7 +33,6 @@ spec:
       imageCredentials:
         username: TODO-USER
         password: TODO-SECRET
-
   documentationURL: https://docs.aquasec.com
   sourceURL: https://github.com/kubermatic-labs/aqua-helm/tree/2022.4-kkp-fix/kube-enforcer
 #  logo: |+
