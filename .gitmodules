@@ -1,0 +1,3 @@
+[submodule "kubermatic-applications/aquasec-apps/kubermatic-labs-fork-git-submodule"]
+	path = kubermatic-applications/aquasec-apps/kubermatic-labs-fork-git-submodule
+	url = git@github.com:kubermatic-labs/aqua-helm.git

@@ -1,0 +1,42 @@
+apiVersion: apps.kubermatic.k8c.io/v1
+kind: ApplicationDefinition
+metadata:
+  name: aquasec-enforcers
+spec:
+  description: Component Enforcers -  Aqua Security provides security for the cloud-native world inside any CNCF-Kubernetes. This application installs the Kube- and Aqua-Enforcer inside a cluster that shall be connected to an exisisting Aqua Server. The Server can either be SaaS based or installed via the aqua-server Application, depending on your license.
+  method: helm
+  defaultDeployOptions:
+    helm:
+      atomic: true
+      wait: true
+      timeout: "5m"
+  versions:
+  - template:
+      source:
+        git:
+          path: kube-enforcer
+          ref:
+            branch: '2022.4-kkp-fix'
+          remote:  https://github.com/kubermatic-labs/aqua-helm
+          # FIXME Issue with lock file:
+          # Max number of retries was exceeded. Last error: can not build dependencies: the lock file (Chart.lock) is out of sync with the dependencies file (Chart.yaml). Please update the dependencies. Please check your configuration or contact your KKP Administrator.
+          # remote: https://github.com/aquasecurity/aqua-helm
+    version: '2022.4'
+  defaultValues: |
+    webhooks:
+      #tested with cert-manager version 1.14.1
+      certManager: true
+    certsSecret:
+      autoGenerate: true
+    clusterName: TODO-ADJUST-YOUR NAME
+    global:
+      imageCredentials:
+        username: TODO-USER
+        password: TODO-SECRET
+
+  documentationURL: https://docs.aquasec.com
+  sourceURL: https://github.com/kubermatic-labs/aqua-helm/tree/2022.4-kkp-fix/kube-enforcer
+#  logo: |+
+#    base64 encoded png file
+#  logoFormat: png
+

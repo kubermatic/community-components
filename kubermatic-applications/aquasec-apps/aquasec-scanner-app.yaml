@@ -1,0 +1,20 @@
+apiVersion: apps.kubermatic.k8c.io/v1
+kind: ApplicationDefinition
+metadata:
+  name: aquasec-scanners
+spec:
+  description: Component Scanner - Aqua Security provides security for the cloud-native world inside any CNCF-Kubernetes. This application installs additional local scanner pods inside a cluster that shall be connected to an exisisting Aqua Server. The Server can either be SaaS based or installed via the aqua-server Application, depending on your license.
+  method: helm
+  defaultDeployOptions:
+    helm:
+      atomic: true
+      wait: true
+      timeout: "5m"
+  versions:
+  - template:
+      source:
+        git:
+          path: scanner
+          ref:
+            branch: 2022.4
+          remote: https://github.com/aquasecurity/aqua-helm
