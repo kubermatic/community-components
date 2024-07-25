@@ -9,7 +9,7 @@ spec:
     helm:
       atomic: true
       wait: true
-      timeout: "5m"
+      timeout: "15m"
   versions:
   - template:
       source:
