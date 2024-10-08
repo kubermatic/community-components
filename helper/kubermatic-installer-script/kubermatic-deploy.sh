@@ -92,7 +92,9 @@ function deployBackup() {
       deploy    minio minio minio/
       deploy    s3-exporter kube-system s3-exporter/
     fi
-    kubectl apply -f "$CHART_FOLDER/backup/velero/crd"
+    if [[ -d "$CHART_FOLDER/backup/velero/crd" ]]; then
+      kubectl apply -f "$CHART_FOLDER/backup/velero/crd"
+    fi
     deploy velero velero backup/velero
 }
 
