@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 ####################################
+# execute via:
+# curl -L https://raw.githubusercontent.com/kubermatic/community-components/refs/heads/master/helper/kube-node-cleanup.sh | bash
+####################################
 # ............. Kubernetes cleanup
 
 # Step 1: Delete All Kubernetes Resources
