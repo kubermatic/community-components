@@ -126,6 +126,7 @@ List of helper scripts and tools
 | [ssh-jumphosts-template.sh](helper/ssh-jumphosts-template.sh)                                   | Template to create a jumphost script with predefined enviroments.                                                                                                                                |
 | [Infrastructure benchmarking](helper/benchmarking)                                              | Documentation on how to benchmark various infrastrucutre elements used for hosting a kubernetes cluster.                                                                                         |
 | [KKP Project Viewer Service Account](helper/kkp-projectviewer.service-account.rbac.yaml)        | Adding a service account with view-only rights to your KKP Master Cluster                                                                                                                        |
+| [KubeVirt Debug VM (Ubuntu)](helper/kubevirt/kubevirt.debug.vm.yaml)                            | KubeVirt Ubuntu VM with SSH add cloud-init to test or debug kubevirt environments                                                                                                                |
 
 
 ## Knowledge Base
