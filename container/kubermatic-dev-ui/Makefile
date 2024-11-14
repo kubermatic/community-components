@@ -1,7 +1,7 @@
 ## See https://github.com/kubermatic/kubeone/releases
 UI_VERSION ?= 0.1.1
 
-KUBEONE_VERSION ?= 1.6.0
+KUBEONE_VERSION ?= 1.8.3
 ### TODO transfer to kubermatic repo
 DOCKER_REPO ?= 'quay.io/toschneck/kubermatic-dev-ui'
 FINAL_TAG ?= ${UI_VERSION}
@@ -27,9 +27,9 @@ docker-run-local-root: docker-build
 	docker run -it --user 0 --rm -p 6901:6901 -p 5901:5901 -v $(shell pwd):/headless/mnt ${DOCKER_REPO}:${TAG_DATE} bash
 
 docker-run:
-	docker run -it -v $(shell pwd):/headless/mnt ${DOCKER_REPO}:${UI_VERSION} bash
+	docker run -it --rm -p 6901:6901 -p 5901:5901 -v $(shell pwd):/headless/mnt ${DOCKER_REPO}:latest bash
 docker-run-root:
-	docker run -it --user 0 -v $(shell pwd):/headless/mnt ${DOCKER_REPO}:${UI_VERSION} bash
+	docker run -it --user 0 --rm -p 6901:6901 -p 5901:5901 -v $(shell pwd):/headless/mnt ${DOCKER_REPO}:${UI_VERSION} bash
 
 # update latest, version ref and set unique tag
 docker-release: docker-build
