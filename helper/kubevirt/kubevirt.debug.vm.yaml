@@ -1,0 +1,73 @@
+apiVersion: kubevirt.io/v1
+kind: VirtualMachine
+metadata:
+  #namespace: default
+  labels:
+    kubevirt.io/vm: vm-ubuntu-debug
+  name: vm-ubuntu-debug
+spec:
+  dataVolumeTemplates:
+  - metadata:
+      creationTimestamp: null
+      name: vm-ubuntu-debug
+    spec:
+      pvc:
+        accessModes:
+        - ReadWriteOnce
+        resources:
+          requests:
+            storage: 8Gi
+        #storageClassName: kubermatic-vm-disk
+      source:
+        http:
+          #url: http://vm-image-registry.kube-system.svc/vms/ubuntu-22.04-server-cloudimg-amd64.img
+          #latest cloudimg
+          url: https://cloud-images.ubuntu.com/releases/22.04/release/ubuntu-22.04-server-cloudimg-amd64.img
+  running: true
+  template:
+    metadata:
+      labels:
+        kubevirt.io/vm: vm-ubuntu-debug
+    spec:
+      dnsConfig:
+        nameservers:
+        - 8.8.8.8
+      dnsPolicy: None
+      domain:
+        devices:
+          disks:
+          - disk:
+              bus: virtio
+            name: datavolumedisk
+          - disk:
+              bus: virtio
+            name: cloudinitdisk
+#          interfaces:
+#          - macAddress: 12:78:03:8b:95:d7
+#            name: default
+#        machine:
+#          type: q35
+#      networks:
+#      - name: default
+        resources:
+          requests:
+            memory: "8Gi"
+            cpu: "2"
+          limits:
+            memory: "8Gi"
+            cpu: "2"
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - dataVolume:
+          name: vm-ubuntu-debug
+        name: datavolumedisk
+      - cloudInitNoCloud:
+          userData: |
+            #!/bin/sh
+            uname -a
+            mkdir -p /root/.ssh
+            cat << EOF >> /root/.ssh/authorized_keys
+            #### TODO ADD YOUR SSH PUBLIC KEY EOF
+            echo 'ssh key added ...'
+            cat /root/.ssh/authorized_keys
+        name: cloudinitdisk
