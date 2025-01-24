@@ -4,6 +4,7 @@ kind: ApplicationDefinition
 metadata:
   name: canal
 spec:
+  displayName: Canal Custom
   description: A Helm chart for deploying Canal on a Kubernetes cluster.
   method: helm
   versions:
@@ -17,7 +18,7 @@ spec:
     version: 3.23.3
   # During the applicationdefinition creation time if the defaultValues is updated, then it is render for override during the application creation process from UI.
   # By default, it is set empty.
-  defaultValues:
+  defaultValuesBlock: | 
     canalIface: "wt0"
     vethMTU: "1280"
     cluster:

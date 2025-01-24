@@ -1,34 +1,5 @@
 # Applications
 
-## Agro CD setup
-Sample values yaml for exposing AgroCD
-
-```yaml
-server:
-  certificate:
-    enabled: true
-    domain: argocd.xxxx.lab.kubermatic.io
-    issuer:
-      group: cert-manager.io
-      kind: ClusterIssuer
-      name: letsencrypt-prod
-    secretName: argocd-tls
-  ingress:
-    enabled: true
-    https: true
-    hosts:
-    - argocd.xxxx.lab.kubermatic.io
-    ingressClassName: 'nginx'
-    annotations:
-      cert-manager.io/cluster-issuer: letsencrypt-prod
-      kubernetes.io/tls-acme: 'true'
-      nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
-    tls: 
-    - secretName: argocd-tls
-      hosts:
-        - argocd.xxxx.lab.kubermatic.io
-```
-
 ## Echo Server setup
 Sample values yaml for exposing Echo server
 ```yaml
@@ -122,4 +93,37 @@ cluster:
       nodeAnalyzer:
         benchmarkRunner:
           deploy: false
+```
+
+---
+
+## DEPRECATED
+
+### Agro CD setup
+Sample values yaml for exposing AgroCD
+
+```yaml
+server:
+  certificate:
+    enabled: true
+    domain: argocd.xxxx.lab.kubermatic.io
+    issuer:
+      group: cert-manager.io
+      kind: ClusterIssuer
+      name: letsencrypt-prod
+    secretName: argocd-tls
+  ingress:
+    enabled: true
+    https: true
+    hosts:
+    - argocd.xxxx.lab.kubermatic.io
+    ingressClassName: 'nginx'
+    annotations:
+      cert-manager.io/cluster-issuer: letsencrypt-prod
+      kubernetes.io/tls-acme: 'true'
+      nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
+    tls: 
+    - secretName: argocd-tls
+      hosts:
+        - argocd.xxxx.lab.kubermatic.io
 ```

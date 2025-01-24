@@ -4,6 +4,7 @@ kind: ApplicationDefinition
 metadata:
   name: eclipse-che
 spec:
+  displayName: displayName
   description: A Helm chart for deploying Eclipse Che on a Kubernetes or Openshift cluster.
   method: helm
   versions:
@@ -17,7 +18,7 @@ spec:
     version: 7.55.0
   # During the applicationdefinition creation time if the defaultValues is updated, then it is render for override during the application creation process from UI.
   # By default, it is set empty.
-  defaultValues:
+  defaultValuesBlock: | 
     networking:
       auth:
         identityProviderURL: "https://xxxxx.lab.kubermatic.io/dex"
