@@ -10,7 +10,7 @@ terraform {
     }
     vsphere = {
       source  = "hashicorp/vsphere"
-      version = "~> 2.1.1"
+      version = "~> 2.11.0"
     }
     azurerm = {
       source  = "hashicorp/azurerm"
