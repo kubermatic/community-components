@@ -23,7 +23,8 @@ kind: ApplicationDefinition
 metadata:
   name: external-dns
 spec:
-  description: External for Kubernetes - https://github.com/kubernetes-sigs/external-dns/tree/master/charts/external-dns
+  displayName: ExternalDNS
+  description: ExternalDNS synchronizes exposed Kubernetes Services and Ingresses with DNS providers.
   method: helm
   versions:
     - template:
@@ -54,6 +55,7 @@ spec:
       enabled: true
       mountPath: /.aws
       data:
+        #NOTE: do NOT enter productive credentials
         credentials: |-
           [default]
           aws_access_key_id: xxxx
