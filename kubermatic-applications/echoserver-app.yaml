@@ -3,7 +3,7 @@ kind: ApplicationDefinition
 metadata:
   name: echoserver
 spec:
-  displayName: Echo
+  displayName: Echo Server App
   description: An echo server is a server that replicates the request sent by the client and sends it back.
   method: helm
   versions:
