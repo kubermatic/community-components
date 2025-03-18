@@ -1,0 +1,81 @@
+### Installs some needed packages for ubuntu 20.04 to run kubevirt and storage performant
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: kubevirt-package-installer
+  namespace: kube-system
+  labels:
+    app: kubevirt-package-installer
+spec:
+  selector:
+    matchLabels:
+      app: kubevirt-package-installer
+  updateStrategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 50%
+  template:
+    metadata:
+      labels:
+        app: kubevirt-package-installer
+    spec:
+      priorityClassName: system-node-critical
+      ### needs to best to get schedueled before CNI starts
+      hostNetwork: true
+      nodeSelector:
+        v1.kubeone.io/operating-system: ubuntu
+      hostPID: true
+      tolerations:
+        - effect: NoSchedule
+          operator: Exists
+        - key: CriticalAddonsOnly
+          operator: Exists
+        - effect: NoExecute
+          operator: Exists
+      initContainers:
+        - name: kubevirt-package-installer
+          image: quay.io/kubermatic/util:2.3.0
+          securityContext:
+            privileged: true
+          env:
+            - name: REBOOT_NODE_IF_REQUIRED
+#              value: 'false'
+              value: '{{ .Params.REBOOT_NODE_IF_REQUIRED }}'
+            - name: APT_UPGRADE
+              value: '{{ .Params.APT_UPGRADE }}'
+#              value: 'true'
+          command:
+            - nsenter
+          args:
+            - -t
+            - '1'
+            - -m
+            - -u
+            - -i
+            - -n
+            - -p
+            - --
+            - bash
+            - -c
+            - |
+              apt update
+              if [[ "$APT_UPGRADE" == "true" ]]; then
+                apt upgrade -y
+              fi
+              apt install -y linux-generic-hwe-20.04
+              apt install -y eatmydata bridge-utils cpu-checker libvirt-clients libvirt-daemon qemu qemu-kvm libguestfs-tools
+              apt autoremove -y
+              apt autoclean -y
+              echo "-------- REBOOT? ------"
+              if [ -f /var/run/reboot-required ]; then
+                  cat /var/run/reboot-required
+                  echo 'reboot required!'
+                if [[ "$REBOOT_NODE_IF_REQUIRED" == "true" ]]; then
+                  echo 'reboot ALLOWED!'
+                  reboot
+                fi
+              fi
+      containers:
+        - name: pause
+          image: gcr.io/google_containers/pause
+      terminationGracePeriodSeconds: 10
