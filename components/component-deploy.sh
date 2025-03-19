@@ -15,7 +15,7 @@ DEPLOY_VMWARE_EXPORTER="vmware-exporter"
 if [[ $# -lt 4 ]] || [[ "$1" == "--help" ]]; then
   echo "ARGUMENTS:"$*
   echo ""
-  echo "Usage: $(basename \"$0\") path/to/VALUES_FILES path/to/CHART_FOLDER ($DEPLOY_S3_SYNCER|$DEPLOY_SGW|$DEPLOY_RCLONE_S3_SYNCER|$DEPLOY_THANOS_SEED_INGRESS|$DEPLOY_VMWARE_EXPORTER)"
+  echo "Usage: $(basename \"$0\") path/to/VALUES_FILES path/to/VALUE_FILE_OVERRIDE path/to/CHART_FOLDER ($DEPLOY_S3_SYNCER|$DEPLOY_SGW|$DEPLOY_RCLONE_S3_SYNCER|$DEPLOY_THANOS_SEED_INGRESS|$DEPLOY_VMWARE_EXPORTER)"
   exit 1
 fi
 
