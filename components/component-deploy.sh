@@ -12,7 +12,7 @@ DEPLOY_SGW="service-gateway"
 DEPLOY_THANOS_SEED_INGRESS="thanos-seed-ingress"
 DEPLOY_VMWARE_EXPORTER="vmware-exporter"
 
-if [[ $# -lt 3 ]] || [[ "$1" == "--help" ]]; then
+if [[ $# -lt 4 ]] || [[ "$1" == "--help" ]]; then
   echo "ARGUMENTS:"$*
   echo ""
   echo "Usage: $(basename \"$0\") path/to/VALUES_FILES path/to/CHART_FOLDER ($DEPLOY_S3_SYNCER|$DEPLOY_SGW|$DEPLOY_RCLONE_S3_SYNCER|$DEPLOY_THANOS_SEED_INGRESS|$DEPLOY_VMWARE_EXPORTER)"
@@ -25,14 +25,19 @@ if [[ ! -f "$VALUES_FILE" ]]; then
     exit 1
 fi
 
-CHART_FOLDER=$(realpath "$2")
+VALUE_FILE_OVERRIDE=$2
+if [[ ! -z "$VALUE_FILE_OVERRIDE" ]]; then
+    VALUE_FILE_OVERRIDE=$(realpath "$2")
+fi
+
+CHART_FOLDER=$(realpath "$3")
 if [[ ! -d "$CHART_FOLDER" ]]; then
     echodate "CHART_FOLDER not found! $CHART_FOLDER"
     exit 1
 fi
 
 ### verification is checked in case expresion
-DEPLOY_STACK="$3"
+DEPLOY_STACK="$4"
 
 HELM_EXTRA_ARGS=${HELM_EXTRA_ARGS:-""} #"--dry-run --debug"
 
