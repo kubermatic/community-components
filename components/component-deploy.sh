@@ -71,7 +71,7 @@ function deploy {
 
   TEST_NAME="[Helm] Deploy chart $name into namespace $namespace"
   echodate "Upgrading $TEST_NAME ..."
-  helm upgrade --create-namespace --install --wait $HELM_EXTRA_ARGS --timeout $timeout --values "$VALUES_FILE" --namespace "$namespace" "$name" "$path"
+  helm upgrade --create-namespace --install --wait $HELM_EXTRA_ARGS --timeout $timeout --values "$VALUES_FILE" --values "$VALUE_FILE_OVERRIDE" --namespace "$namespace" "$name" "$path"
 
   unset TEST_NAME
 }
