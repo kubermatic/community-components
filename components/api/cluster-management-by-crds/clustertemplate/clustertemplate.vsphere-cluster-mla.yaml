@@ -108,7 +108,7 @@ spec:
   containerRuntime: containerd
   enableOperatingSystemManager: true
   enableUserSSHKeyAgent: true
-  exposeStrategy: NodePort
+  exposeStrategy: Tunneling
   humanReadableName: cluster-template-crd-example-vsphere
   kubernetesDashboard:
     enabled: true

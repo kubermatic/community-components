@@ -81,7 +81,7 @@ spec:
   containerRuntime: containerd
   enableOperatingSystemManager: true
   enableUserSSHKeyAgent: true
-  exposeStrategy: NodePort
+  exposeStrategy: Tunneling
   features:
     apiserverNetworkPolicy: true
     etcdLauncher: true
