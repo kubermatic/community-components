@@ -9,14 +9,13 @@ source $BASEDIR/../hack/lib.sh
 DEPLOY_S3_SYNCER="s3-syncer"
 DEPLOY_RCLONE_S3_SYNCER="rclone-s3-syncer"
 DEPLOY_SGW="service-gateway"
-DEPLOY_CERT="cert-update-svc"
 DEPLOY_THANOS_SEED_INGRESS="thanos-seed-ingress"
 DEPLOY_VMWARE_EXPORTER="vmware-exporter"
 
 if [[ $# -lt 4 ]] || [[ "$1" == "--help" ]]; then
   echo "ARGUMENTS:"$*
   echo ""
-  echo "Usage: $(basename \"$0\") path/to/VALUES_FILES path/to/VALUE_FILE_OVERRIDE path/to/CHART_FOLDER ($DEPLOY_S3_SYNCER|$DEPLOY_SGW|$DEPLOY_WACKER_CERT)"
+  echo "Usage: $(basename \"$0\") path/to/VALUES_FILES path/to/VALUE_FILE_OVERRIDE path/to/CHART_FOLDER ($DEPLOY_S3_SYNCER|$DEPLOY_SGW|$DEPLOY_RCLONE_S3_SYNCER|$DEPLOY_THANOS_SEED_INGRESS|$DEPLOY_VMWARE_EXPORTER)"
   exit 1
 fi
 
@@ -26,9 +25,9 @@ if [[ ! -f "$VALUES_FILE" ]]; then
     exit 1
 fi
 
-VALUE_FILE_OVERRIDE=$(realpath "$2")
-if [[ ! -f "$VALUE_FILE_OVERRIDE" ]]; then
-    VALUE_FILE_OVERRIDE=""
+VALUE_FILE_OVERRIDE=$2
+if [[ ! -z "$VALUE_FILE_OVERRIDE" ]]; then
+    VALUE_FILE_OVERRIDE=$(realpath "$2")
 fi
 
 CHART_FOLDER=$(realpath "$3")
