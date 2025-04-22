@@ -1,9 +1,5 @@
 {
   "name": "ubuntu-node-pool",
-  "annotations": {
-      "cluster.k8s.io/cluster-api-autoscaler-node-group-max-size": "5",
-      "cluster.k8s.io/cluster-api-autoscaler-node-group-min-size": "2"
-  },
   "spec": {
     "template": {
       "cloud": {
@@ -30,7 +26,9 @@
         "sles": null
       }
     },
-    "replicas": 1,
+    "replicas": 2,
+    "minReplicas": 2,
+    "maxReplicas": 5,
     "dynamicConfig": false
   }
 }
