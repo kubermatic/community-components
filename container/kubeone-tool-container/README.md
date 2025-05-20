@@ -41,7 +41,7 @@ docker run -v $(shell pwd):/home/kubermatic/mnt -it quay.io/kubermatic-labs/kube
 ```
 To run the container and "keep it running":
 ```
-docker run  --name  kubeone-tool-container -v $(shell pwd):/home/kubermatic/mnt -t -d quay.io/kubermatic-labs/kubeone-tool-container
+docker run  --name  kubeone-tool-container -v $(pwd):/home/kubermatic/mnt -t -d quay.io/kubermatic-labs/kubeone-tool-container
 docker exec -it kubeone-tool-container
 ```
 
