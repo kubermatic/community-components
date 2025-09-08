@@ -199,7 +199,7 @@ USER ${USER}
 
 # Install minio Operator Kubectl krew plugin, disk utils, resource-capacity and service-account creation
 # Install fubectl dependencies
-RUN bash -ic 'kubectl krew install minio df-pv pv-migrate resource-capacity view-serviceaccount-kubeconfig virt && kinstall'
+RUN bash -ic 'kubectl krew install minio df-pv pv-migrate pvmigrate resource-capacity view-serviceaccount-kubeconfig virt && kinstall'
 
 ### Init terrafrom poviders to cache provider binaries for offline setups
 COPY terraform_libraries.tf .

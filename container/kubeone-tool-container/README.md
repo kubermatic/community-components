@@ -33,15 +33,15 @@ make docker-run-local-root
 ### Manual Usage
 To build and run the images you can:
 ```
-docker build -t local/kubeone-tool-container .
+docker build -t quay.io/kubermatic-labs/kubeone-tooling .
 ```
 To temporary run the container:
 ```
-docker run -v $(shell pwd):/home/kubermatic/mnt -it local/kubeone-tool-container
+docker run -v $(shell pwd):/home/kubermatic/mnt -it quay.io/kubermatic-labs/kubeone-tooling
 ```
 To run the container and "keep it running":
 ```
-docker run  --name  kubeone-tool-container -v $(shell pwd):/home/kubermatic/mnt -t -d local/kubeone-tool-container
+docker run  --name  kubeone-tool-container -v $(pwd):/home/kubermatic/mnt -t -d quay.io/kubermatic-labs/kubeone-tooling
 docker exec -it kubeone-tool-container
 ```
 
