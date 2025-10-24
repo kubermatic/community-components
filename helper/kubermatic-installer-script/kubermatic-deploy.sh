@@ -146,7 +146,11 @@ case "$DEPLOY_STACK" in
     #### elastic stack removed -> Loki
     if [[ "${DEPLOY_LOKI}" = true ]]; then
       deploy "loki" "logging" logging/loki/
-      deploy "promtail" "logging" logging/promtail/ 900s
+      if [[ -d "$CHART_FOLDER/logging/alloy" ]]; then
+        deploy "alloy" "logging" logging/alloy/ 900s
+      else
+        deploy "promtail" "logging" logging/promtail/ 900s
+      fi
     fi
     ;;
 
