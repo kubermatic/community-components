@@ -15,7 +15,7 @@
 
 ARG ARCH=amd64
 ARG OS=linux
-ARG BASE_IMAGE=${ARCH}/ubuntu:22.04
+ARG BASE_IMAGE=${ARCH}/ubuntu:24.04
 FROM ${BASE_IMAGE}
 # FIXME: Validate every software to see if it offers darwin and arm64 builds and replace hardcoded values with variables
 # Added args again since args before FROM are not available after FROM statement [Ref: https://docs.docker.com/engine/reference/builder/#understand-how-arg-and-from-interact]
@@ -48,7 +48,7 @@ RUN apt-get update && apt-get install -y\
     software-properties-common \
     iputils-ping \
     locate \
-    netcat \
+    netcat-traditional \
     dnsutils\
     zsh \
     uuid-runtime \
@@ -57,7 +57,7 @@ RUN apt-get update && apt-get install -y\
     figlet lolcat \
     && apt-get clean
 
-RUN wget --no-check-certificate -qO -  https://apt.releases.hashicorp.com/gpg | apt-key add - && \
+RUN wget --no-check-certificate -qO -  https://apt.releases.hashicorp.com/gpg | gpg --dearmor | tee /etc/apt/trusted.gpg.d/hashicorp.gpg  > /dev/null && \
     apt-add-repository "deb [arch=$(dpkg --print-architecture)] https://apt.releases.hashicorp.com $(lsb_release -cs) main" && \
     apt update -y && apt-get install -y terraform && \
     apt-get clean
@@ -80,8 +80,8 @@ RUN curl -sL https://packages.microsoft.com/keys/microsoft.asc | \
     apt-get clean
 
 # Install GCP CLI
-RUN echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] http://packages.cloud.google.com/apt cloud-sdk main" | sudo tee -a /etc/apt/sources.list.d/google-cloud-sdk.list &&  \
-    curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key --keyring /usr/share/keyrings/cloud.google.gpg  add - &&  \
+RUN echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" | sudo tee -a /etc/apt/sources.list.d/google-cloud-sdk.list &&  \
+    curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key --keyring /usr/share/keyrings/cloud.google.gpg add - &&  \
     apt-get update -y && \
     apt-get install google-cloud-sdk -y && \
     apt-get clean
@@ -94,9 +94,9 @@ RUN curl -L $(curl -s https://api.github.com/repos/vmware/govmomi/releases/lates
 RUN echo "deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.30/deb/ /" | sudo tee /etc/apt/sources.list.d/kubernetes.list && \
     mkdir -p /etc/apt/keyrings && curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.30/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg && \
     #helm \
-    curl https://baltocdn.com/helm/signing.asc | gpg --dearmor | sudo tee /usr/share/keyrings/helm.gpg > /dev/null && \
+    curl -fsSL https://packages.buildkite.com/helm-linux/helm-debian/gpgkey | gpg --dearmor | sudo tee /usr/share/keyrings/helm.gpg > /dev/null && \
     sudo apt-get install apt-transport-https --yes && \
-    echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/helm.gpg] https://baltocdn.com/helm/stable/debian/ all main" | sudo tee /etc/apt/sources.list.d/helm-stable-debian.list && \
+    echo "deb [signed-by=/usr/share/keyrings/helm.gpg] https://packages.buildkite.com/helm-linux/helm-debian/any/ any main" | sudo tee /etc/apt/sources.list.d/helm-stable-debian.list && \
     apt-get update && \
     apt-get install -y kubectl helm jq && \
     apt-get clean
@@ -150,9 +150,7 @@ RUN curl -s https://ngrok-agent.s3.amazonaws.com/ngrok.asc | sudo tee /etc/apt/t
 
 # Install OpenStack CLI
 RUN     apt-get update -y && \
-        apt-get install python3-pip -y && \
-        apt-get clean && \
-        pip install --no-cache-dir python-openstackclient
+    apt install python3-openstackclient -y
 
 ### INSTALL helper
 RUN wget https://rawgit.com/kubermatic/fubectl/master/fubectl.source -O /bin/fubectl.source && \
@@ -164,7 +162,7 @@ ARG USER=kubermatic
 ARG USER_HOME=/home/${USER}
 ENV USER_HOME=$USER_HOME
 ENV HOME=$USER_HOME
-RUN useradd -rm -d ${USER_HOME} -s /bin/bash -g root -G sudo -u 1000 ${USER} && chown $USER -R $USER_HOME
+RUN useradd -rm -d ${USER_HOME} -s /bin/bash -g root -G sudo -u 1001 ${USER} && chown $USER -R $USER_HOME
 USER ${USER}
 WORKDIR ${USER_HOME}
 
