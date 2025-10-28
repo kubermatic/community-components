@@ -1,9 +1,9 @@
 ## See https://github.com/kubermatic/kubeone/releases
-KUBEONE_VERSION ?= 1.10.0
+KUBEONE_VERSION ?= 1.11.3
 DOCKER_REPO ?= 'quay.io/kubermatic-labs/kubeone-tooling'
 FINAL_TAG ?= ${KUBEONE_VERSION}
 TAG_DATE ?= ${KUBEONE_VERSION}-$(shell date -I)
-BASE_IMAGE ?= amd64/ubuntu:22.04
+BASE_IMAGE ?= amd64/ubuntu:24.04
 PLATFORM ?= linux/amd64
 CONTAINER_USER ?= kubermatic
 CONTAINER_USER_HOME ?= /home/kubermatic
