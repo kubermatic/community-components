@@ -133,20 +133,34 @@ function deployCertManager() {
       deploy    cert-manager cert-manager cert-manager/
     fi
 }
+
 function deployIAP() {
     # We might have not configured IAP which results in nothing being deployed. This triggers https://github.com/helm/helm/issues/4295 and marks this as failed
     # We hack around this by grepping for a string that is mandatory in the values file of IAP
-    # to determine if its configured, because am empty chart leads to Helm doing weird things
+    # to determine if its configured, because an empty chart leads to Helm doing weird things
     if [[ -v DEPLOY_IAP ]]; then
-      ### not used until iap ca field is not in chart
-      if grep -q oidc_issuer_url "$VALUES_FILE"; then
+      # Check all values files to see if oidc_issuer_url occurs
+      local iap_configured=false
+      for value_file in "${HELM_VALUES_ARGS[@]}"; do
+        # Array elements have the following form: --values "/abs/path"
+        # We only need the path:
+        if [[ "$value_file" == --values ]]; then
+          continue
+        fi
+        ### not used until iap ca field is not in chart
+        if grep -q 'oidc_issuer_url' "$value_file"; then
+          iap_configured=true
+          break
+        fi
+      done
+      
+      if [[ "$iap_configured" == true ]]; then
         deploy iap iap iap/
       else
         echodate "Skipping IAP deployment because discovery_url is unset in values file"
       fi
     fi
 }
-
 
 echodate "Deploying $DEPLOY_STACK stack..."
 
