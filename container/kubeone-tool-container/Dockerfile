@@ -15,19 +15,18 @@
 
 ARG ARCH=amd64
 ARG OS=linux
-ARG BASE_IMAGE=${ARCH}/ubuntu:24.04
+ARG BASE_IMAGE=ubuntu:24.04
 FROM ${BASE_IMAGE}
 # FIXME: Validate every software to see if it offers darwin and arm64 builds and replace hardcoded values with variables
 # Added args again since args before FROM are not available after FROM statement [Ref: https://docs.docker.com/engine/reference/builder/#understand-how-arg-and-from-interact]
 ARG ARCH
 ARG OS
 USER 0
-
 ENV GO111MODULE=on
 # Install KubeOne
 ENV DEBIAN_FRONTEND=noninteractive
 
-RUN apt-get update && apt-get install -y\
+RUN apt-get update && apt-get install -y \
     bash-completion \
     python3-crcmod \
     ca-certificates \
@@ -54,8 +53,8 @@ RUN apt-get update && apt-get install -y\
     uuid-runtime \
     iperf3 \
     fio \
-    figlet lolcat \
-    && apt-get clean
+    figlet lolcat && \
+    apt autoremove && apt autoclean && apt-get clean -y
 
 RUN wget --no-check-certificate -qO -  https://apt.releases.hashicorp.com/gpg | gpg --dearmor | tee /etc/apt/trusted.gpg.d/hashicorp.gpg  > /dev/null && \
     apt-add-repository "deb [arch=$(dpkg --print-architecture)] https://apt.releases.hashicorp.com $(lsb_release -cs) main" && \
@@ -109,7 +108,7 @@ RUN RELEASE_URL=$(curl -Ls -o /dev/null -w %{url_effective} https://github.com/m
 # Install velero
 RUN mkdir /tmp/velero-inst && cd /tmp/velero-inst \
     && curl -L $(curl -s https://api.github.com/repos/vmware-tanzu/velero/releases/latest | grep browser_download_url | grep -i linux-amd64 | cut -d '"' -f 4) | tar --strip 1 -xzf - \
-    && mv velero /usr/bin && cd \
+    && chmod +x velero && mv velero /usr/bin && cd \
     && velero version --client-only
 
 # Install KubeOne
@@ -118,6 +117,14 @@ RUN VERSION=$kubeone_version && \
     curl -LO "https://github.com/kubermatic/kubeone/releases/download/v${VERSION}/kubeone_${VERSION}_linux_amd64.zip" && \
     unzip kubeone_${VERSION}_linux_amd64.zip -d kubeone_${VERSION}_linux_amd64 && \
     mv kubeone_${VERSION}_linux_amd64/kubeone /usr/local/bin
+
+# Install kubeovn kubectl plugin ko
+# https://kubeovn.github.io/docs/v1.14.x/en/ops/kubectl-ko/
+ARG kubeovn_ko_release
+RUN wget https://raw.githubusercontent.com/kubeovn/kube-ovn/release-${kubeovn_ko_release}/dist/images/kubectl-ko && \
+    mv kubectl-ko /usr/local/bin/kubectl-ko && \
+    chmod +x /usr/local/bin/kubectl-ko && \
+    /usr/local/bin/kubectl-ko
 
 # Install kustomize
 RUN curl -s "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh"  | bash && \
@@ -133,6 +140,7 @@ RUN K9S_RELEASE_URL=$(curl -Ls -o /dev/null -w %{url_effective} https://github.c
     K9S_LATEST="${K9S_RELEASE_URL##*/}" && \
     wget -c "https://github.com/derailed/k9s/releases/download/${K9S_LATEST}/k9s_Linux_amd64.tar.gz"  -O - | tar -xz -C /usr/local/bin/
 
+# Cilium CLI
 RUN CILIUM_CLI_VERSION=$(curl -s https://raw.githubusercontent.com/cilium/cilium-cli/master/stable.txt) && \
     curl -L --remote-name-all https://github.com/cilium/cilium-cli/releases/download/${CILIUM_CLI_VERSION}/cilium-${OS}-${ARCH}.tar.gz && \
     sudo tar -C /usr/local/bin -xzvf cilium-${OS}-${ARCH}.tar.gz && \
@@ -197,7 +205,7 @@ USER ${USER}
 
 # Install minio Operator Kubectl krew plugin, disk utils, resource-capacity and service-account creation
 # Install fubectl dependencies
-RUN bash -ic 'kubectl krew install minio df-pv pv-migrate pvmigrate resource-capacity view-serviceaccount-kubeconfig virt && kinstall'
+RUN bash -ic 'kubectl krew install minio df-pv pv-migrate pvmigrate resource-capacity view-serviceaccount-kubeconfig virt view-secret kyverno oidc-login && kinstall'
 
 ### Init terrafrom poviders to cache provider binaries for offline setups
 COPY terraform_libraries.tf .
