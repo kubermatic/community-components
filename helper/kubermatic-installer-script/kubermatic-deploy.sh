@@ -6,7 +6,7 @@ BASEDIR=$(dirname "$0")
 source $BASEDIR/../../hack/lib.sh
 
 if [[ $# -lt 1 ]] || [[ "$1" == "--help" ]]; then
-  echo "Usage: $(basename \"$0\") (master|seed) path/to/VALUES_FILES path/to/CHART_FOLDER (monitoring|logging|backup|kubermatic|kubermatic-deployment-only)"
+  echo "Usage: $(basename \"$0\") (master|seed) path/to/VALUES_FILE1 [path/to/VALUES_FILE2 ...] path/to/CHART_FOLDER (monitoring|logging|backup|kubermatic|kubermatic-deployment-only)"
   echo "FYI: kubermatic|kubermatic-deployment-only is deprecated due to new kubermatic-installer binary"
   exit 1
 fi
@@ -20,18 +20,39 @@ else
   echo "invalid deploy type, expected (master|seed), got $DEPLOY_TYPE"
 fi
 
-VALUES_FILE=$(realpath "$2")
-if [[ ! -f "$VALUES_FILE" ]]; then
-    echodate "'values.yaml' in folder not found! \nCONTENT $VALUES_FILE:\n`ls -l $VALUES_FILE/..`"
-    exit 1
+args=("$@")
+
+# at least 4 arguments
+if [[ ${#args[@]} -lt 4 ]]; then
+  echo "Usage: $(basename "$0") (master|seed) values1.yaml [values2.yaml ...] path/to/CHART_FOLDER (monitoring|logging|backup|kubermatic|kubermatic-deployment-only)"
+  exit 1
 fi
-CHART_FOLDER=$(realpath "$3")
+
+# helm values files = args[1..-3]
+HELM_VALUES_ARGS=()
+for (( i=1; i<${#args[@]}-2; i++ )); do
+  VALUES_FILE="$(realpath "${args[$i]}")"
+  if [[ ! -f "$VALUES_FILE" ]]; then
+    echodate "'values.yaml' not found: $VALUES_FILE"
+    exit 1
+  fi
+  HELM_VALUES_ARGS+=( --values "$VALUES_FILE" )
+done
+
+if [[ ${#HELM_VALUES_ARGS[@]} -eq 0 ]]; then
+  echodate "At least one values.yaml must be provided."
+  exit 1
+fi
+
+# CHART_FOLDER = penultimate argument
+CHART_FOLDER=$(realpath "${args[-2]}")
 if [[ ! -d "$CHART_FOLDER" ]]; then
     echodate "CHART_FOLDER not found! $CHART_FOLDER"
     exit 1
 fi
 ### verification is checked in case expresion
-DEPLOY_STACK="$4"
+# DEPLOY_STACK = last argument
+DEPLOY_STACK="${args[-1]}"
 
 DEPLOY_CERTMANAGER=true
 DEPLOY_MINIO=true
@@ -40,7 +61,7 @@ DEPLOY_LOKI=true
 DEPLOY_IAP=true
 #CANARY_DEPLOYMENT=true
 
-#verify Helm3
+# verify Helm3
 [[ $(helm version --short) =~ ^v3.*$ ]] && echo "helm3 detected!" || (echo "This script requires helm3! Please install helm3: https://helm.sh/docs/intro/install" && exit 1)
 
 function deploy {
@@ -83,7 +104,7 @@ function deploy {
   echodate "Upgrading [$namespace] $name ..."
   kubectl create namespace "$namespace" || true
   helm dependency build $path
-  helm upgrade --install --wait --timeout $timeout $MASTER_FLAG --values "$VALUES_FILE" --namespace "$namespace" "$name" "$path"
+  helm upgrade --install --wait --timeout $timeout $MASTER_FLAG "${HELM_VALUES_ARGS[@]}" --namespace "$namespace" "$name" "$path"
 
   if [[ -v CANARY_DEPLOYMENT ]]; then
     TEST_NAME="[Helm] Rollback chart $name"
@@ -112,20 +133,34 @@ function deployCertManager() {
       deploy    cert-manager cert-manager cert-manager/
     fi
 }
+
 function deployIAP() {
     # We might have not configured IAP which results in nothing being deployed. This triggers https://github.com/helm/helm/issues/4295 and marks this as failed
     # We hack around this by grepping for a string that is mandatory in the values file of IAP
-    # to determine if its configured, because am empty chart leads to Helm doing weird things
+    # to determine if its configured, because an empty chart leads to Helm doing weird things
     if [[ -v DEPLOY_IAP ]]; then
-      ### not used until iap ca field is not in chart
-      if grep -q oidc_issuer_url "$VALUES_FILE"; then
+      # Check all values files to see if oidc_issuer_url occurs
+      local iap_configured=false
+      for value_file in "${HELM_VALUES_ARGS[@]}"; do
+        # Array elements have the following form: --values "/abs/path"
+        # We only need the path:
+        if [[ "$value_file" == --values ]]; then
+          continue
+        fi
+        ### not used until iap ca field is not in chart
+        if grep -q 'oidc_issuer_url' "$value_file"; then
+          iap_configured=true
+          break
+        fi
+      done
+      
+      if [[ "$iap_configured" == true ]]; then
         deploy iap iap iap/
       else
         echodate "Skipping IAP deployment because discovery_url is unset in values file"
       fi
     fi
 }
-
 
 echodate "Deploying $DEPLOY_STACK stack..."
 
