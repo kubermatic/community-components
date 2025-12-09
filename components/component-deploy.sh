@@ -12,32 +12,45 @@ DEPLOY_SGW="service-gateway"
 DEPLOY_THANOS_SEED_INGRESS="thanos-seed-ingress"
 DEPLOY_VMWARE_EXPORTER="vmware-exporter"
 
-if [[ $# -lt 4 ]] || [[ "$1" == "--help" ]]; then
-  echo "ARGUMENTS:"$*
-  echo ""
-  echo "Usage: $(basename \"$0\") path/to/VALUES_FILES path/to/VALUE_FILE_OVERRIDE path/to/CHART_FOLDER ($DEPLOY_S3_SYNCER|$DEPLOY_SGW|$DEPLOY_RCLONE_S3_SYNCER|$DEPLOY_THANOS_SEED_INGRESS|$DEPLOY_VMWARE_EXPORTER)"
+if [[ $# -lt 1 ]] || [[ "$1" == "--help" ]]; then
+  echo "Usage: $(basename "$0") path/to/values1.yaml [values2.yaml ...] path/to/CHART_FOLDER ($DEPLOY_S3_SYNCER|$DEPLOY_SGW|$DEPLOY_RCLONE_S3_SYNCER|$DEPLOY_THANOS_SEED_INGRESS|$DEPLOY_VMWARE_EXPORTER)"
   exit 1
 fi
 
-VALUES_FILE=$(realpath "$1")
-if [[ ! -f "$VALUES_FILE" ]]; then
-    echodate -e "'values.yaml' in folder not found! \nCONTENT $VALUES_FILE:\n`ls -l $VALUES_FILE/..`"
+args=("$@")
+
+# at least 4 arguments
+if [[ ${#args[@]} -lt 4 ]] || [[ "$1" == "--help" ]]; then
+  echo "Usage: $(basename \"$0\") path/to/values1.yaml [values2.yaml ...] path/to/CHART_FOLDER ($DEPLOY_S3_SYNCER|$DEPLOY_SGW|$DEPLOY_RCLONE_S3_SYNCER|$DEPLOY_THANOS_SEED_INGRESS|$DEPLOY_VMWARE_EXPORTER)"
+  exit 1
+fi
+
+# helm values files = args[1..-3]
+HELM_VALUES_ARGS=()
+for (( i=1; i<${#args[@]}-2; i++ )); do
+  VALUES_FILE="$(realpath "${args[$i]}")"
+  if [[ ! -f "$VALUES_FILE" ]]; then
+    echodate "'values.yaml' not found: $VALUES_FILE"
     exit 1
+  fi
+  HELM_VALUES_ARGS+=( --values "$VALUES_FILE" )
+done
+
+if [[ ${#HELM_VALUES_ARGS[@]} -eq 0 ]]; then
+  echodate "At least one values.yaml must be provided."
+  exit 1
 fi
 
-VALUE_FILE_OVERRIDE=$2
-if [[ ! -z "$VALUE_FILE_OVERRIDE" ]]; then
-    VALUE_FILE_OVERRIDE=$(realpath "$2")
-fi
-
-CHART_FOLDER=$(realpath "$3")
+# CHART_FOLDER = penultimate argument
+CHART_FOLDER=$(realpath "${args[-2]}")
 if [[ ! -d "$CHART_FOLDER" ]]; then
     echodate "CHART_FOLDER not found! $CHART_FOLDER"
     exit 1
 fi
 
 ### verification is checked in case expresion
-DEPLOY_STACK="$4"
+# DEPLOY_STACK = last argument
+DEPLOY_STACK="${args[-1]}"
 
 HELM_EXTRA_ARGS=${HELM_EXTRA_ARGS:-""} #"--dry-run --debug"
 
@@ -71,7 +84,7 @@ function deploy {
 
   TEST_NAME="[Helm] Deploy chart $name into namespace $namespace"
   echodate "Upgrading $TEST_NAME ..."
-  helm upgrade --create-namespace --install --wait $HELM_EXTRA_ARGS --timeout $timeout --values "$VALUES_FILE" --values "$VALUE_FILE_OVERRIDE" --namespace "$namespace" "$name" "$path"
+  helm upgrade --create-namespace --install --wait $HELM_EXTRA_ARGS --timeout $timeout "${HELM_VALUES_ARGS[@]}" --namespace "$namespace" "$name" "$path"
 
   unset TEST_NAME
 }
