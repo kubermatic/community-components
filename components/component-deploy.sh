@@ -27,7 +27,7 @@ fi
 
 # helm values files = args[1..-3]
 HELM_VALUES_ARGS=()
-for (( i=1; i<${#args[@]}-2; i++ )); do
+for (( i=0; i<${#args[@]}-2; i++ )); do
   VALUES_FILE="$(realpath "${args[$i]}")"
   if [[ ! -f "$VALUES_FILE" ]]; then
     echodate "'values.yaml' not found: $VALUES_FILE"
