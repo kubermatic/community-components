@@ -6,7 +6,7 @@ BASEDIR=$(dirname "$0")
 source $BASEDIR/../../hack/lib.sh
 
 if [[ $# -lt 1 ]] || [[ "$1" == "--help" ]]; then
-  echo "Usage: $(basename \"$0\") (master|seed) path/to/VALUES_FILE1 [path/to/VALUES_FILE2 ...] path/to/CHART_FOLDER (monitoring|logging|backup|kubermatic|kubermatic-deployment-only)"
+  echo "Usage: $(basename \"$0\") (master|seed) path/to/values1.yaml [path/to/values2.yaml ...] path/to/CHART_FOLDER (monitoring|logging|backup|kubermatic|kubermatic-deployment-only)"
   echo "FYI: kubermatic|kubermatic-deployment-only is deprecated due to new kubermatic-installer binary"
   exit 1
 fi
@@ -24,7 +24,7 @@ args=("$@")
 
 # at least 4 arguments
 if [[ ${#args[@]} -lt 4 ]]; then
-  echo "Usage: $(basename "$0") (master|seed) values1.yaml [values2.yaml ...] path/to/CHART_FOLDER (monitoring|logging|backup|kubermatic|kubermatic-deployment-only)"
+  echo "Usage: $(basename "$0") (master|seed) path/to/values1.yaml [path/to/values2.yaml ...] path/to/CHART_FOLDER (monitoring|logging|backup|kubermatic|kubermatic-deployment-only)"
   exit 1
 fi
 
