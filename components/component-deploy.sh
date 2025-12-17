@@ -19,13 +19,13 @@ fi
 
 args=("$@")
 
-# at least 4 arguments
-if [[ ${#args[@]} -lt 4 ]] || [[ "$1" == "--help" ]]; then
+# at least 3 arguments
+if [[ ${#args[@]} -lt 3 ]] || [[ "$1" == "--help" ]]; then
   echo "Usage: $(basename \"$0\") path/to/values1.yaml [values2.yaml ...] path/to/CHART_FOLDER ($DEPLOY_S3_SYNCER|$DEPLOY_SGW|$DEPLOY_RCLONE_S3_SYNCER|$DEPLOY_THANOS_SEED_INGRESS|$DEPLOY_VMWARE_EXPORTER)"
   exit 1
 fi
 
-# helm values files = args[1..-3]
+# helm values files = args[0..-2]
 HELM_VALUES_ARGS=()
 for (( i=0; i<${#args[@]}-2; i++ )); do
   VALUES_FILE="$(realpath "${args[$i]}")"
