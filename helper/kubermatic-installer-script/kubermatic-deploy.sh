@@ -28,7 +28,7 @@ if [[ ${#args[@]} -lt 4 ]]; then
   exit 1
 fi
 
-# helm values files = args[1..-3]
+# helm values files = args[1..-2]
 HELM_VALUES_ARGS=()
 for (( i=1; i<${#args[@]}-2; i++ )); do
   VALUES_FILE="$(realpath "${args[$i]}")"
