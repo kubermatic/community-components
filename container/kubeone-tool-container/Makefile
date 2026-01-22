@@ -1,5 +1,5 @@
 ## See https://github.com/kubermatic/kubeone/releases
-KUBEONE_VERSION ?= 1.12.2
+KUBEONE_VERSION ?= 1.12.3
 KUBEOVN_KO_RELEASE_VERSION ?= 1.14
 DOCKER_REPO ?= 'quay.io/kubermatic-labs/kubeone-tooling'
 FINAL_TAG ?= ${KUBEONE_VERSION}
