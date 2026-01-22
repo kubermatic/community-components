@@ -53,7 +53,8 @@ RUN apt-get update && apt-get install -y \
     uuid-runtime \
     iperf3 \
     fio \
-    figlet lolcat && \
+    figlet lolcat \
+    just && \
     apt autoremove && apt autoclean && apt-get clean -y
 
 RUN wget --no-check-certificate -qO -  https://apt.releases.hashicorp.com/gpg | gpg --dearmor | tee /etc/apt/trusted.gpg.d/hashicorp.gpg  > /dev/null && \
@@ -99,6 +100,18 @@ RUN echo "deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://p
     apt-get update && \
     apt-get install -y kubectl helm jq && \
     apt-get clean
+
+# Install Helmfile and required Helm plugins
+RUN HELMFILE_VERSION=$(curl -s https://api.github.com/repos/helmfile/helmfile/releases/latest | jq -r '.tag_name' | sed 's/v//') && \
+    curl -LO "https://github.com/helmfile/helmfile/releases/download/v${HELMFILE_VERSION}/helmfile_${HELMFILE_VERSION}_linux_amd64.tar.gz" && \
+    tar -xzf helmfile_${HELMFILE_VERSION}_linux_amd64.tar.gz && \
+    mv helmfile /usr/local/bin/helmfile && \
+    chmod +x /usr/local/bin/helmfile && \
+    rm -f helmfile_${HELMFILE_VERSION}_linux_amd64.tar.gz && \
+    # Install helm-diff plugin (required by helmfile)
+    helm plugin install https://github.com/databus23/helm-diff && \
+    # Install helm-secrets plugin (commonly used with helmfile)
+    helm plugin install https://github.com/jkroepke/helm-secrets
 
 # Install Yq
 RUN RELEASE_URL=$(curl -Ls -o /dev/null -w %{url_effective} https://github.com/mikefarah/yq/releases/latest) && \
@@ -161,7 +174,7 @@ RUN     apt-get update -y && \
     apt install python3-openstackclient -y
 
 ### INSTALL helper
-RUN wget https://rawgit.com/kubermatic/fubectl/master/fubectl.source -O /bin/fubectl.source && \
+RUN wget https://raw.githubusercontent.com/kubermatic/fubectl/refs/heads/main/fubectl.source -O /bin/fubectl.source && \
     # powerline go
     wget https://github.com/justjanne/powerline-go/releases/latest/download/powerline-go-linux-amd64 -O /bin/powerline-go && \
     chmod +x /bin/powerline-go
@@ -205,7 +218,8 @@ USER ${USER}
 
 # Install minio Operator Kubectl krew plugin, disk utils, resource-capacity and service-account creation
 # Install fubectl dependencies
-RUN bash -ic 'kubectl krew install minio df-pv pv-migrate pvmigrate resource-capacity view-serviceaccount-kubeconfig virt view-secret kyverno oidc-login && kinstall'
+RUN bash -ic 'kubectl krew install minio df-pv pv-migrate pvmigrate resource-capacity view-serviceaccount-kubeconfig virt view-secret kyverno oidc-login && kinstall' && \
+    ln -s "$(find $USER_HOME/.krew -name virtctl -type f 2>/dev/null | head -1)" $USER_HOME/.krew/bin/virtctl
 
 ### Init terrafrom poviders to cache provider binaries for offline setups
 COPY terraform_libraries.tf .
