@@ -20,14 +20,14 @@ docker-build:
 		-t ${DOCKER_REPO}:${TAG_DATE} .
 
 docker-run-local: docker-build
-	docker run -it -v $(shell pwd):/home/kubermatic/mnt ${DOCKER_REPO}:${TAG_DATE} bash
+	docker run --platform ${PLATFORM} -it -v $(shell pwd):/home/kubermatic/mnt ${DOCKER_REPO}:${TAG_DATE} bash
 docker-run-local-root: docker-build
-	docker run -it --user 0 -v $(shell pwd):/home/kubermatic/mnt ${DOCKER_REPO}:${TAG_DATE} bash
+	docker run --platform ${PLATFORM} -it --user 0 -v $(shell pwd):/home/kubermatic/mnt ${DOCKER_REPO}:${TAG_DATE} bash
 
 docker-run:
-	docker run -it -v $(shell pwd):/home/kubermatic/mnt ${DOCKER_REPO}:${KUBEONE_VERSION} bash
+	docker run --platform ${PLATFORM} -it -v $(shell pwd):/home/kubermatic/mnt ${DOCKER_REPO}:${KUBEONE_VERSION} bash
 docker-run-root:
-	docker run -it --user 0 -v $(shell pwd):/home/kubermatic/mnt ${DOCKER_REPO}:${KUBEONE_VERSION} bash
+	docker run --platform ${PLATFORM} -it --user 0 -v $(shell pwd):/home/kubermatic/mnt ${DOCKER_REPO}:${KUBEONE_VERSION} bash
 
 # update latest, version ref and set unique tag
 docker-release: docker-build

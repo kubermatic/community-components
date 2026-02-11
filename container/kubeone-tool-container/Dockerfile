@@ -53,8 +53,7 @@ RUN apt-get update && apt-get install -y \
     uuid-runtime \
     iperf3 \
     fio \
-    figlet lolcat \
-    just && \
+    figlet lolcat && \
     apt autoremove && apt autoclean && apt-get clean -y
 
 RUN wget --no-check-certificate -qO -  https://apt.releases.hashicorp.com/gpg | gpg --dearmor | tee /etc/apt/trusted.gpg.d/hashicorp.gpg  > /dev/null && \
@@ -100,6 +99,14 @@ RUN echo "deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://p
     apt-get update && \
     apt-get install -y kubectl helm jq && \
     apt-get clean
+
+# Install just from GitHub releases (Ubuntu packages are outdated)
+# https://github.com/casey/just/
+RUN JUST_VERSION=$(curl -s https://api.github.com/repos/casey/just/releases/latest | jq -r '.tag_name') && \
+    curl -LO "https://github.com/casey/just/releases/download/${JUST_VERSION}/just-${JUST_VERSION}-x86_64-unknown-linux-musl.tar.gz" && \
+    tar -xzf just-${JUST_VERSION}-x86_64-unknown-linux-musl.tar.gz just && \
+    install -o root -g root -m 0755 just /usr/local/bin/just && \
+    rm -f just just-${JUST_VERSION}-x86_64-unknown-linux-musl.tar.gz
 
 # Install Helmfile and required Helm plugins
 RUN HELMFILE_VERSION=$(curl -s https://api.github.com/repos/helmfile/helmfile/releases/latest | jq -r '.tag_name' | sed 's/v//') && \
