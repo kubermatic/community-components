@@ -1,5 +1,5 @@
 ## See https://github.com/kubermatic/kubeone/releases
-KUBEONE_VERSION ?= 1.12.2
+KUBEONE_VERSION ?= 1.12.3
 KUBEOVN_KO_RELEASE_VERSION ?= 1.14
 DOCKER_REPO ?= 'quay.io/kubermatic-labs/kubeone-tooling'
 FINAL_TAG ?= ${KUBEONE_VERSION}
@@ -20,14 +20,14 @@ docker-build:
 		-t ${DOCKER_REPO}:${TAG_DATE} .
 
 docker-run-local: docker-build
-	docker run -it -v $(shell pwd):/home/kubermatic/mnt ${DOCKER_REPO}:${TAG_DATE} bash
+	docker run --platform ${PLATFORM} -it -v $(shell pwd):/home/kubermatic/mnt ${DOCKER_REPO}:${TAG_DATE} bash
 docker-run-local-root: docker-build
-	docker run -it --user 0 -v $(shell pwd):/home/kubermatic/mnt ${DOCKER_REPO}:${TAG_DATE} bash
+	docker run --platform ${PLATFORM} -it --user 0 -v $(shell pwd):/home/kubermatic/mnt ${DOCKER_REPO}:${TAG_DATE} bash
 
 docker-run:
-	docker run -it -v $(shell pwd):/home/kubermatic/mnt ${DOCKER_REPO}:${KUBEONE_VERSION} bash
+	docker run --platform ${PLATFORM} -it -v $(shell pwd):/home/kubermatic/mnt ${DOCKER_REPO}:${KUBEONE_VERSION} bash
 docker-run-root:
-	docker run -it --user 0 -v $(shell pwd):/home/kubermatic/mnt ${DOCKER_REPO}:${KUBEONE_VERSION} bash
+	docker run --platform ${PLATFORM} -it --user 0 -v $(shell pwd):/home/kubermatic/mnt ${DOCKER_REPO}:${KUBEONE_VERSION} bash
 
 # update latest, version ref and set unique tag
 docker-release: docker-build
