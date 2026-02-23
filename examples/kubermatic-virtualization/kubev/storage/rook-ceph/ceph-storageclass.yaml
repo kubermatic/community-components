@@ -1,0 +1,84 @@
+# Rook Ceph Storage Classes for KubeVirt
+# Reference: https://rook.io/docs/rook/v1.19
+#
+# Apply after CephCluster is healthy:
+#   kubectl apply -f ceph-storageclass.yaml
+#
+# Verify:
+#   kubectl get sc
+#   kubectl -n rook-ceph exec -it deploy/rook-ceph-tools -- ceph status
+
+---
+# CephBlockPool for RBD storage
+apiVersion: ceph.rook.io/v1
+kind: CephBlockPool
+metadata:
+  name: replicapool
+  namespace: rook-ceph
+spec:
+  failureDomain: host
+  replicated:
+    size: 3
+    requireSafeReplicaSize: false  # Set to true in production with 3+ nodes
+
+---
+# Primary StorageClass for KubeVirt VMs (default)
+# Uses RBD block storage optimized for VM workloads
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: kubev-main
+  annotations:
+    storageclass.kubernetes.io/is-default-class: "true"
+provisioner: rook-ceph.rbd.csi.ceph.com
+parameters:
+  clusterID: rook-ceph
+  pool: replicapool
+  imageFormat: "2"
+  imageFeatures: layering
+
+  csi.storage.k8s.io/provisioner-secret-name: rook-csi-rbd-provisioner
+  csi.storage.k8s.io/provisioner-secret-namespace: rook-ceph
+  csi.storage.k8s.io/controller-expand-secret-name: rook-csi-rbd-provisioner
+  csi.storage.k8s.io/controller-expand-secret-namespace: rook-ceph
+  csi.storage.k8s.io/node-stage-secret-name: rook-csi-rbd-node
+  csi.storage.k8s.io/node-stage-secret-namespace: rook-ceph
+
+  csi.storage.k8s.io/fstype: ext4
+reclaimPolicy: Delete
+allowVolumeExpansion: true
+
+---
+# KubeVirt VM StorageClass - optimized for virtual machine disks
+# Features:
+#   - Block volume mode for direct disk access (no filesystem overhead)
+#   - RWX support for live migration (requires exclusive-lock feature)
+#   - Immediate binding for predictable VM scheduling
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: kubev-vms
+  annotations:
+    # CDI config for e.g. packer to use this storage class
+    storageclass.cdi.kubevirt.io/is-default-virt-class: true
+  labels:
+    app: kubevirt
+provisioner: rook-ceph.rbd.csi.ceph.com
+parameters:
+  clusterID: rook-ceph
+  pool: replicapool
+  imageFormat: "2"
+  # RBD features for KubeVirt live migration:
+  # - exclusive-lock: required for RWX block volumes
+  # - object-map + fast-diff: efficient cloning and snapshots
+  imageFeatures: layering,exclusive-lock,object-map,fast-diff
+
+  csi.storage.k8s.io/provisioner-secret-name: rook-csi-rbd-provisioner
+  csi.storage.k8s.io/provisioner-secret-namespace: rook-ceph
+  csi.storage.k8s.io/controller-expand-secret-name: rook-csi-rbd-provisioner
+  csi.storage.k8s.io/controller-expand-secret-namespace: rook-ceph
+  csi.storage.k8s.io/node-stage-secret-name: rook-csi-rbd-node
+  csi.storage.k8s.io/node-stage-secret-namespace: rook-ceph
+reclaimPolicy: Delete
+allowVolumeExpansion: true
+volumeBindingMode: Immediate

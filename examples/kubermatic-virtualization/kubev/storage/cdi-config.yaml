@@ -1,0 +1,15 @@
+apiVersion: cdi.kubevirt.io/v1beta1
+kind: CDI
+metadata:
+  annotations:
+    cdi.kubevirt.io/configAuthority: ""
+  name: cdi
+spec:
+  config:
+    featureGates:
+    - HonorWaitForFirstConsumer
+    - HotplugVolumes
+    - WebhookPvcRendering
+    # somehow tools like packer need this
+    scratchSpaceStorageClass: kubev-vms
+  imagePullPolicy: IfNotPresent
