@@ -50,6 +50,9 @@ export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"
 #### terrafrom autocompletion
 complete -C /usr/bin/terraform terraform
 
+### just autocompletion
+source <(just --completions bash)
+
 ### kubeone autocompletion
 source <(kubeone completion bash)
 
