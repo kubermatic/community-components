@@ -5,9 +5,9 @@ kind: KubeVCluster
 networkConfiguration:
   dnsServer: 10.0.1.2
   # POD CIDR range
-  networkCIDR: 10.44.0.0/24
+  networkCIDR: 172.25.0.0/24
   # Gateway at POD default kube-ovn network
-  gatewayIP: 10.44.0.1
+  gatewayIP: 172.25.0.1
 
 
 #offlineSettings:
