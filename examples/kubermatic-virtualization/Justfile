@@ -1,0 +1,60 @@
+
+_default:
+    @just --list
+set shell := ["bash", "-uc"]
+
+KUBEV_FOLDER := source_directory()/"kubev"
+KUBEV_KUBECONFIG := KUBEV_FOLDER/"kubev-kubeconfig.crypt.yaml"
+
+#### Local KubeV Tooling
+KUBEV_SSH_KEY := source_directory()/"../git-submodules/secrets/ssh/id_rsa"
+KUBEV_TF_INFRA := source_directory()/"./keepalived-lb-tf-infra"
+DOCKER_EXTRA_FLAG := "--detach"
+CONTAINER_NAME := "kubev"
+ENV_FILE := source_directory()/".env"
+
+local-kubev-tooling-start:
+    #!/usr/bin/env bash
+    source "{{ ENV_FILE }}"
+    docker pull --platform linux/amd64 ${DOCKER_REPO}:${TOOLING_CONTAINER_TAG}
+    docker run -it --platform linux/amd64 --user 0 --rm \
+        --name {{ CONTAINER_NAME }} {{ DOCKER_EXTRA_FLAG }} \
+        -v {{ source_directory() }}/../../../:/data \
+        ${DOCKER_REPO}:${TOOLING_CONTAINER_TAG} bash
+    just local-kubev-tooling-exec
+
+local-kubev-tooling-rm:
+    docker rm -f {{ CONTAINER_NAME }}
+
+local-kubev-tooling-exec:
+    docker exec -w /data -it {{ CONTAINER_NAME }} bash
+
+load-env:
+    @test -f {{ KUBEV_SSH_KEY }} && chmod 600 {{ KUBEV_SSH_KEY }} && ssh-add {{ KUBEV_SSH_KEY }} && echo "[ok] "|| (echo "ERROR: ssh key permission ..." && exit 2)
+
+#### #### KubeV Cluster Management
+#### Terraform (K8s API LB)
+
+kubev-lb-tf-init: load-env
+    cd {{ KUBEV_TF_INFRA }} && terraform init
+
+kubev-lb-tf-apply: load-env
+    cd {{ KUBEV_TF_INFRA }} && terraform apply
+
+kubev-lb-output: load-env
+    cd {{ KUBEV_TF_INFRA }} && terraform output
+
+kubev-apply:
+    kubermatic-virtualization version > {{ KUBEV_FOLDER }}/kubermatic-virtualization.version.txt
+    kubermatic-virtualization apply --verbose -f {{ KUBEV_FOLDER }}/kubev.yaml
+    cp ./*-kubeconfig {{ KUBEV_KUBECONFIG }}
+    just untaint-cp-nodes
+    just kubev-apply-services
+
+kubev-apply-services:
+	cd {{ KUBEV_FOLDER }} && KUBECONFIG={{ KUBEV_KUBECONFIG }} helmfile sync
+
+#### Kubernetes Helpers
+untaint-cp-nodes:
+	kubectl --kubeconfig {{ KUBEV_KUBECONFIG }} taint nodes --all node-role.kubernetes.io/master- || echo "... untainted"
+	kubectl --kubeconfig {{ KUBEV_KUBECONFIG }} taint nodes --all node-role.kubernetes.io/control-plane- || echo "... untainted"

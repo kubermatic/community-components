@@ -1,0 +1,87 @@
+# Rook Ceph Cluster Configuration for KubeVirt
+# Reference: https://rook.io/docs/rook/v1.19/CRDs/Cluster/ceph-cluster-crd/
+#
+# Apply after the rook-ceph operator is running:
+#   kubectl apply -f ceph-cluster.yaml
+#
+# Monitor cluster status:
+#   kubectl -n rook-ceph get cephcluster
+#   kubectl -n rook-ceph get pods
+#   kubectl -n rook-ceph exec -it deploy/rook-ceph-tools -- ceph status
+
+apiVersion: ceph.rook.io/v1
+kind: CephCluster
+metadata:
+  name: rook-ceph
+  namespace: rook-ceph
+spec:
+  # Ceph Squid (v19.2.3) - recommended for Rook v1.19
+  cephVersion:
+    image: quay.io/ceph/ceph:v19.2.3
+    allowUnsupported: false
+
+  # Data directory - must persist across reboots
+  dataDirHostPath: /var/lib/rook
+
+  # Monitor configuration
+  mon:
+    count: 3
+    allowMultiplePerNode: true  # Set to false in production with 3+ dedicated nodes
+
+  # Manager configuration
+  mgr:
+    count: 2
+    allowMultiplePerNode: true  # Set to false in production
+    modules:
+      - name: pg_autoscaler
+        enabled: true
+
+  # Dashboard - access via: kubectl -n rook-ceph port-forward svc/rook-ceph-mgr-dashboard 8443:8443
+  dashboard:
+    enabled: true
+    #ssl: true
+
+  # Storage configuration - uses /dev/sdb on all nodes
+  storage:
+    useAllNodes: true
+    useAllDevices: false
+    devices:
+      - name: "sdb"
+
+  # Placement - allow running on control-plane nodes
+  placement:
+    all:
+      tolerations:
+        - key: "node-role.kubernetes.io/control-plane"
+          operator: "Exists"
+          effect: "NoSchedule"
+        - key: "node-role.kubernetes.io/master"
+          operator: "Exists"
+          effect: "NoSchedule"
+
+  # Resource limits (adjust based on your environment)
+  resources:
+    mgr:
+      limits:
+        memory: "1Gi"
+      requests:
+        cpu: "250m"
+        memory: "512Mi"
+    mon:
+      limits:
+        memory: "2Gi"
+      requests:
+        cpu: "250m"
+        memory: "512Mi"
+    osd:
+      limits:
+        memory: "4Gi"
+      requests:
+        cpu: "250m"
+        memory: "1Gi"
+
+  # Disruption management
+  disruptionManagement:
+    managePodBudgets: true
+    osdMaintenanceTimeout: 30
+    pgHealthCheckTimeout: 0
