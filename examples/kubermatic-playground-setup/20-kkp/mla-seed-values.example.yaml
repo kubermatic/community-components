@@ -1,0 +1,128 @@
+iap:
+  oidc_issuer_url: https://<DOMAIN>/dex
+  replicas: 1
+  deployments:
+    grafana:
+      name: grafana
+      client_id: grafana
+      client_secret: <SECRET>
+      encryption_key: <SECRET>
+      upstream_service: grafana.monitoring.svc.cluster.local
+      upstream_port: 3000
+      ingress:
+        host: "grafana.<SEED_DOMAIN>"
+      config:
+        scope: "groups openid email"
+        ## do not route health endpoint through the proxy
+        skip_auth_regex:
+          - '/api/health'
+        ## auto-register users based on their email address
+        ## Grafana is configured to look for the X-Forwarded-Email header
+        pass_user_headers: true
+        # oauth2-proxy requires some sort of restriction to be here
+        email_domains: ['*']
+        # Restrict access even further (not necessary here because Dex is already
+        # configured to only leave kubermatic peeps in).
+        # githubConfig:
+        #   org: kubermatic
+        #   team: "developers,marketing,sales"
+        # googleConfig:
+        #   groups: [group1, group2, group3]
+
+    prometheus:
+      name: prometheus
+      client_id: prometheus
+      client_secret: <SECRET>
+      encryption_key: <SECRET>
+      upstream_service: prometheus.monitoring.svc.cluster.local
+      upstream_port: 9090
+      ingress:
+        host: "prometheus.<SEED_DOMAIN>"
+      config:
+        scope: "groups openid email"
+        # oauth2-proxy requires some sort of restriction to be here
+        email_domains: ['*']
+        ## do not route health endpoint through the proxy
+        skip_auth_regex:
+          - '/-/healthy'
+
+    alertmanager:
+      name: alertmanager
+      client_id: alertmanager
+      client_secret: <SECRET>
+      encryption_key: <SECRET>
+      upstream_service: alertmanager.monitoring.svc.cluster.local
+      upstream_port: 9093
+      ingress:
+        host: "alertmanager.<SEED_DOMAIN>"
+      config:
+        scope: "groups openid email"
+        # oauth2-proxy requires some sort of restriction to be here
+        email_domains: ['*']
+        ## do not route health endpoint through the proxy
+        skip_auth_regex:
+          - '/-/healthy'
+
+    karma:
+      name: karma
+      client_id: karma
+      client_secret: <SECRET>
+      encryption_key: <SECRET>
+      upstream_service: karma.monitoring.svc.cluster.local
+      upstream_port: 8080
+      ingress:
+        host: "karma.<SEED_DOMAIN>"
+      config:
+        scope: "groups openid email"
+        # oauth2-proxy requires some sort of restriction to be here
+        email_domains: ['*']
+        ## do not route health endpoint through the proxy
+        skip_auth_regex:
+          - '/-/healthy'
+
+#minio:
+#  storageClass: kubermatic-backup
+#  credentials:
+#    accessKey: <SECRET>
+#    secretKey: <SECRET>
+
+grafana:
+  user: YWRtaW4= # admin
+  password: <BASE64_ENCODED_PASSWORD>
+  host: "grafana.<SEED_DOMAIN>"
+  provisioning:
+    datasources:
+      prometheusServices:
+        - prometheus
+      lokiServices:
+        - loki
+    configuration:
+      auto_assign_org_role: Editor
+      disable_login_form: false
+  dashboards:
+    editable: true
+    datasourceHide: 0
+
+alertmanager:
+  host: "alertmanager.<SEED_DOMAIN>"
+  replicas: 1
+  storageClass: kubermatic-backup
+  config:
+    route:
+      receiver: blackhole
+    receivers:
+      - name: blackhole
+    templates:
+      - '*.tmpl'
+
+prometheus:
+  host: "prometheus.<SEED_DOMAIN>"
+  replicas: 1
+  storageClass: kubermatic-backup
+  externalLabels:
+    seed_cluster: dev
+  tsdb:
+    retentionTime: 24h
+  scraping:
+    blackBoxExporter:
+      enabled: false

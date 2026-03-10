@@ -1,0 +1,20 @@
+# Terraform config & state (persistent/important!)
+/00-terraform/aws/terraform.tfvars
+/00-terraform/aws/.terraform*
+/00-terraform/aws/terraform.tfstate
+/00-terraform/aws/terraform.tfstate.backup
+/00-terraform/aws/tf.json
+
+# KubeOne resources (ephemeral)
+/10-kubeone/*.tar.gz
+/*-kubeconfig
+
+# KKP resources (persistent but can be restored from the k8s cluster in doubt)
+/20-kkp/release
+/20-kkp/password
+/20-kkp/values.yaml
+/20-kkp/mla-seed-values.yaml
+/20-kkp/mla-usercluster-values.yaml
+/20-kkp/kubermatic.yaml
+/20-kkp/kubeconfig
+
