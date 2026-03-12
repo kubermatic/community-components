@@ -26,7 +26,7 @@ The following CLI tools must be installed on your host:
 This section explains how to create/upgrade a Kubernetes cluster.
 The process is idempotent so that you can repeat it whenever you change the configuration or want to upgrade your cluster.
 
-1. Specify your individual Terraform configuration within `00-terraform/terraform.tfvars`, e.g.:
+1. Create the file `00-terraform/aws/terraform.tfvars` and specify your individual configuration in there, e.g.:
 ```
 aws_region = "eu-central-1"
 cluster_name = "johndoe-k1-kkp"
