@@ -47,7 +47,7 @@ source "$(dirname "$0")/route53-login.sh"
 
 echo "${ACTION}ing $TYPE record for $DOMAIN -> $VALUE in zone $ZONEID"
 
-CHANGE_BATCH="$(jq -n --arg a "$ACTION" --arg d "$DOMAIN" --arg t $TYPE --arg v "$VALUE" \
+CHANGE_BATCH="$(jq -n --arg a "$ACTION" --arg d "$DOMAIN" --arg t "$TYPE" --arg v "$VALUE" \
 	'{Changes:[{Action:$a,ResourceRecordSet:{Name:$d,Type:$t,TTL:300,ResourceRecords:[{Value:$v}]}}]}')"
 
 aws route53 change-resource-record-sets \
