@@ -7,13 +7,14 @@
 set -euo pipefail
 
 : ${VAULT_ADDR:=https://vault.kubermatic.com}
+: ${VAULT_OIDC_AUTH_PATH:=loodse}
 : ${VAULT_AWS_PATH:=dev/aws-playground}
 
 export VAULT_ADDR
 
 if ! vault token lookup &>/dev/null; then
 	echo "Logging in to Vault..."
-	vault login --method=oidc --path=loodse
+	vault login --method=oidc --path="$VAULT_OIDC_AUTH_PATH"
 fi
 
 echo "Fetching AWS credentials from Vault..."
