@@ -1,0 +1,63 @@
+iap:
+  oidc_issuer_url: https://<DOMAIN>/dex
+  deployments:
+    grafana:
+      name: grafana
+      replicas: 1
+      client_id: mla-grafana
+      client_secret: <SECRET>
+      encryption_key: <SECRET>
+      upstream_service: grafana.mla.svc.cluster.local
+      upstream_port: 80
+      ingress:
+        host: "grafana.<USER_CLUSTER_DOMAIN>"
+      config:
+        scope: "groups openid email"
+        # oauth2-proxy requires some sort of restriction to be here
+        email_domains: ['*']
+        ## do not route health endpoint through the proxy
+        skip_auth_regex:
+          - '/api/health'
+        ## auto-register users based on their email address
+        ## Grafana is configured to look for the X-Forwarded-Email header
+        pass_user_headers: true
+        # Restrict access even further (not necessary here because Dex is already
+        # configured to only leave kubermatic peeps in).
+        # githubConfig:
+        #   org: kubermatic
+        #   team: "developers,marketing,sales"
+        # googleConfig:
+        #   groups: [group1, group2, group3]
+
+    alertmanager:
+      name: alertmanager
+      replicas: 1
+      client_id: mla-alertmanager
+      client_secret: <SECRET>
+      encryption_key: <SECRET>
+      upstream_service: alertmanager-proxy.mla.svc.cluster.local
+      upstream_port: 8080
+      ingress:
+        host: "alertmanager.<USER_CLUSTER_DOMAIN>"
+      config:
+        scope: "groups openid email"
+        # oauth2-proxy requires some sort of restriction to be here
+        email_domains: ['*']
+        ## do not route health endpoint through the proxy
+        skip_auth_regex:
+          - '/-/healthy'
+
+minio:
+  persistence:
+    storageClass: kubermatic-backup
+
+cortex:
+  alertmanager:
+    persistentVolume:
+      storageClass: kubermatic-backup
+  compactor:
+    persistentVolume:
+      storageClass: kubermatic-backup
+  store_gateway:
+    persistentVolume:
+      storageClass: kubermatic-backup

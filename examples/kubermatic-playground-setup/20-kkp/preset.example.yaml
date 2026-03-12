@@ -1,0 +1,11 @@
+apiVersion: kubermatic.k8c.io/v1
+kind: Preset
+metadata:
+  name: kubermatic
+spec:
+  aws:
+    accessKeyID: <AWS_ACCESS_KEY_ID>
+    secretAccessKey: <AWS_SECRET_ACCESS_KEY>
+    vpcID: <AWS_VPC_ID>
+    # Refers to a datacenter defined within seed.yaml
+    datacenter: aws-eu-central-1a
