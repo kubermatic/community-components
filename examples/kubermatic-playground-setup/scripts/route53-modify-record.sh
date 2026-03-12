@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Creates or updates an A or CNAME DNS record within Route53
-# Usage: ./route53-upsert-record.sh ZONEID DOMAIN TYPE VALUE
+# Usage: ./route53-modify-record.sh ACTION ZONEID DOMAIN TYPE VALUE
 
 usage() {
 	echo "Usage: $0 ACTION ZONEID DOMAIN TYPE VALUE" >&2
