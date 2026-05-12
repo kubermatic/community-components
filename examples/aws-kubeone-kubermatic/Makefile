@@ -42,9 +42,9 @@ kubeone-destroy: ## Destroy the Kubernetes cluster.
 kubeone-test: ## Test the Kubernetes cluster connectivity (listing nodes).
 	kubectl get nodes --kubeconfig="$(KUBECONFIG)"
 
-kkp-values: kkp-values.yaml kkp-kubermatic.yaml kkp-seed-mla-values ## Generate the configuration files.
+kkp-values: kkp-values.yaml kkp-kubermatic.yaml kkp-certificate-issuer.yaml kkp-seed-mla-values ## Generate the configuration files.
 
-kkp-apply: kkp-apply-master kkp-apply-seed kkp-apply-preset kkp-dns ## Install/update KKP master and seed into the Kubernetes cluster.
+kkp-apply: kkp-apply-master kkp-apply-certificate-issuer kkp-apply-seed kkp-apply-preset kkp-dns ## Install/update KKP master and seed into the Kubernetes cluster.
 
 kkp-apply-master: kkp-values ## Install/update KKP master into the Kubernetes cluster.
 	export KUBECONFIG="$(KUBECONFIG)"; \
@@ -103,7 +103,6 @@ kkp-apply-seed-mla: kkp-seed-mla-values ## Install/upgrade the seed cluster moni
 		--charts-directory=$(KKP_DIR)/release/$(KKP_RELEASE)/charts \
 		--helm-values=$(KKP_DIR)/mla-seed-values.yaml \
 		--mla-include-iap
-	# TODO: test --migrate-gateway-api here
 
 kkp-apply-usercluster-mla: kkp-usercluster-mla-values ## Install/upgrade the user cluster monitoring stack.
 	export KUBECONFIG="$(KUBECONFIG)"; \
@@ -177,6 +176,7 @@ kkp-values.yaml: kkp $(KKP_DIR)/password
 	RULES="$$RULES"' | .dex.config.staticClients += [{"id":"prometheus", "name":"Prometheus", "secret":strenv(SEED_PROMETHEUS_CLIENT_SECRET)}]'; \
 	RULES="$$RULES"' | .dex.config.staticClients += [{"id":"mla-grafana", "name":"Grafana (user cluster)", "secret":strenv(USER_GRAFANA_CLIENT_SECRET)}]'; \
 	RULES="$$RULES"' | .dex.config.staticClients += [{"id":"mla-alertmanager", "name":"Alertmanager (user cluster)", "secret":strenv(USER_ALERTMANAGER_CLIENT_SECRET)}]'; \
+	RULES="$$RULES"' | .dex.ingress.annotations["cert-manager.io/cluster-issuer"] = "letsencrypt-prod"'; \
 	RULES="$$RULES"' | .minio.storeSize="125Gi" | .minio.storageClass="kubermatic-backup"'; \
 	RULES="$$RULES"' | .minio.credentials={"accessKey":strenv(MINIO_ACCESS_KEY), "secretKey":strenv(MINIO_SECRET_KEY)}'; \
 	RULES="$$RULES"' | .telemetry.uuid=strenv(TELEMETRY_UUID)'; \
@@ -189,7 +189,7 @@ kkp-values.yaml: kkp $(KKP_DIR)/password
 	RULES='.dex.ingress.hosts[0].host=strenv(DOMAIN) | .dex.ingress.tls[0].hosts[0]=strenv(DOMAIN) | .dex.config.issuer="https://"+strenv(DOMAIN)+"/dex"'; \
 	RULES="$$RULES"' | (.dex.config.staticClients[] | select(.id=="kubermatic")) |= . + {"RedirectURIs":["https://"+strenv(DOMAIN),"https://"+strenv(DOMAIN)+"/projects"]}'; \
 	RULES="$$RULES"' | (.dex.config.staticClients[] | select(.id=="kubermaticIssuer")) |= . + {"RedirectURIs":["https://"+strenv(DOMAIN)+"/api/v1/kubeconfig","https://"+strenv(DOMAIN)+"/api/v2/kubeconfig/secret","https://"+strenv(DOMAIN)+"/api/v2/dashboard/login"]}'; \
-	RULES="$$RULES"' | (.dex.config.staticClients[] | select(.id=="grafana")) |= . + {"RedirectURIs":["https://grafana."+strenv(SEED_DOMAIN)]}'; \
+	RULES="$$RULES"' | (.dex.config.staticClients[] | select(.id=="grafana")) |= . + {"RedirectURIs":["https://grafana."+strenv(SEED_DOMAIN)+"/oauth/callback"]}'; \
 	RULES="$$RULES"' | (.dex.config.staticClients[] | select(.id=="alertmanager")) |= . + {"RedirectURIs":["https://alertmanager."+strenv(SEED_DOMAIN)]}'; \
 	RULES="$$RULES"' | (.dex.config.staticClients[] | select(.id=="karma")) |= . + {"RedirectURIs":["https://karma."+strenv(SEED_DOMAIN)]}'; \
 	RULES="$$RULES"' | (.dex.config.staticClients[] | select(.id=="prometheus")) |= . + {"RedirectURIs":["https://prometheus."+strenv(SEED_DOMAIN)]}'; \
@@ -210,10 +210,24 @@ kkp-kubermatic.yaml: kkp-values.yaml
 	@echo Updating domain and issuer client secret within $(KKP_DIR)/kubermatic.yaml; \
 	export DOMAIN="$(DOMAIN)"; \
 	export ISSUER_CLIENT_SECRET="`yq eval '.dex.config.staticClients[] | select(.id=="kubermaticIssuer").secret' "$(KKP_DIR)/values.yaml"`"; \
+	export CERTIFICATE_ISSUER="`yq eval '.dex.ingress.annotations["cert-manager.io/cluster-issuer"]' "$(KKP_DIR)/values.yaml"`"; \
 	RULES='.spec.ingress.domain=strenv(DOMAIN) | .spec.auth.tokenIssuer="https://"+strenv(DOMAIN)+"/dex"'; \
 	RULES="$$RULES | .spec.auth.issuerClientSecret=strenv(ISSUER_CLIENT_SECRET)"; \
+	RULES="$$RULES"' | .spec.ingress.certificateIssuer.name=strenv(CERTIFICATE_ISSUER)'; \
 	yq eval -i "$$RULES" "$(KKP_DIR)/kubermatic.yaml"
-	# TODO: configure let's encrypt prod issuer?!
+
+kkp-apply-certificate-issuer: kkp-certificate-issuer.yaml
+	export KUBECONFIG="$(KUBECONFIG)"; \
+	kubectl apply -f $(KKP_DIR)/certificate-issuer.yaml
+
+kkp-certificate-issuer.yaml:
+	@echo "Generating $(KKP_DIR)/certificate-issuer.yaml based on .env file"; \
+	set -eu; \
+	source .env; \
+	: "$$ADMIN_EMAIL"; \
+	export ADMIN_EMAIL; \
+	RULES='.spec.acme.email=strenv(ADMIN_EMAIL)'; \
+	yq eval "$$RULES" "$(KKP_DIR)/certificate-issuer.example.yaml" > "$(KKP_DIR)/certificate-issuer.yaml"
 
 $(KKP_DIR)/password:
 	cat /dev/urandom | base64 | tr -dc 'A-Za-z0-9' | head -c14 > "$(KKP_DIR)/password"

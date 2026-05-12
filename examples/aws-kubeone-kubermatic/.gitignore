@@ -10,11 +10,13 @@
 /*-kubeconfig
 
 # KKP resources (persistent but can be restored from the k8s cluster in doubt)
+.env
 /20-kkp/release
 /20-kkp/password
 /20-kkp/values.yaml
 /20-kkp/mla-seed-values.yaml
 /20-kkp/mla-usercluster-values.yaml
+/20-kkp/certificate-issuer.yaml
 /20-kkp/kubermatic.yaml
 /20-kkp/kubeconfig
 

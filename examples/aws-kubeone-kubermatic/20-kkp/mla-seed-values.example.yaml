@@ -98,7 +98,6 @@ grafana:
         - loki
     configuration:
       auto_assign_org_role: Editor
-      disable_login_form: false
   dashboards:
     editable: true
     datasourceHide: 0
