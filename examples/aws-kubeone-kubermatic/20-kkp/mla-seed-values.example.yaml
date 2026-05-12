@@ -104,9 +104,12 @@ grafana:
     datasourceHide: 0
 
 alertmanager:
+  # TODO: where's host defined? not here according to the chart's values.yaml
   host: "alertmanager.<SEED_DOMAIN>"
-  replicas: 1
-  storageClass: kubermatic-backup
+  replicaCount: 1
+  persistence:
+    storageClass: kubermatic-fast
+    size: 4Gi
   config:
     route:
       receiver: blackhole
@@ -118,7 +121,8 @@ alertmanager:
 prometheus:
   host: "prometheus.<SEED_DOMAIN>"
   replicas: 1
-  storageClass: kubermatic-backup
+  storageClass: kubermatic-fast
+  storageSize: 50Gi
   externalLabels:
     seed_cluster: dev
   tsdb:
