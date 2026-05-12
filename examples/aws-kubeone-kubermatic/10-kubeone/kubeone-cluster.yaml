@@ -7,3 +7,8 @@ versions:
 cloudProvider:
   aws: {}
   external: true
+
+addons:
+  enable: true
+  addons:
+    - name: cluster-autoscaler

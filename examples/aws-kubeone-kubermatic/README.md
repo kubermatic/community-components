@@ -31,6 +31,8 @@ The process is idempotent so that you can repeat it whenever you change the conf
 aws_region = "eu-central-1"
 cluster_name = "johndoe-k1-kkp"
 ssh_public_key_file = "~/.ssh/id_rsa.pub"
+cluster_autoscaler_min_replicas = 1
+cluster_autoscaler_max_replicas = 3
 ```
 Please make sure to configure a `cluster_name` that is unique across the company by prefixing it with your name.
 
