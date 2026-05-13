@@ -44,7 +44,7 @@ kubeone-test: ## Test the Kubernetes cluster connectivity (listing nodes).
 
 kkp-values: kkp-values.yaml kkp-kubermatic.yaml kkp-certificate-issuer.yaml kkp-seed-mla-values ## Generate the configuration files.
 
-kkp-apply: kkp-apply-master kkp-apply-certificate-issuer kkp-apply-seed kkp-apply-preset kkp-dns ## Install/update KKP master and seed into the Kubernetes cluster.
+kkp-apply: kkp-apply-master kkp-apply-certificate-issuer kkp-apply-seed kkp-apply-preset kkp-dns kkp-login-info ## Install/update KKP master and seed into the Kubernetes cluster.
 
 kkp-apply-master: kkp-values ## Install/update KKP master into the Kubernetes cluster.
 	export KUBECONFIG="$(KUBECONFIG)"; \
@@ -110,6 +110,12 @@ kkp-apply-usercluster-mla: kkp-usercluster-mla-values ## Install/upgrade the use
 		--charts-directory=$(KKP_DIR)/release/$(KKP_RELEASE)/charts \
 		--helm-values=$(KKP_DIR)/mla-usercluster-values.yaml \
 		--mla-include-iap
+
+kkp-login-info: kkp-values ## Print the KKP URL and credentials.
+	@URL="https://$(DOMAIN)/"; \
+	USERNAME="`yq eval '.dex.config.staticPasswords[0].email' $(KKP_DIR)/values.yaml`"; \
+	PASSWORD="`cat $(KKP_DIR)/password`"; \
+	printf '\n\tKKP URL: %s\n\tUsername: %s\n\tPassword: %s\n\n' "$$URL" "$$USERNAME" "$$PASSWORD"
 
 kkp-destroy-userclusters: ## Destroy all KKP user clusters.
 	kubectl delete clusters --all --kubeconfig="$(KUBECONFIG)"

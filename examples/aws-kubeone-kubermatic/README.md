@@ -47,21 +47,30 @@ In case the infrastructure cannot be created initially due to an IP conflict, de
 make kubeone-apply
 ```
 
-4. Generate the configuration files (if not exist):
+4. Configure your Email address to issue a Let's Encrypt TLS certificate
+Copy `.env.example` to `.env` and fill in your Email address.
+
+5. Generate the configuration files (if not exist):
 ```sh
 make kkp-values
 ```
 Optionally you can change the generated admin password within the `20-kkp/password` file afterwards.
 
-5. Install KKP master and seed components into the KubeOne Kubernetes cluster:
+6. Install KKP master and seed components into the KubeOne Kubernetes cluster:
 ```sh
 make kkp-apply
 ```
 Once DNS has propagated (can take a few minutes), you can browse the KKP dashboard at `https://{cluster_name}.lab.kubermatic.io`.
 
-6. Install the Monitoring & Logging (MLA) stack (not working yet):
+7. Install the Monitoring & Logging (MLA) stack (not working yet):
 ```sh
 make kkp-apply-seed-mla kkp-apply-usercluster-mla
+```
+
+8. Browse and log into KKP
+Print the KKP URL and credentials:
+```sh
+make kkp-login-info
 ```
 
 ### Destroying the cluster & infrastructure
