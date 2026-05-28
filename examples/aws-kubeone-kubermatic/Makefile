@@ -42,7 +42,7 @@ kubeone-destroy: ## Destroy the Kubernetes cluster.
 kubeone-test: ## Test the Kubernetes cluster connectivity (listing nodes).
 	kubectl get nodes --kubeconfig="$(KUBECONFIG)"
 
-kkp-values: kkp-values.yaml kkp-kubermatic.yaml kkp-certificate-issuer.yaml kkp-seed-mla-values ## Generate the configuration files.
+kkp-values: kkp-values.yaml kkp-kubermatic.yaml kkp-certificate-issuer.yaml kkp-seed-mla-values kkp-usercluster-mla-values ## Generate the configuration files.
 
 kkp-apply: kkp-apply-master kkp-apply-certificate-issuer kkp-apply-seed kkp-apply-preset kkp-dns kkp-login-info ## Install/update KKP master and seed into the Kubernetes cluster.
 
@@ -58,7 +58,10 @@ kkp-apply-master: kkp-values ## Install/update KKP master into the Kubernetes cl
 kkp-dns: ## Register DNS record for the cluster.
 	@export KUBECONFIG="$(KUBECONFIG)"; \
 	for i in `seq 10`; do \
-		LB_HOSTNAME="`kubectl -n kubermatic get ingress kubermatic -o jsonpath={.status.loadBalancer.ingress[0].hostname}`" || exit 1; \
+		LB_HOSTNAME="`kubectl -n kubermatic get gateway kubermatic -o jsonpath={.status.addresses[0].value}`" \
+			|| LB_HOSTNAME="`kubectl -n kubermatic get gateway byo-gateway -o jsonpath={.status.addresses[0].value}`" \
+			|| LB_HOSTNAME="`kubectl -n kubermatic get ingress kubermatic -o jsonpath={.status.loadBalancer.ingress[0].hostname}`" \
+			|| exit 1; \
 		if [ "$$LB_HOSTNAME" ]; then \
 			echo "$(DOMAIN) -> $$LB_HOSTNAME"; \
 			./scripts/route53-modify-record.sh UPSERT $(ROUTE53_ZONEID) $(DOMAIN) CNAME "$$LB_HOSTNAME" && \
@@ -124,7 +127,6 @@ kkp-seed-mla-values: kkp kkp-values.yaml
 	# TODO: remove minio since it has been set up for the seed already
 	@[ -f "$(KKP_DIR)/mla-seed-values.yaml" ] || ( \
 	echo Generating initial $(KKP_DIR)/mla-seed-values.yaml with random secrets; \
-	export DOMAIN="$(DOMAIN)"; \
 	export MINIO_ACCESS_KEY="`cat /dev/urandom | base64 | tr -dc 'A-Za-z0-9' | head -c32`"; \
 	export MINIO_SECRET_KEY="`cat /dev/urandom | base64 | tr -dc 'A-Za-z0-9' | head -c32`"; \
 	export GRAFANA_ADMIN_PASSWORD="`cat /dev/urandom | base64 | tr -dc 'A-Za-z0-9' | head -c14 | base64 -w0`"; \
@@ -138,7 +140,6 @@ kkp-seed-mla-values: kkp kkp-values.yaml
 	export PROMETHEUS_ENCRYPTION_KEY="`cat /dev/urandom | base64 | tr -dc 'A-Za-z0-9' | head -c32`"; \
 	RULES='.minio.credentials.accessKey=strenv(MINIO_ACCESS_KEY) | .minio.credentials.secretKey=strenv(MINIO_SECRET_KEY)'; \
 	RULES="$$RULES"' | .grafana.password=strenv(GRAFANA_ADMIN_PASSWORD)'; \
-	RULES="$$RULES"' | .iap.oidc_issuer_url="https://"+strenv(DOMAIN)+"/dex"'; \
 	RULES="$$RULES"' | .iap.deployments.grafana.encryption_key=strenv(GRAFANA_ENCRYPTION_KEY)'; \
 	RULES="$$RULES"' | .iap.deployments.grafana.client_secret=strenv(GRAFANA_CLIENT_SECRET)'; \
 	RULES="$$RULES"' | .iap.deployments.karma.encryption_key=strenv(KARMA_ENCRYPTION_KEY)'; \
@@ -150,6 +151,7 @@ kkp-seed-mla-values: kkp kkp-values.yaml
 	yq eval "$$RULES" "$(KKP_DIR)/mla-seed-values.example.yaml" > $(KKP_DIR)/mla-seed-values.yaml)
 
 	@echo Updating domain and client secrets within $(KKP_DIR)/mla-seed-values.yaml; \
+	export DOMAIN="$(DOMAIN)"; \
 	export SEED_DOMAIN="kubermatic.$(DOMAIN)"; \
 	RULES='.'; \
 	RULES="$$RULES"' | .grafana.host="grafana."+strenv(SEED_DOMAIN)'; \
@@ -159,7 +161,37 @@ kkp-seed-mla-values: kkp kkp-values.yaml
 	RULES="$$RULES"' | .iap.deployments.alertmanager.ingress.host="alertmanager."+strenv(SEED_DOMAIN)'; \
 	RULES="$$RULES"' | .iap.deployments.prometheus.ingress.host="prometheus."+strenv(SEED_DOMAIN)'; \
 	RULES="$$RULES"' | .iap.deployments.karma.ingress.host="karma."+strenv(SEED_DOMAIN)'; \
+	RULES="$$RULES"' | .iap.oidc_issuer_url="https://"+strenv(DOMAIN)+"/dex"'; \
 	yq eval -i "$$RULES" "$(KKP_DIR)/mla-seed-values.yaml"
+
+kkp-usercluster-mla-values: kkp kkp-values.yaml
+	@[ -f "$(KKP_DIR)/mla-usercluster-values.yaml" ] || ( \
+	echo Generating initial $(KKP_DIR)/mla-usercluster-values.yaml with random secrets; \
+	export MINIO_ACCESS_KEY="`cat /dev/urandom | base64 | tr -dc 'A-Za-z0-9' | head -c32`"; \
+	export MINIO_SECRET_KEY="`cat /dev/urandom | base64 | tr -dc 'A-Za-z0-9' | head -c32`"; \
+	export GRAFANA_ADMIN_PASSWORD="`cat /dev/urandom | base64 | tr -dc 'A-Za-z0-9' | head -c14 | base64 -w0`"; \
+	export GRAFANA_CLIENT_SECRET="`yq eval '.dex.config.staticClients[] | select(.id == "mla-grafana").secret' "$(KKP_DIR)/values.yaml"`"; \
+	export GRAFANA_ENCRYPTION_KEY="`cat /dev/urandom | base64 | tr -dc 'A-Za-z0-9' | head -c32`"; \
+	export ALERTMANAGER_CLIENT_SECRET="`yq eval '.dex.config.staticClients[] | select(.id == "mla-alertmanager").secret' "$(KKP_DIR)/values.yaml"`"; \
+	export ALERTMANAGER_ENCRYPTION_KEY="`cat /dev/urandom | base64 | tr -dc 'A-Za-z0-9' | head -c32`"; \
+	RULES='.'; \
+	RULES="$$RULES"' | .mlaSecrets.minio.accessKey=strenv(MINIO_ACCESS_KEY)'; \
+	RULES="$$RULES"' | .mlaSecrets.minio.secretKey=strenv(MINIO_SECRET_KEY)'; \
+	RULES="$$RULES"' | .mlaSecrets.grafana.adminPassword=strenv(GRAFANA_ADMIN_PASSWORD)'; \
+	RULES="$$RULES"' | .iap.deployments.grafana.encryption_key=strenv(GRAFANA_ENCRYPTION_KEY)'; \
+	RULES="$$RULES"' | .iap.deployments.grafana.client_secret=strenv(GRAFANA_CLIENT_SECRET)'; \
+	RULES="$$RULES"' | .iap.deployments.alertmanager.encryption_key=strenv(ALERTMANAGER_ENCRYPTION_KEY)'; \
+	RULES="$$RULES"' | .iap.deployments.alertmanager.client_secret=strenv(ALERTMANAGER_CLIENT_SECRET)'; \
+	yq eval "$$RULES" "$(KKP_DIR)/mla-usercluster-values.example.yaml" > $(KKP_DIR)/mla-usercluster-values.yaml)
+
+	@echo Updating domain within $(KKP_DIR)/mla-usercluster-values.yaml; \
+	export DOMAIN="$(DOMAIN)"; \
+	export USERCLUSTER_DOMAIN="usercluster.kubermatic.$(DOMAIN)"; \
+	RULES='.'; \
+	RULES="$$RULES"' | .iap.deployments.grafana.ingress.host="grafana."+strenv(USERCLUSTER_DOMAIN)'; \
+	RULES="$$RULES"' | .iap.deployments.alertmanager.ingress.host="alertmanager."+strenv(USERCLUSTER_DOMAIN)'; \
+	RULES="$$RULES"' | .iap.oidc_issuer_url="https://"+strenv(DOMAIN)+"/dex"'; \
+	yq eval -i "$$RULES" "$(KKP_DIR)/mla-usercluster-values.yaml"
 
 kkp-values.yaml: kkp $(KKP_DIR)/password
 	@[ -f "$(KKP_DIR)/values.yaml" ] || ( \
@@ -196,11 +228,11 @@ kkp-values.yaml: kkp $(KKP_DIR)/password
 	RULES="$$RULES"' | (.dex.config.staticClients[] | select(.id=="kubermatic")) |= . + {"RedirectURIs":["https://"+strenv(DOMAIN),"https://"+strenv(DOMAIN)+"/projects"]}'; \
 	RULES="$$RULES"' | (.dex.config.staticClients[] | select(.id=="kubermaticIssuer")) |= . + {"RedirectURIs":["https://"+strenv(DOMAIN)+"/api/v1/kubeconfig","https://"+strenv(DOMAIN)+"/api/v2/kubeconfig/secret","https://"+strenv(DOMAIN)+"/api/v2/dashboard/login"]}'; \
 	RULES="$$RULES"' | (.dex.config.staticClients[] | select(.id=="grafana")) |= . + {"RedirectURIs":["https://grafana."+strenv(SEED_DOMAIN)+"/oauth/callback"]}'; \
-	RULES="$$RULES"' | (.dex.config.staticClients[] | select(.id=="alertmanager")) |= . + {"RedirectURIs":["https://alertmanager."+strenv(SEED_DOMAIN)]}'; \
-	RULES="$$RULES"' | (.dex.config.staticClients[] | select(.id=="karma")) |= . + {"RedirectURIs":["https://karma."+strenv(SEED_DOMAIN)]}'; \
-	RULES="$$RULES"' | (.dex.config.staticClients[] | select(.id=="prometheus")) |= . + {"RedirectURIs":["https://prometheus."+strenv(SEED_DOMAIN)]}'; \
-	RULES="$$RULES"' | (.dex.config.staticClients[] | select(.id=="mla-grafana")) |= . + {"RedirectURIs":["https://grafana.usercluster."+strenv(SEED_DOMAIN)]}'; \
-	RULES="$$RULES"' | (.dex.config.staticClients[] | select(.id=="mla-alertmanager")) |= . + {"RedirectURIs":["https://alertmanager.usercluster."+strenv(SEED_DOMAIN)]}'; \
+	RULES="$$RULES"' | (.dex.config.staticClients[] | select(.id=="alertmanager")) |= . + {"RedirectURIs":["https://alertmanager."+strenv(SEED_DOMAIN)+"/oauth/callback"]}'; \
+	RULES="$$RULES"' | (.dex.config.staticClients[] | select(.id=="karma")) |= . + {"RedirectURIs":["https://karma."+strenv(SEED_DOMAIN)+"/oauth/callback"]}'; \
+	RULES="$$RULES"' | (.dex.config.staticClients[] | select(.id=="prometheus")) |= . + {"RedirectURIs":["https://prometheus."+strenv(SEED_DOMAIN)+"/oauth/callback"]}'; \
+	RULES="$$RULES"' | (.dex.config.staticClients[] | select(.id=="mla-grafana")) |= . + {"RedirectURIs":["https://grafana.usercluster."+strenv(SEED_DOMAIN)+"/oauth/callback"]}'; \
+	RULES="$$RULES"' | (.dex.config.staticClients[] | select(.id=="mla-alertmanager")) |= . + {"RedirectURIs":["https://alertmanager.usercluster."+strenv(SEED_DOMAIN)+"/oauth/callback"]}'; \
 	RULES="$$RULES"' | .dex.config.staticPasswords[0].hash=strenv(PASSWD_HASH)'; \
 	yq eval -i "$$RULES" "$(KKP_DIR)/values.yaml"
 

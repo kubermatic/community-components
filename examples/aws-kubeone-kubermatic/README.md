@@ -62,10 +62,12 @@ make kkp-apply
 ```
 Once DNS has propagated (can take a few minutes), you can browse the KKP dashboard at `https://{cluster_name}.lab.kubermatic.io`.
 
-7. Install the Monitoring & Logging (MLA) stack (not working yet):
+7. Install the Monitoring & Logging (MLA) stack:
 ```sh
 make kkp-apply-seed-mla kkp-apply-usercluster-mla
 ```
+
+TODO: make connectivity into user clusters from outside work!
 
 8. Browse and log into KKP
 Print the KKP URL and credentials:
