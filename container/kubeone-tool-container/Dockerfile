@@ -23,82 +23,37 @@ ARG ARCH
 ARG OS
 USER 0
 ENV GO111MODULE=on
-# Install KubeOne
 ENV DEBIAN_FRONTEND=noninteractive
 
-RUN apt-get update && apt-get install -y \
-    bash-completion \
-    python3-crcmod \
-    ca-certificates \
-    curl \
-    apt-transport-https \
-    lsb-release \
-    gnupg \
-    unzip \
-    upx-ucl \
-    openssh-server \
-    sudo \
-    vim \
-    make \
-    git-crypt \
-    git \
-    fonts-powerline \
-    tmux \
-    software-properties-common \
-    iputils-ping \
-    locate \
-    netcat-traditional \
-    dnsutils\
-    zsh \
-    uuid-runtime \
-    iperf3 \
-    fio \
-    figlet lolcat && \
-    apt autoremove && apt autoclean && apt-get clean -y
+# All APT-managed software is installed in a single transaction to keep the
+# image small and the build fast:
+#   1. Bootstrap just enough to reach HTTPS-protected repos.
+#   2. Configure every third-party APT source from apt-sources.sh.
+#   3. Install the full package list from apt-packages.txt.
+# Package list and repository setup live in their own files (see those for
+# what each entry is for and why each repo is needed).
+COPY apt-packages.txt apt-sources.sh /tmp/
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+        ca-certificates curl gnupg lsb-release \
+        apt-transport-https software-properties-common && \
+    bash /tmp/apt-sources.sh && \
+    apt-get update && \
+    sed 's/#.*$//' /tmp/apt-packages.txt | xargs apt-get install -y && \
+    apt-get autoremove -y && apt-get clean && \
+    rm -rf /var/lib/apt/lists/* /tmp/apt-packages.txt /tmp/apt-sources.sh
 
-RUN wget --no-check-certificate -qO -  https://apt.releases.hashicorp.com/gpg | gpg --dearmor | tee /etc/apt/trusted.gpg.d/hashicorp.gpg  > /dev/null && \
-    apt-add-repository "deb [arch=$(dpkg --print-architecture)] https://apt.releases.hashicorp.com $(lsb_release -cs) main" && \
-    apt update -y && apt-get install -y terraform && \
-    apt-get clean
 RUN terraform -install-autocomplete
 
 # Install AWS CLI
 RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" && \
     unzip awscliv2.zip && \
-    ./aws/install
-
-# Install Azure CLI
-RUN curl -sL https://packages.microsoft.com/keys/microsoft.asc | \
-    gpg --dearmor | \
-    tee /etc/apt/trusted.gpg.d/microsoft.gpg > /dev/null  && \
-    AZ_REPO=$(lsb_release -cs) && \
-    echo "deb [arch=amd64] https://packages.microsoft.com/repos/azure-cli/ $AZ_REPO main" | \
-    tee /etc/apt/sources.list.d/azure-cli.list  && \
-    apt-get update -y && \
-    apt-get install azure-cli -y && \
-    apt-get clean
-
-# Install GCP CLI
-RUN echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" | sudo tee -a /etc/apt/sources.list.d/google-cloud-sdk.list &&  \
-    curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key --keyring /usr/share/keyrings/cloud.google.gpg add - &&  \
-    apt-get update -y && \
-    apt-get install google-cloud-sdk -y && \
-    apt-get clean
+    ./aws/install && \
+    rm -rf awscliv2.zip aws
 
 # Install govc
 RUN curl -L $(curl -s https://api.github.com/repos/vmware/govmomi/releases/latest | grep browser_download_url | grep -i govc_linux_x86 | cut -d '"' -f 4) | tar -xvz govc && mv govc /usr/local/bin && \
     chmod +x /usr/local/bin/govc
-
-# Install Kubectl & Helm & and fubectl depedencies
-RUN echo "deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.30/deb/ /" | sudo tee /etc/apt/sources.list.d/kubernetes.list && \
-    mkdir -p /etc/apt/keyrings && curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.30/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg && \
-    #helm \
-    curl -fsSL https://packages.buildkite.com/helm-linux/helm-debian/gpgkey | gpg --dearmor | sudo tee /usr/share/keyrings/helm.gpg > /dev/null && \
-    sudo apt-get install apt-transport-https --yes && \
-    echo "deb [signed-by=/usr/share/keyrings/helm.gpg] https://packages.buildkite.com/helm-linux/helm-debian/any/ any main" | sudo tee /etc/apt/sources.list.d/helm-stable-debian.list && \
-    apt-get update && \
-    apt-get install -y kubectl helm jq && \
-    apt-get clean
 
 # Install just from GitHub releases (Ubuntu packages are outdated)
 # https://github.com/casey/just/
@@ -173,13 +128,6 @@ RUN LAZYGIT_VERSION=0.37.0 && \
     mv lazygit /usr/local/bin && \
     cd .. && rm -rf /tmp/lazygit-inst
 
-# Install ngrok
-RUN curl -s https://ngrok-agent.s3.amazonaws.com/ngrok.asc | sudo tee /etc/apt/trusted.gpg.d/ngrok.asc >/dev/null && echo "deb https://ngrok-agent.s3.amazonaws.com buster main" | sudo tee /etc/apt/sources.list.d/ngrok.list && sudo apt update && sudo apt install ngrok
-
-# Install OpenStack CLI
-RUN     apt-get update -y && \
-    apt install python3-openstackclient -y
-
 ### INSTALL helper
 RUN wget https://raw.githubusercontent.com/kubermatic/fubectl/refs/heads/main/fubectl.source -O /bin/fubectl.source && \
     # powerline go
@@ -225,7 +173,7 @@ USER ${USER}
 
 # Install minio Operator Kubectl krew plugin, disk utils, resource-capacity and service-account creation
 # Install fubectl dependencies
-RUN bash -ic 'kubectl krew install minio df-pv pv-migrate pvmigrate resource-capacity view-serviceaccount-kubeconfig virt view-secret kyverno oidc-login && kinstall' && \
+RUN bash -ic 'kubectl krew install minio df-pv pv-migrate pvmigrate resource-capacity view-serviceaccount-kubeconfig virt view-secret kyverno oidc-login view-allocations && kinstall' && \
     ln -s "$(find $USER_HOME/.krew -name virtctl -type f 2>/dev/null | head -1)" $USER_HOME/.krew/bin/virtctl
 
 ### Init terrafrom poviders to cache provider binaries for offline setups

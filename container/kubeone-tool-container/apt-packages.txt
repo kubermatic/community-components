@@ -1,0 +1,72 @@
+# APT packages installed into the kubeone-tool container.
+# Consumed by Dockerfile: blank lines and `#` comments are stripped, the rest
+# is passed to `apt-get install -y`. Group additions under the right section
+# and keep comments explaining *why* a package is needed.
+
+# === Bootstrap / HTTPS support ===
+# Already installed in the bootstrap step but kept here so a rebuild of the
+# package set is self-contained and reproducible.
+ca-certificates
+curl
+gnupg
+lsb-release
+apt-transport-https
+software-properties-common
+
+# === Core utilities and build tools ===
+make
+git
+git-crypt
+sudo
+unzip
+upx-ucl
+vim
+locate
+uuid-runtime
+
+# === Shell, terminal, prompt cosmetics ===
+bash-completion
+zsh
+tmux
+fonts-powerline
+figlet
+lolcat
+
+# === Networking, DNS and bandwidth diagnostics ===
+iputils-ping
+netcat-traditional
+dnsutils
+iperf3
+
+# === Disk and I/O benchmarking ===
+fio
+
+# === SSH server (optional remote access into the container) ===
+openssh-server
+
+# === Python runtime and tooling ===
+python3
+python3-pip
+python3-crcmod
+
+# === JSON / YAML query helper used by many install scripts ===
+jq
+
+# === Infrastructure-as-Code ===
+terraform
+ansible
+python3-openstackclient
+
+# === Cloud provider CLIs ===
+azure-cli
+google-cloud-sdk
+
+# === Kubernetes ===
+# NOTE: kubectl is pulled from the K8s apt repo pinned in apt-sources.sh.
+# That repo must be >= v1.32 (Go 1.25+) so kubectl does not panic with
+# "lfstack.push invalid packing" when run under Rosetta on Apple Silicon.
+kubectl
+helm
+
+# === Tunneling ===
+ngrok
