@@ -67,13 +67,14 @@ Once DNS has propagated (can take a few minutes), you can browse the KKP dashboa
 make kkp-apply-seed-mla kkp-apply-usercluster-mla
 ```
 
-TODO: make connectivity into user clusters from outside work!
-
 8. Browse and log into KKP
 Print the KKP URL and credentials:
 ```sh
 make kkp-login-info
 ```
+
+When creating AWS-based user clusters via the KKP Dashboard, please check the "Assign Public IP" checkbox within the 4th step ("Initial Nodes") of the user cluster creation wizard.
+Otherwise machines won't join the cluster as nodes.
 
 ### Destroying the cluster & infrastructure
 
