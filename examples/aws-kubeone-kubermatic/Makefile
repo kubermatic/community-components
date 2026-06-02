@@ -16,6 +16,9 @@ DOMAIN = $(CLUSTER_NAME).$(DNS_ZONE)
 default: help
 
 terraform-apply: ## Create/update the AWS infrastructure.
+	@if [ ! -f "$(TF_DIR)/.terraform.lock.hcl" ]; then \
+		(set -x; terraform -chdir="$(TF_DIR)" init); \
+	fi
 	./scripts/with-aws-login.sh terraform -chdir="$(TF_DIR)" apply
 
 terraform-output:
