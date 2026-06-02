@@ -246,6 +246,7 @@ kkp-kubermatic.yaml: kkp-values.yaml
 	export SERVICE_ACCOUNT_KEY="`cat /dev/urandom | base64 | tr -dc 'A-Za-z0-9' | head -c32`"; \
 	RULES='.spec.auth.issuerCookieKey=strenv(ISSUER_COOKIE_KEY) | .spec.auth.serviceAccountKey=strenv(SERVICE_ACCOUNT_KEY)'; \
 	RULES="$$RULES"' | .spec.featureGates.UserClusterMLA=true'; \
+	RULES="$$RULES"' | .spec.exposeStrategy="LoadBalancer"'; \
 	yq eval "$$RULES" "$(KKP_DIR)/release/$(KKP_RELEASE)/examples/kubermatic.example.yaml" > $(KKP_DIR)/kubermatic.yaml)
 
 	@echo Updating domain and issuer client secret within $(KKP_DIR)/kubermatic.yaml; \
