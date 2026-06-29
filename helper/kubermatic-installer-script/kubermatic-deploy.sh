@@ -61,8 +61,8 @@ DEPLOY_LOKI=true
 DEPLOY_IAP=true
 #CANARY_DEPLOYMENT=true
 
-# verify Helm3
-[[ $(helm version --short) =~ ^v3.*$ ]] && echo "helm3 detected!" || (echo "This script requires helm3! Please install helm3: https://helm.sh/docs/intro/install" && exit 1)
+# verify Helm v3 or v4
+[[ $(helm version --short) =~ ^v(3|4)\..*$ ]] && echo "Helm v3 or v4 detected!" || (echo "This script requires Helm v3 or v4! Please install Helm: https://helm.sh/docs/intro/install" && exit 1)
 
 function deploy {
   local name="$1"
