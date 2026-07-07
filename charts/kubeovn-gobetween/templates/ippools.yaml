@@ -1,0 +1,29 @@
+{{- if and .Values.frontend.ipPool.name .Values.frontend.ipPool.ips }}
+apiVersion: kubeovn.io/v1
+kind: IPPool
+metadata:
+  name: {{ .Values.frontend.ipPool.name }}
+  labels:
+    {{- include "kubeovn-gobetween-lb.labels" . | nindent 4 }}
+spec:
+  subnet: {{ .Values.frontend.subnet }}
+  ips:
+    {{- range .Values.frontend.ipPool.ips }}
+    - {{ . | quote }}
+    {{- end }}
+{{- end }}
+---
+{{- if and .Values.backend.ipPool.name .Values.backend.ipPool.ips }}
+apiVersion: kubeovn.io/v1
+kind: IPPool
+metadata:
+  name: {{ .Values.backend.ipPool.name }}
+  labels:
+    {{- include "kubeovn-gobetween-lb.labels" . | nindent 4 }}
+spec:
+  subnet: {{ .Values.backend.ipPool.subnet }}
+  ips:
+    {{- range .Values.backend.ipPool.ips }}
+    - {{ . | quote }}
+    {{- end }}
+{{- end }}

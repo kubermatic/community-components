@@ -1,0 +1,52 @@
+## ── Frontend ─────────────────────────────────────────────────
+## Network-facing side of the load balancer.
+## The pod is placed on this OVN network and receives a fixed IP from the pool.
+
+frontend:
+  port: 6443                             # listen port inside the pod
+  vpc: ""                                # OVN VPC (logical router) the pod attaches to
+  subnet: ""                             # OVN logical switch / subnet (used for pod placement and IPPool)
+  ipPool:
+    name: ""                             # IPPool name — assigned to the pod for a stable VIP
+    ips: []                              # list of IPs in the pool (typically just the VIP)
+
+## ── Backend ──────────────────────────────────────────────────
+## Static list of backend target IPs, managed via an IPPool.
+
+backend:
+  port: 6443                             # port on each backend target
+  ipPool:
+    name: ""                             # IPPool name for backend targets
+    subnet: ""                           # OVN subnet the IPPool belongs to
+    ips: []                              # list of backend IPs
+
+## ── Gobetween ────────────────────────────────────────────────
+## TCP load balancer settings.
+
+gobetween:
+  image: yyyar/gobetween:0.8.1
+  balance: roundrobin                    # balancing strategy (roundrobin, weight, leastconn, etc.)
+  maxConnections: 10000
+  healthcheck:
+    kind: ping                           # ICMP health check (requires NET_RAW)
+    interval: "10s"
+    timeout: "2s"
+    fails: 2
+    passes: 1
+
+## ── Scheduling ───────────────────────────────────────────────
+
+priorityClass:
+  enabled: true
+  name: gobetween-critical-lb
+  value: 1000000                         # high priority — preempts lower pods if needed
+
+tolerations:
+  - key: node.kubernetes.io/not-ready
+    operator: Exists
+    effect: NoExecute
+    tolerationSeconds: 10
+  - key: node.kubernetes.io/unreachable
+    operator: Exists
+    effect: NoExecute
+    tolerationSeconds: 10

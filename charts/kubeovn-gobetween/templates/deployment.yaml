@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "kubeovn-gobetween-lb.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "kubeovn-gobetween-lb.labels" . | nindent 4 }}
+spec:
+  # TODO find way in ovn for custom VPCs to make deployment HA
+  strategy:
+    type: Recreate
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "kubeovn-gobetween-lb.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "kubeovn-gobetween-lb.selectorLabels" . | nindent 8 }}
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+        checksum/ippools: {{ include (print $.Template.BasePath "/ippools.yaml") . | sha256sum }}
+        {{- if .Values.frontend.vpc }}
+        ovn.kubernetes.io/logical_router: {{ .Values.frontend.vpc }}
+        {{- end }}
+        {{- if .Values.frontend.subnet }}
+        ovn.kubernetes.io/logical_switch: {{ .Values.frontend.subnet }}
+        {{- end }}
+        {{- if .Values.frontend.ipPool.name }}
+        ovn.kubernetes.io/ip_pool: {{ .Values.frontend.ipPool.name | quote }}
+        {{- end }}
+    spec:
+      {{- if .Values.priorityClass.enabled }}
+      priorityClassName: {{ .Values.priorityClass.name }}
+      {{- end }}
+      terminationGracePeriodSeconds: 5
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+      - name: gobetween
+        image: {{ .Values.gobetween.image }}
+        command: ["/gobetween"]
+        args: ["-c", "/etc/gobetween/gobetween.toml"]
+        securityContext:
+          capabilities:
+            add: ["NET_RAW"]
+        ports:
+        - containerPort: {{ .Values.frontend.port }}
+          protocol: TCP
+        volumeMounts:
+        - name: config
+          mountPath: /etc/gobetween/gobetween.toml
+          subPath: gobetween.toml
+          readOnly: true
+      volumes:
+      - name: config
+        configMap:
+          name: {{ include "kubeovn-gobetween-lb.fullname" . }}

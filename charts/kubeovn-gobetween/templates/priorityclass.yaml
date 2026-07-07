@@ -1,0 +1,11 @@
+{{- if .Values.priorityClass.enabled }}
+apiVersion: scheduling.k8s.io/v1
+kind: PriorityClass
+metadata:
+  name: {{ .Values.priorityClass.name }}
+  labels:
+    {{- include "kubeovn-gobetween-lb.labels" . | nindent 4 }}
+value: {{ .Values.priorityClass.value | int }}
+globalDefault: false
+description: "High priority for critical load balancer pods"
+{{- end }}

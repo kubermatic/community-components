@@ -1,0 +1,31 @@
+# helmfile to prepare kubev cluster
+repositories:
+  - name: kubermatic-community
+    url: git+https://github.com/kubermatic/community-components@charts/kubeovn-gobetween?ref=kubeovn-gobetween-v0.2.0
+
+releases:
+  - name: kubelb-k8s-api-lb
+    namespace: kubelb
+    createNamespace: true
+    chart: kubermatic-community/kubeovn-gobetween
+    values:
+      - frontend:
+          port: 6443
+          vpc: mgmt
+          subnet: mgmt-kubermatic-ext
+          ipPool:
+            name: mgmt-kubermatic-ext-kubelb-k8s-api
+            ips:
+              - "10.0.102.100"
+        backend:
+          port: 6443
+          ipPool:
+            name: mgmt-kubermatic-int-kubelb-cp
+            subnet: mgmt-kubermatic-int
+            ips:
+              - "172.16.102.10"
+              - "172.16.102.11"
+              - "172.16.102.12"
+        priorityClass:
+          enabled: true
+          name: k8s-api-kubelb
