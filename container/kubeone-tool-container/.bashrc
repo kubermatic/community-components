@@ -3,6 +3,11 @@ export PATH=$PATH:/usr/local/bin
 export PATH=$PATH:/usr/bin
 export PATH="$HOME/bin:$PATH"
 
+### start an ssh-agent if none is available (skips when one is forwarded into the container)
+if [ -z "$SSH_AUTH_SOCK" ]; then
+    eval "$(ssh-agent -s)" > /dev/null
+fi
+
 ### write commands immediately to history
 #http://www.shellhacks.com/en/7-Tips-Tuning-Command-Line-History-in-Bash
 shopt -s histappend

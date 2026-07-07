@@ -70,10 +70,11 @@ RUN HELMFILE_VERSION=$(curl -s https://api.github.com/repos/helmfile/helmfile/re
     mv helmfile /usr/local/bin/helmfile && \
     chmod +x /usr/local/bin/helmfile && \
     rm -f helmfile_${HELMFILE_VERSION}_linux_amd64.tar.gz && \
-    # Install helm-diff plugin (required by helmfile)
-    helm plugin install https://github.com/databus23/helm-diff && \
-    # Install helm-secrets plugin (commonly used with helmfile)
-    helm plugin install https://github.com/jkroepke/helm-secrets
+    # helm-diff is required by helmfile; helm-secrets is commonly used with it.
+    # --verify=false: Helm v4 verifies plugin provenance by default, but these
+    # community plugins don't ship a .prov file yet, so skip verification.
+    helm plugin install https://github.com/databus23/helm-diff --verify=false && \
+    helm plugin install https://github.com/jkroepke/helm-secrets --verify=false
 
 # Install Yq
 RUN RELEASE_URL=$(curl -Ls -o /dev/null -w %{url_effective} https://github.com/mikefarah/yq/releases/latest) && \
