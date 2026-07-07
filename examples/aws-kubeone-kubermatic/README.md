@@ -62,7 +62,7 @@ make kkp-apply
 ```
 Once DNS has propagated (can take a few minutes), you can browse the KKP dashboard at `https://{cluster_name}.lab.kubermatic.io`.
 
-7. Install the Monitoring & Logging (MLA) stack (not working yet):
+7. Install the Monitoring & Logging (MLA) stack:
 ```sh
 make kkp-apply-seed-mla kkp-apply-usercluster-mla
 ```
@@ -72,6 +72,9 @@ Print the KKP URL and credentials:
 ```sh
 make kkp-login-info
 ```
+
+When creating AWS-based user clusters via the KKP Dashboard, please check the "Assign Public IP" checkbox within the 4th step ("Initial Nodes") of the user cluster creation wizard.
+Otherwise machines won't join the cluster as nodes.
 
 ### Destroying the cluster & infrastructure
 

@@ -1,3 +1,17 @@
+mlaSecrets:
+  minio:
+    ## Set enabled to false if you want to reuse an existing secret for minio.
+    enabled: true
+    ## Set default accesskey, secretkey
+    ## AccessKey and secretKey are generated when not set
+    accessKey: "accesskey"
+    secretKey: "secretkey"
+  grafana:
+    ## Set enabled to false if you want to reuse an existing secret for grafana.
+    enabled: true
+    adminUser: admin
+    adminPassword: strongpassword
+
 iap:
   oidc_issuer_url: https://<DOMAIN>/dex
   deployments:
@@ -49,15 +63,22 @@ iap:
 
 minio:
   persistence:
-    storageClass: kubermatic-backup
+    storageClass: kubermatic-fast
+  resources:
+    requests:
+      # Reduced from 4Gi to make it schedulable within the test cluster
+      memory: 3Gi
 
 cortex:
   alertmanager:
     persistentVolume:
-      storageClass: kubermatic-backup
+      size: 4Gi
+      storageClass: kubermatic-fast
   compactor:
     persistentVolume:
-      storageClass: kubermatic-backup
+      size: 4Gi
+      storageClass: kubermatic-fast
   store_gateway:
     persistentVolume:
-      storageClass: kubermatic-backup
+      size: 4Gi
+      storageClass: kubermatic-fast
