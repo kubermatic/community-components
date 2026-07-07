@@ -3,6 +3,11 @@ export PATH=$PATH:/usr/local/bin
 export PATH=$PATH:/usr/bin
 export PATH="$HOME/bin:$PATH"
 
+### start an ssh-agent if none is available (skips when one is forwarded into the container)
+if [ -z "$SSH_AUTH_SOCK" ]; then
+    eval "$(ssh-agent -s)" > /dev/null
+fi
+
 ### write commands immediately to history
 #http://www.shellhacks.com/en/7-Tips-Tuning-Command-Line-History-in-Bash
 shopt -s histappend
@@ -20,7 +25,16 @@ function _update_ps1() {
         export POWERLINE_THEME=default
         #export POWERLINE_THEME=low-contrast
     fi
-    PS1="$(/bin/powerline-go -theme $POWERLINE_THEME -cwd-max-depth 5 -newline -modules "termtitle,kube,venv,user,host,ssh,cwd,perms,git,hg,jobs,exit,root,vgo" -error $?)"
+    # Default to powerline-go's `gitlite` module (branch name only, no working
+    # tree walk). The full `git` module runs `git status --porcelain`, which
+    # crawls through Docker Desktop's FUSE bridge on bind-mounted host paths
+    # and takes 20-30s on the first cd into a directory.
+    # Override with: export POWERLINE_GIT_MODULE=git  (or any other module
+    # name, e.g. an empty string to drop the git segment entirely).
+    if [ -z $POWERLINE_GIT_MODULE ]; then
+        export POWERLINE_GIT_MODULE=gitlite
+    fi
+    PS1="$(/bin/powerline-go -theme $POWERLINE_THEME -cwd-max-depth 5 -newline -modules "termtitle,kube,venv,user,host,ssh,cwd,perms,$POWERLINE_GIT_MODULE,hg,jobs,exit,root,vgo" -error $?)"
 }
 export TERM="xterm-256color"
 if [ "$TERM" != "linux" ]; then
