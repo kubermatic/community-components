@@ -1,0 +1,21 @@
+# APT packages installed into the kubermatic-dev-ui container.
+# Consumed by Dockerfile: blank lines and `#` comments are stripped, the rest
+# is passed to `apt-get install -y`. Group additions under the right section
+# and keep comments explaining *why* a package is needed.
+
+# === Bootstrap / HTTPS support ===
+# Already installed in the bootstrap step but kept here so a rebuild of the
+# package set is self-contained and reproducible.
+ca-certificates
+curl
+gnupg
+lsb-release
+apt-transport-https
+software-properties-common
+
+# === Terminal emulators ===
+# terminator + xfce4-terminal back the Terminal desktop launcher. xfce4-terminal
+# is wired as the XFCE "TerminalEmulator" helper (config/xfce4/helpers.rc) so the
+# Terminal desktop icon launches reliably under amd64 emulation.
+terminator
+xfce4-terminal

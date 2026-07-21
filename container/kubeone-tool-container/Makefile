@@ -7,7 +7,7 @@ TAG_DATE ?= ${KUBEONE_VERSION}-$(shell date -I)
 BASE_IMAGE ?= ubuntu:24.04
 PLATFORM ?= linux/amd64
 CONTAINER_USER ?= kubermatic
-CONTAINER_USER_ID ?= 1000
+CONTAINER_USER_ID ?= 1001
 CONTAINER_USER_HOME ?= /home/kubermatic
 .PHONY: docker-release docker-build
 

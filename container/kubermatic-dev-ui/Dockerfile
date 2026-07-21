@@ -18,37 +18,34 @@ FROM ${BASE_IMAGE}
 ARG USER_ID=1000
 
 USER 0
-### IntelliJ IDEA - Community Edition
-#RUN  mkdir -p /apps/idea/ && \
-#     wget -c "https://download.jetbrains.com/idea/ideaIC-2022.3.2.tar.gz"  -O - | tar -xz -C /apps/idea/
-#     # /usr/local/bin/
-#RUN  mkdir -p /apps/download/ && cd /apps/download/ && \
-#     wget -c "https://code.visualstudio.com/sha/download?build=stable&os=linux-deb-x64" -O vscode.deb && \
-#     apt install -y ./vscode.deb && \
-#     rm -rf /apps/download
-#RUN  mkdir -p /apps/vscode-cli/ && \
-#     wget -c "https://code.visualstudio.com/sha/download?build=stable&os=cli-alpine-x64"  -O - | tar -xz -C /apps/vscode-cli/
+# All APT-managed software is installed in a single transaction to keep the
+# image small and the build fast:
+#   1. Repair APT sources from apt-sources.sh -- the dev-ui base ships a dead
+#      Helm/baltocdn repo that makes apt-get update fail, so this must run first.
+#   2. Bootstrap just enough to reach HTTPS-protected repos.
+#   3. Install the full package list from apt-packages.txt.
+# Package list and repository setup live in their own files (see those for
+# what each entry is for and why each repo is needed).
+COPY apt-packages.txt apt-sources.sh /tmp/
+RUN bash /tmp/apt-sources.sh && \
+    apt-get update && \
+    apt-get upgrade -y && \
+    apt-get install -y --no-install-recommends \
+        ca-certificates curl gnupg lsb-release \
+        apt-transport-https software-properties-common && \
+    sed 's/#.*$//' /tmp/apt-packages.txt | xargs apt-get install -y --no-install-recommends && \
+    apt-get autoremove -y && apt-get clean && \
+    rm -rf /var/lib/apt/lists/* /tmp/apt-packages.txt /tmp/apt-sources.sh
 
-# The dev-ui base (Debian bullseye, built 2024) ships a now-dead Helm apt repo on
-# baltocdn that makes any "apt-get update" fail ("repository no longer signed").
-# Remove it — Helm moved off baltocdn long ago, so it is dead weight anyway.
-RUN rm -f /etc/apt/sources.list.d/helm-stable-debian.list; \
-    grep -rlZ baltocdn /etc/apt /etc/apt/sources.list.d 2>/dev/null | xargs -0 -r rm -f; \
-    true
-
+### VS Code
 RUN  mkdir -p /apps/vscode/ && \
      wget -c "https://code.visualstudio.com/sha/download?build=stable&os=linux-x64"  -O - | tar -xz -C /apps/vscode/
 RUN echo '/apps/vscode/VSCode-linux-x64/bin/code --no-sandbox --user-data-dir /headless/vscode-user-data $?' > /usr/local/bin/code && \
     chmod +x /usr/local/bin/code
-#RUN mkdir -p /apps/vscode-plugins/ && \
-#     wget -c "https://open-vsx.org/api/ms-kubernetes-tools/vscode-kubernetes-tools/1.3.11/file/ms-kubernetes-tools.vscode-kubernetes-tools-1.3.11.vsix" -O /apps/vscode-plugins/kubernetes.vsix
-RUN #code --install-extension /apps/vscode-plugins/kubernetes.vsix
-RUN #code --install-extension /apps/vscode-plugins/kubernetes.vsix
 RUN /usr/local/bin/code --install-extension ms-kubernetes-tools.vscode-kubernetes-tools
 
 COPY config/terminator/config /headless/.config/terminator/config
 COPY config/terminator/config /root/.config/terminator/config
-RUN apt update && apt install -y terminator xfce4-terminal && apt clean
 
 COPY config/Desktop/ /headless/Desktop/
 COPY config/background/bg_image.png /headless/.config/bg_image.png
