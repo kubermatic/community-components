@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=Trust desktop launchers
+Comment=Mark ~/Desktop/*.desktop trusted so XFCE 4.17+ launches them without the untrusted-launcher prompt
+Exec=/usr/local/bin/trust-desktop-launchers.sh
+OnlyShowIn=XFCE;
+X-XFCE-Autostart-Overridable=false
+NoDisplay=true
+Terminal=false
