@@ -13,8 +13,23 @@ K8S_REPO_VERSION="v1.36"
 
 CODENAME="$(lsb_release -cs)"
 ARCH="$(dpkg --print-architecture)"
+DISTRO="$(lsb_release -is)"
 
 mkdir -p /etc/apt/keyrings /usr/share/keyrings
+
+# --- Debian backports ------------------------------------------------------
+# A few packages are not in Debian 'main' for a given stable release but are
+# available via backports (e.g. upx-ucl on bookworm; Ubuntu ships it in
+# 'universe' and Debian trixie in 'main'). Enabling backports gives them an
+# install candidate. Backports are NotAutomatic (pin priority 100), so this
+# does NOT pull backport versions of packages that already exist in 'main' --
+# it only adds availability for ones that are otherwise missing. Scoped to
+# bookworm on purpose so we never point at a -backports suite that does not
+# exist for the current base (e.g. Ubuntu, or a Debian release without one).
+if [ "${DISTRO}" = "Debian" ] && [ "${CODENAME}" = "bookworm" ]; then
+  echo "deb http://deb.debian.org/debian ${CODENAME}-backports main" \
+    > /etc/apt/sources.list.d/backports.list
+fi
 
 # --- HashiCorp (terraform) -------------------------------------------------
 curl -fsSL https://apt.releases.hashicorp.com/gpg \

@@ -92,7 +92,8 @@ ARG kubeone_version
 RUN VERSION=$kubeone_version && \
     curl -LO "https://github.com/kubermatic/kubeone/releases/download/v${VERSION}/kubeone_${VERSION}_linux_amd64.zip" && \
     unzip kubeone_${VERSION}_linux_amd64.zip -d kubeone_${VERSION}_linux_amd64 && \
-    mv kubeone_${VERSION}_linux_amd64/kubeone /usr/local/bin
+    mv kubeone_${VERSION}_linux_amd64/kubeone /usr/local/bin && \
+    rm -rf kubeone_*
 
 # Install kubeovn kubectl plugin ko
 # https://kubeovn.github.io/docs/v1.14.x/en/ops/kubectl-ko/
@@ -109,7 +110,8 @@ RUN curl -s "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/
 # Install Sops
 RUN SOPS_VERSION=$(curl -w '%{url_effective}' -I -L -s -S https://github.com/mozilla/sops/releases/latest -o /dev/null | sed -e 's|.*/v||') && \
     curl -LO https://github.com/getsops/sops/releases/download/v${SOPS_VERSION}/sops-v${SOPS_VERSION}.linux.amd64 && \
-    install -o root -g root -m 0755 sops-v${SOPS_VERSION}.linux.amd64 /usr/local/bin/sops
+    install -o root -g root -m 0755 sops-v${SOPS_VERSION}.linux.amd64 /usr/local/bin/sops && \
+    rm sops-*
 
 # Install k9s
 RUN K9S_RELEASE_URL=$(curl -Ls -o /dev/null -w %{url_effective} https://github.com/derailed/k9s/releases/latest) && \
@@ -136,10 +138,11 @@ RUN wget https://raw.githubusercontent.com/kubermatic/fubectl/refs/heads/main/fu
     chmod +x /bin/powerline-go
 
 ARG USER=kubermatic
+ARG USER_ID=1000
 ARG USER_HOME=/home/${USER}
 ENV USER_HOME=$USER_HOME
 ENV HOME=$USER_HOME
-RUN useradd -rm -d ${USER_HOME} -s /bin/bash -g root -G sudo -u 1001 ${USER} && chown $USER -R $USER_HOME
+RUN useradd -rm -d ${USER_HOME} -s /bin/bash -g root -G sudo -u ${USER_ID} ${USER} && chown $USER -R $USER_HOME
 USER ${USER}
 WORKDIR ${USER_HOME}
 
