@@ -19,6 +19,9 @@ git
 git-crypt
 sudo
 unzip
+# upx-ucl is in Ubuntu 'universe' and Debian trixie 'main', but NOT in Debian
+# bookworm 'main' -- apt-sources.sh enables bookworm-backports so it installs
+# there too.
 upx-ucl
 vim
 locate

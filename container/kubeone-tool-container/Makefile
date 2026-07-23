@@ -7,6 +7,7 @@ TAG_DATE ?= ${KUBEONE_VERSION}-$(shell date -I)
 BASE_IMAGE ?= ubuntu:24.04
 PLATFORM ?= linux/amd64
 CONTAINER_USER ?= kubermatic
+CONTAINER_USER_ID ?= 1001
 CONTAINER_USER_HOME ?= /home/kubermatic
 .PHONY: docker-release docker-build
 
@@ -16,6 +17,7 @@ docker-build:
 		--build-arg kubeone_version=${KUBEONE_VERSION} \
 		--build-arg kubeovn_ko_release=${KUBEOVN_KO_RELEASE_VERSION} \
 		--build-arg USER=${CONTAINER_USER} \
+		--build-arg USER_ID=${CONTAINER_USER_ID} \
 		--build-arg USER_HOME=${CONTAINER_USER_HOME} \
 		-t ${DOCKER_REPO}:${TAG_DATE} .
 
