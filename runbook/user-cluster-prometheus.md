@@ -339,7 +339,8 @@ prometheus-0   1/1     Running   0          116s
 
 ## General Defaulting of User Cluster Prometheus Resources
 
-Currently, it's not implemented. So unfortunately right now the limits needs to get patched at every cluster.
-See GitHub Reference issue: https://github.com/kubermatic/kubermatic/issues/5998
+Create a `ClusterTemplate` with label `scope: seed` and edit your `Seed` manifest's spec to reference that template under `defaultClusterTemplate`
+
+https://docs.kubermatic.com/kubermatic/v2.30/tutorials-howtos/project-and-cluster-management/cluster-defaulting/
 
 
