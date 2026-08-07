@@ -69,12 +69,8 @@ RUN HELMFILE_VERSION=$(curl -s https://api.github.com/repos/helmfile/helmfile/re
     tar -xzf helmfile_${HELMFILE_VERSION}_linux_amd64.tar.gz && \
     mv helmfile /usr/local/bin/helmfile && \
     chmod +x /usr/local/bin/helmfile && \
-    rm -f helmfile_${HELMFILE_VERSION}_linux_amd64.tar.gz && \
-    # helm-diff is required by helmfile; helm-secrets is commonly used with it.
-    # --verify=false: Helm v4 verifies plugin provenance by default, but these
-    # community plugins don't ship a .prov file yet, so skip verification.
-    helm plugin install https://github.com/databus23/helm-diff --verify=false && \
-    helm plugin install https://github.com/jkroepke/helm-secrets --verify=false
+    rm -f helmfile_${HELMFILE_VERSION}_linux_amd64.tar.gz
+    # helm-diff and other plugins installed after USER kubermatic switch below.
 
 # Install Yq
 RUN RELEASE_URL=$(curl -Ls -o /dev/null -w %{url_effective} https://github.com/mikefarah/yq/releases/latest) && \
@@ -145,6 +141,12 @@ ENV HOME=$USER_HOME
 RUN useradd -rm -d ${USER_HOME} -s /bin/bash -g root -G sudo -u ${USER_ID} ${USER} && chown $USER -R $USER_HOME
 USER ${USER}
 WORKDIR ${USER_HOME}
+
+# Install Helm plugins (helm-diff, helm-secrets, helm-git) as the kubermatic user
+# so they land directly in the correct HELM_DATA_HOME.
+RUN helm plugin install https://github.com/databus23/helm-diff --verify=false && \
+    helm plugin install https://github.com/jkroepke/helm-secrets --verify=false && \
+    helm plugin install https://github.com/aslafy-z/helm-git --verify=false
 
 # Install fzf manually since apt-get install does not install bash completion
 RUN git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf && ~/.fzf/install
