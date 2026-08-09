@@ -1,0 +1,77 @@
+# Copyright YEAR The XXX Authors.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+
+ARG BASE_IMAGE=quay.io/kubermatic-labs/kubeone-tooling
+ARG BASE_TAG=TBD
+# Stage to download the kubermatic-virtualization binary via kubermatic-ee-downloader
+# See: https://docs.kubermatic.com/kubermatic-virtualization/v1.1.0/getting-kubermatic-virtualization/
+FROM alpine:latest AS kubev-downloader
+
+ARG KUBEV_VERSION=TBD
+
+RUN apk add --no-cache curl tar bash coreutils && \
+    curl -sfL https://raw.githubusercontent.com/kubermatic/kubermatic-ee-downloader/main/install.sh | INSTALL_DIR=/usr/local/bin sh
+
+WORKDIR /tmp/binary
+RUN --mount=type=secret,id=kubev_username \
+    --mount=type=secret,id=kubev_password \
+    KUBEV_USER="$(tr -d '\r\n' < /run/secrets/kubev_username)" && \
+    KUBEV_PASS="$(tr -d '\r\n' < /run/secrets/kubev_password)" && \
+    [ -n "$KUBEV_USER" ] || { echo "ERROR: kubev_username secret is empty"; exit 1; } && \
+    [ -n "$KUBEV_PASS" ] || { echo "ERROR: kubev_password secret is empty"; exit 1; } && \
+    echo "Using credentials: user=${KUBEV_USER} (password length=${#KUBEV_PASS})" && \
+    kubermatic-ee-downloader get kubermatic-virtualization \
+        --username "$KUBEV_USER" \
+        --password "$KUBEV_PASS" \
+        --version ${KUBEV_VERSION} && \
+    chmod +x /tmp/binary/kubermatic-virtualization
+
+# Main image
+FROM ${BASE_IMAGE}:${BASE_TAG}
+
+ARG USER=kubermatic
+ARG USER_HOME=/home/${USER}
+ARG BIN_ARCH=linux-amd64
+ARG BASE_TAG
+ARG KUBEV_VERSION
+ARG KKP_VERSION=TBD
+LABEL KUBEONE_VERSION=${BASE_TAG}
+LABEL KKP_VERSION=${KKP_VERSION}
+LABEL KUBEV_VERSION=${KUBEV_VERSION}
+
+ENV USER_HOME=$USER_HOME
+ENV HOME=$USER_HOME
+
+USER 0
+COPY --from=kubev-downloader /tmp/binary/kubermatic-virtualization /usr/bin/kubermatic-virtualization
+
+RUN chmod a+rx /usr/bin/kubermatic-virtualization && \
+      echo 'source <(kubermatic-virtualization completion bash)' >> /root/.bashrc && \
+      echo 'kubermatic-virtualization version' >> /root/.bashrc && \
+      echo 'kubermatic-virtualization version' >> $USER_HOME/.bashrc
+
+RUN mkdir -p /tmp/${KKP_VERSION} && \
+      wget https://github.com/kubermatic/kubermatic/releases/download/${KKP_VERSION}/kubermatic-ee-${KKP_VERSION}-${BIN_ARCH}.tar.gz -O- | tar -xz --directory /tmp/${KKP_VERSION}/ && \
+      mv /tmp/${KKP_VERSION}/kubermatic-installer /bin/kubermatic-installer && \
+      chmod +x /bin/kubermatic-installer && \
+      rm -rf /tmp/${KKP_VERSION} && \
+      kubermatic-installer --version && \
+      echo 'figlet KKP '${KKP_VERSION}' | /usr/games/lolcat' >> /root/.bashrc && \
+      echo 'figlet KKP '${KKP_VERSION}' | /usr/games/lolcat' >> $USER_HOME/.bashrc
+
+USER ${USER}
+
+## tail to enable to run in backend
+#CMD exec /bin/bash -c "trap : TERM INT; sleep infinity & wait"

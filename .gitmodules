@@ -1,0 +1,3 @@
+[submodule "container/kubermatic-virtualization-tooling-container/git-submodules/kubermatic-virtualization"]
+	path = container/kubermatic-virtualization-tooling-container/git-submodules/kubermatic-virtualization
+	url = git@github.com:kubermatic/kubermatic-virtualization.git
