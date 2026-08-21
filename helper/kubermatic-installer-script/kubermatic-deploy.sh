@@ -54,11 +54,11 @@ fi
 # DEPLOY_STACK = last argument
 DEPLOY_STACK="${args[-1]}"
 
-DEPLOY_CERTMANAGER=true
-DEPLOY_MINIO=true
-DEPLOY_ALERTMANAGER=true
-DEPLOY_LOKI=true
-DEPLOY_IAP=true
+DEPLOY_CERTMANAGER=${DEPLOY_CERTMANAGER:-true}
+DEPLOY_MINIO=${DEPLOY_MINIO:-true}
+DEPLOY_ALERTMANAGER=${DEPLOY_ALERTMANAGER:-true}
+DEPLOY_LOKI=${DEPLOY_LOKI:-true}
+DEPLOY_IAP=${DEPLOY_IAP:-true}
 #CANARY_DEPLOYMENT=true
 
 # verify Helm v3 or v4
@@ -76,7 +76,7 @@ function deploy {
   fi
   TEST_NAME="[Helm] Deploy chart $name"
 
-  if [[ -v CANARY_DEPLOYMENT ]]; then
+  if [[ "${CANARY_DEPLOYMENT}" = true ]]; then
     inital_revision="$(helm history $name --output=json | jq '.Releases[0].Revision')"
   fi
 
@@ -106,7 +106,7 @@ function deploy {
   helm dependency build $path
   helm upgrade --install --wait --timeout $timeout $MASTER_FLAG "${HELM_VALUES_ARGS[@]}" --namespace "$namespace" "$name" "$path"
 
-  if [[ -v CANARY_DEPLOYMENT ]]; then
+  if [[ "${CANARY_DEPLOYMENT}" = true ]]; then
     TEST_NAME="[Helm] Rollback chart $name"
     echodate "Rolling back $name to revision $inital_revision as this was only a canary deployment"
     helm rollback --wait --timeout "$timeout" "$name" "$inital_revision"
@@ -116,7 +116,7 @@ function deploy {
 
 function deployBackup() {
       # CI has its own Minio deployment as a proxy for GCS, so we do not install the default Helm chart here.
-    if [[ -v DEPLOY_MINIO ]]; then
+    if [[ "${DEPLOY_MINIO}" = true ]]; then
       deploy    minio minio minio/
       deploy    s3-exporter kube-system s3-exporter/
     fi
@@ -127,7 +127,7 @@ function deployBackup() {
 }
 
 function deployCertManager() {
-    if [[ -v DEPLOY_CERTMANAGER ]]; then
+    if [[ "${DEPLOY_CERTMANAGER}" = true ]]; then
       #### CERT-MANAGER
       kubectl apply -f "$CHART_FOLDER/cert-manager/crd"
       deploy    cert-manager cert-manager cert-manager/
@@ -138,7 +138,7 @@ function deployIAP() {
     # We might have not configured IAP which results in nothing being deployed. This triggers https://github.com/helm/helm/issues/4295 and marks this as failed
     # We hack around this by grepping for a string that is mandatory in the values file of IAP
     # to determine if its configured, because an empty chart leads to Helm doing weird things
-    if [[ -v DEPLOY_IAP ]]; then
+    if [[ "${DEPLOY_IAP}" = true ]]; then
       # Check all values files to see if oidc_issuer_url occurs
       local iap_configured=false
       for value_file in "${HELM_VALUES_ARGS[@]}"; do
@@ -171,7 +171,7 @@ case "$DEPLOY_STACK" in
     deploy      kube-state-metrics monitoring monitoring/kube-state-metrics/
     deploy      grafana monitoring monitoring/grafana/
     deploy      blackbox-exporter monitoring monitoring/blackbox-exporter/
-    if [[ -v DEPLOY_ALERTMANAGER ]]; then
+    if [[ "${DEPLOY_ALERTMANAGER}" = true ]]; then
       deploy    alertmanager monitoring monitoring/alertmanager/
     fi
     deploy      prometheus monitoring monitoring/prometheus/ 900s
