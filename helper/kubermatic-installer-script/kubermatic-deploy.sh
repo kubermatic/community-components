@@ -59,7 +59,7 @@ DEPLOY_MINIO=${DEPLOY_MINIO:-true}
 DEPLOY_ALERTMANAGER=${DEPLOY_ALERTMANAGER:-true}
 DEPLOY_LOKI=${DEPLOY_LOKI:-true}
 DEPLOY_IAP=${DEPLOY_IAP:-true}
-#CANARY_DEPLOYMENT=true
+CANARY_DEPLOYMENT=${CANARY_DEPLOYMENT:-false}
 
 # verify Helm v3 or v4
 [[ $(helm version --short) =~ ^v(3|4)\..*$ ]] && echo "Helm v3 or v4 detected!" || (echo "This script requires Helm v3 or v4! Please install Helm: https://helm.sh/docs/intro/install" && exit 1)
