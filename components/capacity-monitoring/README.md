@@ -41,15 +41,15 @@ Alerts covering the events of overcomitting resources have been defined as follo
 
 Suggested exporter: [vmware-exporter](https://github.com/pryorda/vmware_exporter)
 
-Installation method: [helm chart](components/vmware-exporter/Chart.yaml)
+Installation method: [helm chart](../vmware-exporter/Chart.yaml)
 
-Suggested rulesets: [included](knowledge-base/capacity-management/prometheus-rules/vmware.yaml)
+Suggested rulesets: [included](prometheus-rules/vmware.yaml)
 
 ### Nutanix
 
 Suggested exporter: [nutanix-exporter](https://github.com/claranet/nutanix-exporter)
 
-Installation method: [helm chart](components/nutanix-exporter/Chart.yaml)
+Installation method: [helm chart](../nutanix-exporter/Chart.yaml)
 
 Suggested rulesets: TBD
 
@@ -59,7 +59,7 @@ Suggested exporter: [openstack-exporter](https://github.com/openstack-exporter/o
 
 Installation method: [helm chart](https://github.com/openstack-exporter/helm-charts)
 
-Suggested rulesets: [included](knowledge-base/capacity-management/prometheus-rules/openstack.yaml)
+Suggested rulesets: [included](prometheus-rules/openstack.yaml)
 
 ### KubeVirt
 

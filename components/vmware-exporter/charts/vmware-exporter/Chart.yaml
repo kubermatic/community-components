@@ -1,0 +1,13 @@
+apiVersion: v1
+appVersion: 0.13.2
+description: VMware vCenter Exporter for Prometheus Helm chart
+home: https://github.com/pryorda/vmware_exporter
+maintainers:
+- email: info@martinkremers.de
+  name: kremers
+- email: daniel@pryorda.net
+  name: pryorda
+name: vmware-exporter
+sources:
+- https://github.com/pryorda/vmware_exporter
+version: 2.2.0

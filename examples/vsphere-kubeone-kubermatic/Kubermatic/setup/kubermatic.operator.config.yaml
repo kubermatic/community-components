@@ -46,7 +46,7 @@ spec:
       # For generating a certificate signed by a trusted root authority replace
       # with "letsencrypt-prod".
       name: ca-prod
-  exposeStrategy: NodePort
+  exposeStrategy: Tunneling
   # These secret keys configure the way components commmunicate with Dex.
   auth:
     caBundle: |+

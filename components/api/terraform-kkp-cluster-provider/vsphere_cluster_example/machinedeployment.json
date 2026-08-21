@@ -1,0 +1,32 @@
+{
+  "name": "${machine_name}",
+  "spec": {
+    "template": {
+      "cloud": {
+        "vsphere": {
+          "cpus": ${cpus},
+          "memory": ${memory},
+          "diskSizeGB": ${disk_size},
+          "template": "${template_vm}"
+        }
+      },
+      "labels": {},
+      "taints": [],
+      "operatingSystem": {
+        "ubuntu": {
+          "distUpgradeOnBoot": false
+        }
+      },
+      "versions": {
+        "kubelet": "${kubernetes_version}"
+      }
+    },
+    "replicas": ${replicas},
+    "dynamicConfig": null,
+    "minReplicas": null,
+    "maxReplicas": null
+  },
+  "annotations": {
+    "k8c.io/operating-system-profile": "${osp_name}"
+  }
+}

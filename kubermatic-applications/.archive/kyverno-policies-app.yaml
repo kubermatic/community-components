@@ -1,0 +1,20 @@
+apiVersion: apps.kubermatic.k8c.io/v1
+kind: ApplicationDefinition
+metadata:
+  name: kyverno-policies
+spec:
+  description: Kubernetes Pod Security Standards implemented as Kyverno policies.
+  method: helm
+  versions:
+  - template:
+      source:
+        helm:
+          chartName: kyverno-policies
+          chartVersion: 3.0.4
+          url: https://kyverno.github.io/kyverno/
+    version: 1.10.3
+
+  defaultValues:
+    podSecurityStandard: baseline
+    podSecuritySeverity: medium
+    validationFailureAction: Audit

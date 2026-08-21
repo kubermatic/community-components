@@ -1,0 +1,13 @@
+name: argocd.rules
+rules:
+- alert: LargeNumberOfGitRequestsByArgoCD
+  expr: sum(increase(argocd_git_request_total{namespace=~"argocd"}[10m])) > 200
+  annotations:
+    message: "Argocd has made more than 200 git requests in last 10 mins."
+  for: 0m
+  labels:
+    severity: warning
+    resource: '{{ $labels.name }}'
+    service: argocd
+    env: 'XXXXX'
+    seed_cluster: 'YYYYY'

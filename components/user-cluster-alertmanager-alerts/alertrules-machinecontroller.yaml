@@ -1,0 +1,24 @@
+name: machinecontrollerrules
+rules:
+  - alert: KubeNodeMachineMismatch
+    expr: count(kube_node_info unless on(node) kube_node_role{role="control-plane"}) != sum(machine_controller_machines)
+    for: 1h
+    annotations:
+      message: No of Kubernetes nodes has not matched the number of MachineDeployment Machines for longer than an hour.
+    labels:
+      severity: warning
+      resource: '{{ $labels.name }}'
+      env: 'XXXXX'
+      cloud: 'ZZZZZ'
+      seed_cluster: 'YYYYY'
+  - alert: KubeNodeMachineMismatchFor1Day
+    expr: count(kube_node_info unless on(node) kube_node_role{role="control-plane"}) != sum(machine_controller_machines)
+    for: 1d
+    annotations:
+      message: No of Kubernetes nodes has not matched the number of MachineDeployment Machines for longer than one day.
+    labels:
+      severity: critical
+      resource: '{{ $labels.name }}'
+      env: 'XXXXX'
+      cloud: 'ZZZZZ'
+      seed_cluster: 'YYYYY'

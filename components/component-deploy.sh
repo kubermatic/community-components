@@ -3,44 +3,59 @@
 set -euo pipefail
 set +x
 
+BASEDIR=$(dirname "$0")
+source $BASEDIR/../hack/lib.sh
+
 DEPLOY_S3_SYNCER="s3-syncer"
 DEPLOY_RCLONE_S3_SYNCER="rclone-s3-syncer"
 DEPLOY_SGW="service-gateway"
-DEPLOY_CERT="cert-update-svc"
 DEPLOY_THANOS_SEED_INGRESS="thanos-seed-ingress"
 DEPLOY_VMWARE_EXPORTER="vmware-exporter"
 
-if [[ $# -lt 4 ]] || [[ "$1" == "--help" ]]; then
-  echo "ARGUMENTS:"$*
-  echo ""
-  echo "Usage: $(basename \"$0\") path/to/VALUES_FILES path/to/VALUE_FILE_OVERRIDE path/to/CHART_FOLDER ($DEPLOY_S3_SYNCER|$DEPLOY_SGW|$DEPLOY_WACKER_CERT)"
+if [[ $# -lt 1 ]] || [[ "$1" == "--help" ]]; then
+  echo "Usage: $(basename "$0") path/to/values1.yaml [values2.yaml ...] path/to/CHART_FOLDER ($DEPLOY_S3_SYNCER|$DEPLOY_SGW|$DEPLOY_RCLONE_S3_SYNCER|$DEPLOY_THANOS_SEED_INGRESS|$DEPLOY_VMWARE_EXPORTER)"
   exit 1
 fi
 
-VALUES_FILE=$(realpath "$1")
-if [[ ! -f "$VALUES_FILE" ]]; then
-    echo -e "$(date -Is)" "'values.yaml' in folder not found! \nCONTENT $VALUES_FILE:\n`ls -l $VALUES_FILE/..`"
+args=("$@")
+
+# at least 3 arguments
+if [[ ${#args[@]} -lt 3 ]] || [[ "$1" == "--help" ]]; then
+  echo "Usage: $(basename \"$0\") path/to/values1.yaml [values2.yaml ...] path/to/CHART_FOLDER ($DEPLOY_S3_SYNCER|$DEPLOY_SGW|$DEPLOY_RCLONE_S3_SYNCER|$DEPLOY_THANOS_SEED_INGRESS|$DEPLOY_VMWARE_EXPORTER)"
+  exit 1
+fi
+
+# helm values files = args[0..-2]
+HELM_VALUES_ARGS=()
+for (( i=0; i<${#args[@]}-2; i++ )); do
+  VALUES_FILE="$(realpath "${args[$i]}")"
+  if [[ ! -f "$VALUES_FILE" ]]; then
+    echodate "'values.yaml' not found: $VALUES_FILE"
     exit 1
+  fi
+  HELM_VALUES_ARGS+=( --values "$VALUES_FILE" )
+done
+
+if [[ ${#HELM_VALUES_ARGS[@]} -eq 0 ]]; then
+  echodate "At least one values.yaml must be provided."
+  exit 1
 fi
 
-VALUE_FILE_OVERRIDE=$(realpath "$2")
-if [[ ! -f "$VALUE_FILE_OVERRIDE" ]]; then
-    VALUE_FILE_OVERRIDE=""
-fi
-
-CHART_FOLDER=$(realpath "$3")
+# CHART_FOLDER = penultimate argument
+CHART_FOLDER=$(realpath "${args[-2]}")
 if [[ ! -d "$CHART_FOLDER" ]]; then
-    echo "$(date -Is)" "CHART_FOLDER not found! $CHART_FOLDER"
+    echodate "CHART_FOLDER not found! $CHART_FOLDER"
     exit 1
 fi
 
 ### verification is checked in case expresion
-DEPLOY_STACK="$4"
+# DEPLOY_STACK = last argument
+DEPLOY_STACK="${args[-1]}"
 
 HELM_EXTRA_ARGS=${HELM_EXTRA_ARGS:-""} #"--dry-run --debug"
 
-#verify Helm3
-[[ $(helm version --short) =~ ^v3.*$ ]] && echo "helm3 detected!" || (echo "This script requires helm3! Please install helm3: https://helm.sh/docs/intro/install" && exit 1)
+# verify Helm v3 or v4
+[[ $(helm version --short) =~ ^v(3|4)\..*$ ]] && echo "Helm v3 or v4 detected!" || (echo "This script requires Helm v3 or v4! Please install Helm: https://helm.sh/docs/intro/install" && exit 1)
 
 function deploy {
   local name="$1"
@@ -52,14 +67,29 @@ function deploy {
     echo "chart not found! $path"
     exit 1
   fi
+
+  echodate "Fetching dependencies for chart $name ..."
+  requiresUpdate=false
+  chartname=$(yq eval .name $path/Chart.yaml )
+  i=0
+  for url in $(yq eval '.dependencies[]|select(.repository != null)|.repository' $path/Chart.yaml); do
+    i=$((i + 1))
+    helm repo add ${chartname}-dep-${i} ${url}
+    requiresUpdate=true
+  done
+
+  if $requiresUpdate; then
+    helm repo update
+  fi
+
   TEST_NAME="[Helm] Deploy chart $name into namespace $namespace"
-  echo "$(date -Is)" "Upgrading $TEST_NAME ..."
-  helm upgrade --create-namespace --install --wait $HELM_EXTRA_ARGS --timeout $timeout --values "$VALUES_FILE" --values "$VALUE_FILE_OVERRIDE" --namespace "$namespace" "$name" "$path"
+  echodate "Upgrading $TEST_NAME ..."
+  helm upgrade --create-namespace --install --wait $HELM_EXTRA_ARGS --timeout $timeout "${HELM_VALUES_ARGS[@]}" --namespace "$namespace" "$name" "$path"
 
   unset TEST_NAME
 }
 
-echo "$(date -Is)" "Deploying $DEPLOY_STACK stack..."
+echodate "Deploying $DEPLOY_STACK stack..."
 case "$DEPLOY_STACK" in
   "$DEPLOY_SGW")
     deploy service-gateway service-gateway-server service-gateway

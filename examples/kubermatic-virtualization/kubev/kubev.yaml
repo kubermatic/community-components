@@ -1,0 +1,48 @@
+apiVersion: virtualization.k8c.io/v1alpha1
+kind: KubeVCluster
+
+# Default VPC Configuration
+networkConfiguration:
+  dnsServer: 10.0.1.2
+  # POD CIDR range
+  networkCIDR: 172.25.0.0/24
+  # Gateway at POD default kube-ovn network
+  gatewayIP: 172.25.0.1
+
+
+#offlineSettings:
+#  enabled: true
+#  containerRegistry:
+#    address: 10.0.1.2:5000
+#    insecure: true
+#  helmRegistry:
+#    address: 10.0.1.2:5000
+#    insecure: true
+#  packageRepository: 10.0.1.2
+#
+
+# Default VPC: default external announcement
+loadBalancer:
+  metallb:
+    ipRange: 10.0.2.101-10.0.2.110
+apiEndpoint:
+  host: 10.0.2.53
+controlPlane:
+  hosts:
+    - address: 10.0.2.215
+      sshUsername: root
+      sshPrivateKeyFile: /data/infra/kubev/git-submodules/secrets/ssh/id_rsa
+    - address: 10.0.2.213
+      sshUsername: root
+      sshPrivateKeyFile: /data/infra/kubev/git-submodules/secrets/ssh/id_rsa
+    - address: 10.0.2.212
+      sshUsername: root
+      sshPrivateKeyFile: /data/infra/kubev/git-submodules/secrets/ssh/id_rsa
+staticWorkers:
+  hosts:
+    - address: 10.0.2.214
+      sshUsername: root
+      sshPrivateKeyFile: /data/infra/kubev/git-submodules/secrets/ssh/id_rsa
+
+storage:
+  none: {}

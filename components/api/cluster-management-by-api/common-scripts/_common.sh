@@ -78,6 +78,22 @@ patchRequest(){
     -d  @"${payload_file_path}"
 }
 
+putRequest(){
+  api_path=${1}
+  payload_file_path=${2}
+  if [ "$#" -lt 2 ]; then
+    echo "Usage: puRequest API_PATH PAYLOAD_FILE_PATH"
+    echo "e.g.: putRequest /projects/PROJECT_ID/clusters path/cluster.json"
+    exit 0
+  fi
+  curl -k -X PUT \
+      "${KKP_API}${api_path}" \
+    -H  "accept: application/json" \
+    -H  "Content-Type: application/json" \
+    -H  "authorization: Bearer ${KKP_TOKEN}" \
+    -d  @"${payload_file_path}"
+}
+
 deleteRequest(){
   api_path=${1}
   if [ "$#" -lt 1 ]; then

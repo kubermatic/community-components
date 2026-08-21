@@ -1,0 +1,89 @@
+name: miniorules
+rules:
+  - alert: MinioAlmostFull
+    annotations:
+      message: s3-as a service is more than 80% full and can run out of storage space soon.
+    expr: |
+      topk(1, minio_cluster_capacity_usable_free_bytes{}/minio_cluster_capacity_usable_total_bytes{})*100 < 20
+    for: 10m
+    labels:
+      severity: warning
+      resource: '{{ $labels.name }}'
+      service: minio-as-a-service
+      env: 'XXXXX'
+      cloud: 'ZZZZZ'
+      seed_cluster: 'YYYYY'
+  - alert: MinioRunningOutOfFreeSpace
+    annotations:
+      message: s3-as a service is more than 90% full and can run out of storage space anytime. More storage must be added as soon as possible!
+    expr: |
+      topk(1, minio_cluster_capacity_usable_free_bytes{}/minio_cluster_capacity_usable_total_bytes{})*100 < 10
+    for: 15m
+    labels:
+      severity: critical
+      resource: '{{ $labels.name }}'
+      service: minio-as-a-service
+      env: 'XXXXX'
+      cloud: 'ZZZZZ'
+      seed_cluster: 'YYYYY'
+  - alert: MinioDiskOffline
+    annotations:
+      message: One or more disks for minio service are offline. Must act immediately to resolve the issue (possibly via data recovery and restart of minio pods).
+    expr: |
+      minio_cluster_disk_offline_total > 0
+    for: 5m
+    labels:
+      severity: critical
+      resource: '{{ $labels.name }}'
+      service: minio-as-a-service
+      env: 'XXXXX'
+      cloud: 'ZZZZZ'
+      seed_cluster: 'YYYYY'
+  - alert: MinioNodeOffline
+    annotations:
+      message: One or more node for minio service are offline. Must act immediately to resolve the issue (possibly via data recovery and restart of minio pods).
+    expr: |
+      minio_cluster_nodes_offline_total > 0
+    for: 5m
+    labels:
+      severity: critical
+      resource: '{{ $labels.name }}'
+      service: minio-as-a-service
+      env: 'XXXXX'
+      cloud: 'ZZZZZ'
+      seed_cluster: 'YYYYY'
+  - alert: MinioTooManyOpenFDs
+    annotations:
+      message: Minio has too many file-descriptors open. This can have issues on overall stability of minio service. Investigate and Potentially restart minio pods.
+    expr: |
+      minio_node_file_descriptor_open_total{}/minio_node_file_descriptor_limit_total{}*100 > 80
+    for: 1m
+    labels:
+      severity: critical
+      resource: '{{ $labels.name }}'
+      service: minio-as-a-service
+      env: 'XXXXX'
+      cloud: 'ZZZZZ'
+      seed_cluster: 'YYYYY'
+  - alert: MinioOperatorCertExpiryIn30Days
+    annotations:
+      message: 'Minio operator-tls cert will expire in 30 days. Please renew it to avoid service disruption'
+    expr: probe_ssl_earliest_cert_expiry{job="blackbox-exporter-custom-link-monitoring"} - time() < 86400 * 30
+    for: 10m
+    labels:
+      resource: '{{ $labels.name }}'
+      severity: warning
+      env: 'XXXXX'
+      cloud: 'ZZZZZ'
+      seed_cluster: 'YYYYY'
+  - alert: MinioOperatorCertExpiryIn3Days
+    annotations:
+    message: 'Minio operator-tls cert will expire in 3 days. Please renew it as soon as possible to avoid service disruption'
+    expr: probe_ssl_earliest_cert_expiry{job="blackbox-exporter-custom-link-monitoring"} - time() < 86400 * 3
+    for: 10m
+    labels:
+      resource: '{{ $labels.name }}'
+      severity: critical
+      env: 'XXXXX'
+      cloud: 'ZZZZZ'
+      seed_cluster: 'YYYYY'

@@ -1,5 +1,11 @@
 # Kubermatic Setup Requirements
 
+## An up-to-date version has been transfered to Google Docs: [Kubermatic Setup Requirements v1.2](https://docs.google.com/document/d/1gWhrHohE6YDF6kzbI3q5nMP2gweN7Gxj8vP5Py2dzd4/edit?usp=sharing)
+
+----------
+OUTDATED VERSION
+----------
+
 ## Documentation
 To respect the latest requirements and instructions, follow the installation as described at:
 

@@ -1,0 +1,35 @@
+apiVersion: apps.kubermatic.k8c.io/v1
+kind: ApplicationDefinition
+metadata:
+  name: sysdig-agent
+spec:
+  description: Sysdig’s Cloud Native Application Protection Platform (CNAPP) helps you stop cloud and container security attacks with no wasted time.
+  method: helm
+  versions:
+  - template:
+      source:
+        helm:
+          chartName: sysdig-deploy
+          chartVersion: 1.8.28
+          url: https://charts.sysdig.com
+    version: 1.8.28
+    # helm repo add sysdig https://charts.sysdig.com
+    # helm search repo sysdig
+  defaultValues:
+    global:
+      sysdig:
+        # get from sysdig portal: https://eu1.app.sysdig.com/secure/#/data-sources/agents?setupModalEnv=Kubernetes&installContentDisplayType=tabular
+        accessKey: xxxxx___TODO-ADD-KEY___xxxx
+        region: eu1
+      clusterConfig:
+        # give a name for sysdig portal
+        name: xxxxx___TODO-ADD_CLUSTER_NAME___xxxx
+      kspm:
+        deploy: true
+    nodeAnalyzer:
+      secure:
+        vulnerabilityManagement:
+          newEngineOnly: true
+      nodeAnalyzer:
+        benchmarkRunner:
+          deploy: false

@@ -1,0 +1,15 @@
+                                                                        
+                   Kubermatic Virtualization Details                    
+╭──────────────────────────────────────────────────────────────────────╮
+│             Component                           Version              │
+│ Kubermatic Virtualization          d12dc16b7f5d8b18377a7f08ded674562 │
+│                                    7…                                │
+│ Kubernetes                         v1.34.3                           │
+│ KubeOVN CNI                        v1.14.30                          │
+│ Multus CNI                         v4.2.3                            │
+│ Kyverno                            3.5.0                             │
+│ Metal LB                           0.15.2                            │
+│ Cert Manager                       v1.18.2                           │
+│ Longhorn                           1.9.1                             │
+│ Kubevirt                           v1.5.3                            │
+╰──────────────────────────────────────────────────────────────────────╯

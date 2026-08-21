@@ -1,0 +1,6596 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+{{/*  #'{{ index .Values "gitlab-runner" "gitlabUrl" }}'*/}}
+  name: '{{ index .Values "vmware-exporter" "grafana" "configmap" "name" }}'
+  namespace: '{{ index .Values "vmware-exporter" "grafana" "configmap" "namespace" }}'
+  #NOTE: extracted from  https://github.com/pryorda/vmware_exporter/tree/main/dashboards
+  #skip helm rendering for the selected data
+{{`
+data:
+  vsphere-cluster.json: |
+    {
+      "annotations": {
+        "list": [
+          {
+            "builtIn": 1,
+            "datasource": {
+              "type": "datasource",
+              "uid": "grafana"
+            },
+            "enable": true,
+            "hide": true,
+            "iconColor": "rgba(0, 211, 255, 1)",
+            "limit": 100,
+            "name": "Annotations & Alerts",
+            "showIn": 0,
+            "type": "dashboard"
+          }
+        ]
+      },
+      "description": "VMware ESXi single instance graphs.",
+      "editable": true,
+      "fiscalYearStartMonth": 0,
+      "gnetId": 10076,
+      "graphTooltip": 1,
+      "id": 3,
+      "links": [],
+      "panels": [
+        {
+          "datasource": {
+            "uid": "$datasource"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "mappings": [
+                {
+                  "options": {
+                    "match": "null",
+                    "result": {
+                      "text": "N/A"
+                    }
+                  },
+                  "type": "special"
+                }
+              ],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "#299c46",
+                    "value": null
+                  },
+                  {
+                    "color": "rgba(237, 129, 40, 0.89)",
+                    "value": 50
+                  },
+                  {
+                    "color": "#d44a3a",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "short"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 3,
+            "w": 4,
+            "x": 0,
+            "y": 0
+          },
+          "id": 14,
+          "maxDataPoints": 100,
+          "options": {
+            "colorMode": "none",
+            "graphMode": "none",
+            "justifyMode": "auto",
+            "orientation": "horizontal",
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "showPercentChange": false,
+            "textMode": "auto",
+            "wideLayout": true
+          },
+          "targets": [
+            {
+              "expr": "sum(vmware_host_num_cpu{cluster_name=~\"$cluster\"})",
+              "format": "time_series",
+              "intervalFactor": 1,
+              "refId": "A"
+            }
+          ],
+          "title": "Cpu Core Capacity",
+          "type": "stat"
+        },
+        {
+          "datasource": {
+            "uid": "$datasource"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "mappings": [
+                {
+                  "options": {
+                    "match": "null",
+                    "result": {
+                      "text": "N/A"
+                    }
+                  },
+                  "type": "special"
+                }
+              ],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "#299c46",
+                    "value": null
+                  },
+                  {
+                    "color": "rgba(237, 129, 40, 0.89)",
+                    "value": 50
+                  },
+                  {
+                    "color": "#d44a3a",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "hertz"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 3,
+            "w": 4,
+            "x": 4,
+            "y": 0
+          },
+          "id": 38,
+          "maxDataPoints": 100,
+          "options": {
+            "colorMode": "none",
+            "graphMode": "none",
+            "justifyMode": "auto",
+            "orientation": "horizontal",
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "showPercentChange": false,
+            "textMode": "auto",
+            "wideLayout": true
+          },
+          "targets": [
+            {
+              "expr": "sum(vmware_host_cpu_max{cluster_name=~\"$cluster\"}) ",
+              "format": "time_series",
+              "intervalFactor": 1,
+              "refId": "A"
+            }
+          ],
+          "title": "Cpu Capacity",
+          "type": "stat"
+        },
+        {
+          "datasource": {
+            "uid": "$datasource"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "mappings": [
+                {
+                  "options": {
+                    "match": "null",
+                    "result": {
+                      "text": "N/A"
+                    }
+                  },
+                  "type": "special"
+                }
+              ],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "#299c46",
+                    "value": null
+                  },
+                  {
+                    "color": "rgba(237, 129, 40, 0.89)",
+                    "value": 50
+                  },
+                  {
+                    "color": "#d44a3a",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "decmbytes"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 3,
+            "w": 4,
+            "x": 8,
+            "y": 0
+          },
+          "id": 15,
+          "maxDataPoints": 100,
+          "options": {
+            "colorMode": "none",
+            "graphMode": "none",
+            "justifyMode": "auto",
+            "orientation": "horizontal",
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "showPercentChange": false,
+            "textMode": "auto",
+            "wideLayout": true
+          },
+          "targets": [
+            {
+              "expr": "sum(vmware_host_memory_max{cluster_name=~\"$cluster\"})",
+              "format": "time_series",
+              "intervalFactor": 1,
+              "refId": "A"
+            }
+          ],
+          "title": "Memory Capacity",
+          "type": "stat"
+        },
+        {
+          "datasource": {
+            "uid": "$datasource"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "mappings": [
+                {
+                  "options": {
+                    "match": "null",
+                    "result": {
+                      "text": "N/A"
+                    }
+                  },
+                  "type": "special"
+                }
+              ],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "#299c46",
+                    "value": null
+                  },
+                  {
+                    "color": "rgba(237, 129, 40, 0.89)",
+                    "value": 50
+                  },
+                  {
+                    "color": "#d44a3a",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "none"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 3,
+            "w": 4,
+            "x": 12,
+            "y": 0
+          },
+          "id": 36,
+          "maxDataPoints": 100,
+          "options": {
+            "colorMode": "none",
+            "graphMode": "none",
+            "justifyMode": "auto",
+            "orientation": "horizontal",
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "showPercentChange": false,
+            "textMode": "auto",
+            "wideLayout": true
+          },
+          "targets": [
+            {
+              "expr": "count(vmware_host_connection_state{cluster_name=~\"$cluster\"})",
+              "format": "time_series",
+              "intervalFactor": 1,
+              "refId": "A"
+            }
+          ],
+          "title": "Host Number",
+          "type": "stat"
+        },
+        {
+          "datasource": {
+            "uid": "$datasource"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "mappings": [
+                {
+                  "options": {
+                    "N/A": {
+                      "color": "#299c46",
+                      "text": "0"
+                    },
+                    "No Data": {
+                      "color": "#299c46",
+                      "text": "0"
+                    }
+                  },
+                  "type": "value"
+                },
+                {
+                  "options": {
+                    "match": "null",
+                    "result": {
+                      "color": "#299c46",
+                      "text": "0"
+                    }
+                  },
+                  "type": "special"
+                }
+              ],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "#299c46",
+                    "value": null
+                  },
+                  {
+                    "color": "rgba(237, 129, 40, 0.89)",
+                    "value": 50
+                  },
+                  {
+                    "color": "#d44a3a",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "none"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 3,
+            "w": 4,
+            "x": 16,
+            "y": 0
+          },
+          "id": 37,
+          "maxDataPoints": 100,
+          "options": {
+            "colorMode": "none",
+            "graphMode": "none",
+            "justifyMode": "auto",
+            "orientation": "horizontal",
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "showPercentChange": false,
+            "textMode": "auto",
+            "wideLayout": true
+          },
+          "targets": [
+            {
+              "expr": "count(vmware_host_maintenance_mode{cluster_name=~\"$cluster\"}==1) OR vector(0)",
+              "format": "time_series",
+              "intervalFactor": 1,
+              "refId": "A"
+            }
+          ],
+          "title": "Host In Maintenance",
+          "type": "stat"
+        },
+        {
+          "datasource": {
+            "uid": "$datasource"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "mappings": [
+                {
+                  "id": 0,
+                  "op": "=",
+                  "text": "N/A",
+                  "type": 1,
+                  "value": "null"
+                }
+              ],
+              "max": 100,
+              "min": 0,
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "#299c46",
+                    "value": null
+                  },
+                  {
+                    "color": "rgba(237, 129, 40, 0.89)",
+                    "value": 50
+                  },
+                  {
+                    "color": "#d44a3a",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "percent"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 5,
+            "w": 4,
+            "x": 0,
+            "y": 3
+          },
+          "id": 12,
+          "options": {
+            "minVizHeight": 75,
+            "minVizWidth": 75,
+            "orientation": "horizontal",
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "showThresholdLabels": false,
+            "showThresholdMarkers": true,
+            "sizing": "auto"
+          },
+          "targets": [
+            {
+              "expr": "sum(vmware_host_cpu_usagemhz_average{cluster_name=~\"$cluster\"}) * 100 / sum(vmware_host_cpu_max{cluster_name=~\"$cluster\"})",
+              "format": "time_series",
+              "intervalFactor": 1,
+              "legendFormat": "{{ $cluster }",
+              "refId": "A"
+            }
+          ],
+          "title": "Cluster CPU usage",
+          "type": "gauge"
+        },
+        {
+          "datasource": {
+            "uid": "$datasource"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "mappings": [
+                {
+                  "id": 0,
+                  "op": "=",
+                  "text": "N/A",
+                  "type": 1,
+                  "value": "null"
+                }
+              ],
+              "max": 20,
+              "min": 0,
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "#299c46",
+                    "value": null
+                  },
+                  {
+                    "color": "rgba(237, 129, 40, 0.89)",
+                    "value": 5
+                  },
+                  {
+                    "color": "#d44a3a",
+                    "value": 10
+                  }
+                ]
+              },
+              "unit": "percent"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 5,
+            "w": 4,
+            "x": 4,
+            "y": 3
+          },
+          "id": 25,
+          "options": {
+            "minVizHeight": 75,
+            "minVizWidth": 75,
+            "orientation": "horizontal",
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "showThresholdLabels": false,
+            "showThresholdMarkers": true,
+            "sizing": "auto"
+          },
+          "targets": [
+            {
+              "expr": "max(vmware_vm_cpu_ready_summation{cluster_name=~\"$cluster\"})/ 200",
+              "format": "time_series",
+              "intervalFactor": 1,
+              "legendFormat": "{{ cluster }}",
+              "refId": "A"
+            }
+          ],
+          "title": "Max VM Cpu Ready on Cluster",
+          "type": "gauge"
+        },
+        {
+          "datasource": {
+            "uid": "$datasource"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "mappings": [
+                {
+                  "id": 0,
+                  "op": "=",
+                  "text": "N/A",
+                  "type": 1,
+                  "value": "null"
+                }
+              ],
+              "max": 10,
+              "min": 0,
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "#299c46",
+                    "value": null
+                  },
+                  {
+                    "color": "rgba(237, 129, 40, 0.89)",
+                    "value": 1
+                  },
+                  {
+                    "color": "#d44a3a",
+                    "value": 3
+                  }
+                ]
+              },
+              "unit": "percent"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 5,
+            "w": 4,
+            "x": 8,
+            "y": 3
+          },
+          "id": 26,
+          "options": {
+            "minVizHeight": 75,
+            "minVizWidth": 75,
+            "orientation": "horizontal",
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "showThresholdLabels": false,
+            "showThresholdMarkers": true,
+            "sizing": "auto"
+          },
+          "targets": [
+            {
+              "expr": "max(vmware_vm_cpu_costop_summation{cluster_name=~\"$cluster\"})/200",
+              "format": "time_series",
+              "intervalFactor": 1,
+              "legendFormat": "{{ $cluster }}",
+              "refId": "A"
+            }
+          ],
+          "title": "Max VM Cpu Co-Stop on Cluster",
+          "type": "gauge"
+        },
+        {
+          "datasource": {
+            "uid": "$datasource"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 10,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "insertNulls": false,
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "never",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "decimals": 1,
+              "links": [],
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "percent"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 5,
+            "w": 12,
+            "x": 12,
+            "y": 3
+          },
+          "id": 17,
+          "options": {
+            "legend": {
+              "calcs": [],
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "tooltip": {
+              "mode": "multi",
+              "sort": "none"
+            }
+          },
+          "targets": [
+            {
+              "expr": "sum(vmware_host_cpu_usagemhz_average{cluster_name=~\"$cluster\"}) * 100 / sum(vmware_host_cpu_max{cluster_name=~\"$cluster\"})",
+              "format": "time_series",
+              "intervalFactor": 1,
+              "legendFormat": "{{ $cluster }}",
+              "refId": "A"
+            }
+          ],
+          "title": "Cluster CPU usage",
+          "type": "timeseries"
+        },
+        {
+          "datasource": {
+            "uid": "$datasource"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "mappings": [
+                {
+                  "options": {
+                    "match": "null",
+                    "result": {
+                      "text": "N/A"
+                    }
+                  },
+                  "type": "special"
+                }
+              ],
+              "max": 100,
+              "min": 0,
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "#299c46",
+                    "value": null
+                  },
+                  {
+                    "color": "rgba(237, 129, 40, 0.89)",
+                    "value": 50
+                  },
+                  {
+                    "color": "#d44a3a",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "percent"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 5,
+            "w": 4,
+            "x": 0,
+            "y": 8
+          },
+          "id": 13,
+          "maxDataPoints": 100,
+          "options": {
+            "minVizHeight": 75,
+            "minVizWidth": 75,
+            "orientation": "horizontal",
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "showThresholdLabels": false,
+            "showThresholdMarkers": true,
+            "sizing": "auto"
+          },
+          "targets": [
+            {
+              "expr": "sum(vmware_host_memory_usage{cluster_name=~\"$cluster\"}) * 100 / sum(vmware_host_memory_max{cluster_name=~\"$cluster\"})",
+              "format": "time_series",
+              "intervalFactor": 1,
+              "legendFormat": "{{ $cluster }}",
+              "refId": "A"
+            }
+          ],
+          "title": "Cluster Memory usage",
+          "type": "gauge"
+        },
+        {
+          "datasource": {
+            "uid": "$datasource"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "decimals": 1,
+              "mappings": [
+                {
+                  "id": 0,
+                  "op": "=",
+                  "text": "N/A",
+                  "type": 1,
+                  "value": "null"
+                }
+              ],
+              "max": 100,
+              "min": 0,
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "#299c46",
+                    "value": null
+                  },
+                  {
+                    "color": "rgba(237, 129, 40, 0.89)",
+                    "value": 1024
+                  },
+                  {
+                    "color": "#d44a3a",
+                    "value": 2048
+                  }
+                ]
+              },
+              "unit": "deckbytes"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 5,
+            "w": 4,
+            "x": 4,
+            "y": 8
+          },
+          "id": 31,
+          "options": {
+            "minVizHeight": 75,
+            "minVizWidth": 75,
+            "orientation": "horizontal",
+            "reduceOptions": {
+              "calcs": [
+                "max"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "showThresholdLabels": false,
+            "showThresholdMarkers": true,
+            "sizing": "auto"
+          },
+          "targets": [
+            {
+              "expr": "max(vmware_vm_mem_vmmemctl_average{cluster_name=~\"$cluster\"})",
+              "format": "time_series",
+              "intervalFactor": 1,
+              "refId": "A"
+            }
+          ],
+          "title": "Max VM Ballooning",
+          "type": "gauge"
+        },
+        {
+          "datasource": {
+            "uid": "$datasource"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "decimals": 2,
+              "mappings": [
+                {
+                  "id": 0,
+                  "op": "=",
+                  "text": "N/A",
+                  "type": 1,
+                  "value": "null"
+                }
+              ],
+              "max": 100,
+              "min": 0,
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "#299c46",
+                    "value": null
+                  },
+                  {
+                    "color": "rgba(237, 129, 40, 0.89)",
+                    "value": 0.01
+                  },
+                  {
+                    "color": "#d44a3a",
+                    "value": 0.1
+                  }
+                ]
+              },
+              "unit": "deckbytes"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 5,
+            "w": 4,
+            "x": 8,
+            "y": 8
+          },
+          "id": 35,
+          "options": {
+            "minVizHeight": 75,
+            "minVizWidth": 75,
+            "orientation": "horizontal",
+            "reduceOptions": {
+              "calcs": [
+                "max"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "showThresholdLabels": false,
+            "showThresholdMarkers": true,
+            "sizing": "auto"
+          },
+          "targets": [
+            {
+              "expr": "max(vmware_vm_mem_swapped_average{cluster_name=~\"$cluster\"})",
+              "format": "time_series",
+              "intervalFactor": 1,
+              "refId": "A"
+            }
+          ],
+          "title": "Max VM Swapped",
+          "type": "gauge"
+        },
+        {
+          "datasource": {
+            "uid": "$datasource"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 10,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "insertNulls": false,
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "never",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "decimals": 1,
+              "links": [],
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "percent"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 5,
+            "w": 12,
+            "x": 12,
+            "y": 8
+          },
+          "id": 18,
+          "options": {
+            "legend": {
+              "calcs": [],
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "tooltip": {
+              "mode": "multi",
+              "sort": "none"
+            }
+          },
+          "targets": [
+            {
+              "expr": "sum((vmware_host_memory_usage{cluster_name=~\"$cluster\"}) * 100) / sum(vmware_host_memory_max{cluster_name=~\"$cluster\"})",
+              "format": "time_series",
+              "intervalFactor": 1,
+              "legendFormat": "{{ $cluster }}",
+              "refId": "A"
+            }
+          ],
+          "title": "Cluster Memory usage",
+          "type": "timeseries"
+        },
+        {
+          "datasource": {
+            "uid": "$datasource"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 10,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "insertNulls": false,
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "never",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "decimals": 1,
+              "links": [],
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "KBs"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 6,
+            "w": 24,
+            "x": 0,
+            "y": 13
+          },
+          "id": 19,
+          "options": {
+            "legend": {
+              "calcs": [
+                "mean",
+                "max",
+                "min"
+              ],
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "tooltip": {
+              "mode": "multi",
+              "sort": "none"
+            }
+          },
+          "targets": [
+            {
+              "expr": "sum(vmware_vm_net_received_average{cluster_name=~\"$cluster\"})+sum(vmware_vm_net_transmitted_average{cluster_name=~\"$cluster\"})",
+              "format": "time_series",
+              "intervalFactor": 1,
+              "legendFormat": "{{ $cluster }}",
+              "refId": "A"
+            }
+          ],
+          "title": "Cluster Network Usage",
+          "type": "timeseries"
+        },
+        {
+          "datasource": {
+            "uid": "$datasource"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 10,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "insertNulls": false,
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "never",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "decimals": 1,
+              "links": [],
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "KBs"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 5,
+            "w": 12,
+            "x": 0,
+            "y": 19
+          },
+          "id": 22,
+          "options": {
+            "legend": {
+              "calcs": [
+                "mean",
+                "max",
+                "min"
+              ],
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "tooltip": {
+              "mode": "multi",
+              "sort": "none"
+            }
+          },
+          "targets": [
+            {
+              "expr": "sum(vmware_vm_net_received_average{cluster_name=~\"$cluster\"})",
+              "format": "time_series",
+              "intervalFactor": 1,
+              "legendFormat": "{{ $cluster }}",
+              "refId": "A"
+            }
+          ],
+          "title": "Cluster Network Receive Usage",
+          "type": "timeseries"
+        },
+        {
+          "datasource": {
+            "uid": "$datasource"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 10,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "insertNulls": false,
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "never",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "decimals": 1,
+              "links": [],
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "KBs"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 5,
+            "w": 12,
+            "x": 12,
+            "y": 19
+          },
+          "id": 21,
+          "options": {
+            "legend": {
+              "calcs": [
+                "mean",
+                "max",
+                "min"
+              ],
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "tooltip": {
+              "mode": "multi",
+              "sort": "none"
+            }
+          },
+          "targets": [
+            {
+              "expr": "sum(vmware_vm_net_transmitted_average{cluster_name=~\"$cluster\"})",
+              "format": "time_series",
+              "intervalFactor": 1,
+              "legendFormat": "{{ $cluster}}",
+              "refId": "A"
+            }
+          ],
+          "title": "Cluster Network Transmit Rate",
+          "type": "timeseries"
+        },
+        {
+          "datasource": {
+            "uid": "$datasource"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 10,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "insertNulls": false,
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "never",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "decimals": 1,
+              "links": [],
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "KBs"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 5,
+            "w": 12,
+            "x": 0,
+            "y": 24
+          },
+          "id": 27,
+          "options": {
+            "legend": {
+              "calcs": [
+                "mean",
+                "max",
+                "min"
+              ],
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "tooltip": {
+              "mode": "multi",
+              "sort": "none"
+            }
+          },
+          "targets": [
+            {
+              "expr": "sum(vmware_vm_net_broadcastRx_summation{cluster_name=~\"$cluster\"})",
+              "format": "time_series",
+              "intervalFactor": 1,
+              "legendFormat": "{{ $cluster }}",
+              "refId": "A"
+            }
+          ],
+          "title": "Cluster Network Broadcast RX",
+          "type": "timeseries"
+        },
+        {
+          "datasource": {
+            "uid": "$datasource"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 10,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "insertNulls": false,
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "never",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "decimals": 1,
+              "links": [],
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "KBs"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 5,
+            "w": 12,
+            "x": 12,
+            "y": 24
+          },
+          "id": 28,
+          "options": {
+            "legend": {
+              "calcs": [
+                "mean",
+                "max",
+                "min"
+              ],
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "tooltip": {
+              "mode": "multi",
+              "sort": "none"
+            }
+          },
+          "targets": [
+            {
+              "expr": "sum(vmware_vm_net_broadcastTx_summation{cluster_name=~\"$cluster\"})",
+              "format": "time_series",
+              "intervalFactor": 1,
+              "legendFormat": "{{ $cluster}}",
+              "refId": "A"
+            }
+          ],
+          "title": "Cluster Network Broadcast TX",
+          "type": "timeseries"
+        },
+        {
+          "datasource": {
+            "uid": "$datasource"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 10,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "insertNulls": false,
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "never",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "decimals": 1,
+              "links": [],
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "KBs"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 5,
+            "w": 12,
+            "x": 0,
+            "y": 29
+          },
+          "id": 29,
+          "options": {
+            "legend": {
+              "calcs": [
+                "mean",
+                "max",
+                "min"
+              ],
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "tooltip": {
+              "mode": "multi",
+              "sort": "none"
+            }
+          },
+          "targets": [
+            {
+              "expr": "sum(vmware_vm_net_multicastRx_summation{cluster_name=~\"$cluster\"})",
+              "format": "time_series",
+              "intervalFactor": 1,
+              "legendFormat": "{{ $cluster }}",
+              "refId": "A"
+            }
+          ],
+          "title": "Host Network Multicast RX",
+          "type": "timeseries"
+        },
+        {
+          "datasource": {
+            "uid": "$datasource"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 10,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "insertNulls": false,
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "never",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "decimals": 1,
+              "links": [],
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "KBs"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 5,
+            "w": 12,
+            "x": 12,
+            "y": 29
+          },
+          "id": 30,
+          "options": {
+            "legend": {
+              "calcs": [
+                "mean",
+                "max",
+                "min"
+              ],
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "tooltip": {
+              "mode": "multi",
+              "sort": "none"
+            }
+          },
+          "targets": [
+            {
+              "expr": "sum(vmware_vm_net_multicastTx_summation{cluster_name=~\"$cluster\"})",
+              "format": "time_series",
+              "intervalFactor": 1,
+              "legendFormat": "{{ $cluster }}",
+              "refId": "A"
+            }
+          ],
+          "title": "Cluster Network Multicast TX",
+          "type": "timeseries"
+        },
+        {
+          "datasource": {
+            "uid": "$datasource"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 10,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "insertNulls": false,
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "never",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "decimals": 1,
+              "links": [],
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "KBs"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 5,
+            "w": 24,
+            "x": 0,
+            "y": 34
+          },
+          "id": 20,
+          "options": {
+            "legend": {
+              "calcs": [
+                "mean",
+                "max",
+                "min"
+              ],
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "tooltip": {
+              "mode": "multi",
+              "sort": "none"
+            }
+          },
+          "targets": [
+            {
+              "expr": "sum(vmware_vm_disk_read_average{cluster_name=~\"$cluster\"})+sum(vmware_vm_disk_write_average{cluster_name=~\"$cluster\"})",
+              "format": "time_series",
+              "intervalFactor": 1,
+              "legendFormat": "{{ $cluster }}",
+              "refId": "A"
+            }
+          ],
+          "title": "Cluster Disk Read And Write",
+          "type": "timeseries"
+        },
+        {
+          "datasource": {
+            "uid": "$datasource"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 10,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "insertNulls": false,
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "never",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "decimals": 1,
+              "links": [],
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "KBs"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 5,
+            "w": 12,
+            "x": 0,
+            "y": 39
+          },
+          "id": 23,
+          "options": {
+            "legend": {
+              "calcs": [
+                "mean",
+                "max",
+                "min"
+              ],
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "tooltip": {
+              "mode": "multi",
+              "sort": "none"
+            }
+          },
+          "targets": [
+            {
+              "expr": "sum(vmware_vm_disk_read_average{cluster_name =~\"$cluster\"})",
+              "format": "time_series",
+              "intervalFactor": 1,
+              "legendFormat": "{{ $cluster }}",
+              "refId": "A"
+            }
+          ],
+          "title": "Cluster Disk Read",
+          "type": "timeseries"
+        },
+        {
+          "datasource": {
+            "uid": "$datasource"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 10,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "insertNulls": false,
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "never",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "decimals": 1,
+              "links": [],
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "KBs"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 5,
+            "w": 12,
+            "x": 12,
+            "y": 39
+          },
+          "id": 24,
+          "options": {
+            "legend": {
+              "calcs": [
+                "mean",
+                "max",
+                "min"
+              ],
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "tooltip": {
+              "mode": "multi",
+              "sort": "none"
+            }
+          },
+          "targets": [
+            {
+              "expr": "sum(vmware_vm_disk_write_average{cluster_name=~\"$cluster\"})",
+              "format": "time_series",
+              "intervalFactor": 1,
+              "legendFormat": "{{ $cluster }}",
+              "refId": "A"
+            }
+          ],
+          "title": "Cluster Disk Write",
+          "type": "timeseries"
+        }
+      ],
+      "schemaVersion": 39,
+      "tags": [
+        "vmware"
+      ],
+      "templating": {
+        "list": [
+          {
+            "current": {
+              "selected": false,
+              "text": "Prometheus",
+              "value": "Prometheus"
+            },
+            "hide": 0,
+            "includeAll": false,
+            "label": "Datasource",
+            "multi": false,
+            "name": "datasource",
+            "options": [],
+            "query": "prometheus",
+            "refresh": 1,
+            "regex": "",
+            "skipUrlSync": false,
+            "type": "datasource"
+          },
+          {
+            "current": {
+              "selected": true,
+              "text": [
+                "cluster1"
+              ],
+              "value": [
+                "cluster1"
+              ]
+            },
+            "datasource": {
+              "uid": "$datasource"
+            },
+            "definition": "label_values(cluster_name)",
+            "hide": 0,
+            "includeAll": false,
+            "label": "cluster",
+            "multi": true,
+            "name": "cluster",
+            "options": [],
+            "query": "label_values(cluster_name)",
+            "refresh": 1,
+            "regex": "",
+            "skipUrlSync": false,
+            "sort": 0,
+            "tagValuesQuery": "",
+            "tagsQuery": "",
+            "type": "query",
+            "useTags": false
+          }
+        ]
+      },
+      "time": {
+        "from": "now-15m",
+        "to": "now"
+      },
+      "timepicker": {
+        "hidden": false,
+        "refresh_intervals": [
+          "5s",
+          "10s",
+          "30s",
+          "1m",
+          "5m",
+          "15m",
+          "30m",
+          "1h",
+          "2h",
+          "1d"
+        ],
+        "time_options": [
+          "5m",
+          "15m",
+          "1h",
+          "6h",
+          "12h",
+          "24h",
+          "2d",
+          "7d",
+          "30d"
+        ]
+      },
+      "timezone": "browser",
+      "title": "VMware Cluster",
+      "uid": "MRvkcY2Zz",
+      "version": 1,
+      "weekStart": ""
+    }
+  vsphere-esx.json: |
+    {
+      "__inputs": [
+        {
+          "name": "datasource",
+          "label": "prometheus",
+          "description": "",
+          "type": "datasource",
+          "pluginId": "prometheus",
+          "pluginName": "Prometheus"
+        }
+      ],
+      "__requires": [
+        {
+          "type": "grafana",
+          "id": "grafana",
+          "name": "Grafana",
+          "version": "4.3.0"
+        },
+        {
+          "type": "panel",
+          "id": "graph",
+          "name": "Graph",
+          "version": ""
+        },
+        {
+          "type": "datasource",
+          "id": "prometheus",
+          "name": "Prometheus",
+          "version": "1.0.0"
+        },
+        {
+          "type": "panel",
+          "id": "singlestat",
+          "name": "Singlestat",
+          "version": ""
+        }
+      ],
+      "annotations": {
+        "list": []
+      },
+      "editable": true,
+      "fiscalYearStartMonth": 0,
+      "graphTooltip": 0,
+      "id": 47,
+      "links": [],
+      "panels": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "$datasource"
+          },
+          "description": "System uptime",
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "decimals": 1,
+              "mappings": [
+                {
+                  "options": {
+                    "match": "null",
+                    "result": {
+                      "text": "N/A"
+                    }
+                  },
+                  "type": "special"
+                }
+              ],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "s"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 7,
+            "w": 6,
+            "x": 0,
+            "y": 0
+          },
+          "id": 3,
+          "maxDataPoints": 100,
+          "options": {
+            "colorMode": "none",
+            "graphMode": "none",
+            "justifyMode": "auto",
+            "orientation": "horizontal",
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "showPercentChange": false,
+            "textMode": "auto",
+            "wideLayout": true
+          },
+          "targets": [
+            {
+              "expr": "time() - vmware_host_boot_timestamp_seconds{host_name=\"$hostname\"}",
+              "format": "time_series",
+              "intervalFactor": 2,
+              "legendFormat": "",
+              "refId": "A",
+              "step": 4
+            }
+          ],
+          "title": "Uptime",
+          "type": "stat"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "$datasource"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "mappings": [
+                {
+                  "options": {
+                    "match": "null",
+                    "result": {
+                      "text": "N/A"
+                    }
+                  },
+                  "type": "special"
+                }
+              ],
+              "max": 100,
+              "min": 0,
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "rgba(50, 172, 45, 0.97)",
+                    "value": null
+                  },
+                  {
+                    "color": "rgba(237, 129, 40, 0.89)",
+                    "value": 80
+                  },
+                  {
+                    "color": "rgba(245, 54, 54, 0.9)",
+                    "value": 90
+                  }
+                ]
+              },
+              "unit": "percent"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 7,
+            "w": 6,
+            "x": 6,
+            "y": 0
+          },
+          "id": 4,
+          "maxDataPoints": 100,
+          "options": {
+            "minVizHeight": 75,
+            "minVizWidth": 75,
+            "orientation": "horizontal",
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "showThresholdLabels": false,
+            "showThresholdMarkers": true,
+            "sizing": "auto"
+          },
+          "targets": [
+            {
+              "expr": "vmware_host_cpu_usage{host_name=\"$hostname\"} / vmware_host_cpu_max{host_name=\"$hostname\"} * 100",
+              "format": "time_series",
+              "intervalFactor": 1,
+              "legendFormat": "",
+              "refId": "A",
+              "step": 2
+            }
+          ],
+          "title": "CPU Usage",
+          "type": "gauge"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "$datasource"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "mappings": [
+                {
+                  "options": {
+                    "match": "null",
+                    "result": {
+                      "text": "N/A"
+                    }
+                  },
+                  "type": "special"
+                }
+              ],
+              "max": 100,
+              "min": 0,
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "rgba(50, 172, 45, 0.97)",
+                    "value": null
+                  },
+                  {
+                    "color": "rgba(237, 129, 40, 0.89)",
+                    "value": 80
+                  },
+                  {
+                    "color": "rgba(245, 54, 54, 0.9)",
+                    "value": 90
+                  }
+                ]
+              },
+              "unit": "percent"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 7,
+            "w": 6,
+            "x": 12,
+            "y": 0
+          },
+          "id": 5,
+          "maxDataPoints": 100,
+          "options": {
+            "minVizHeight": 75,
+            "minVizWidth": 75,
+            "orientation": "horizontal",
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "showThresholdLabels": false,
+            "showThresholdMarkers": true,
+            "sizing": "auto"
+          },
+          "targets": [
+            {
+              "expr": "vmware_host_memory_usage{host_name=\"$hostname\"} / vmware_host_memory_max{host_name=\"$hostname\"} * 100",
+              "format": "time_series",
+              "intervalFactor": 1,
+              "legendFormat": "",
+              "refId": "A",
+              "step": 2
+            }
+          ],
+          "title": "Memory Usage",
+          "type": "gauge"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "$datasource"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "mappings": [
+                {
+                  "options": {
+                    "0": {
+                      "text": "DOWN"
+                    },
+                    "1": {
+                      "text": "UP"
+                    }
+                  },
+                  "type": "value"
+                }
+              ],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "rgba(245, 54, 54, 0.9)",
+                    "value": null
+                  },
+                  {
+                    "color": "rgba(237, 129, 40, 0.89)",
+                    "value": 1
+                  },
+                  {
+                    "color": "rgba(50, 172, 45, 0.97)",
+                    "value": 1
+                  }
+                ]
+              },
+              "unit": "none"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 7,
+            "w": 6,
+            "x": 18,
+            "y": 0
+          },
+          "id": 6,
+          "maxDataPoints": 100,
+          "options": {
+            "colorMode": "background",
+            "graphMode": "none",
+            "justifyMode": "auto",
+            "orientation": "horizontal",
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "showPercentChange": false,
+            "textMode": "auto",
+            "wideLayout": true
+          },
+          "targets": [
+            {
+              "expr": "vmware_host_power_state{host_name=\"$hostname\"}",
+              "format": "time_series",
+              "intervalFactor": 2,
+              "refId": "A",
+              "step": 4
+            }
+          ],
+          "title": "Host State",
+          "type": "stat"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "$datasource"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 0,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "insertNulls": false,
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "never",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "max": 100,
+              "min": 0,
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "percent"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 11,
+            "w": 12,
+            "x": 0,
+            "y": 7
+          },
+          "id": 1,
+          "options": {
+            "legend": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "displayMode": "list",
+              "placement": "right",
+              "showLegend": false
+            },
+            "tooltip": {
+              "mode": "multi",
+              "sort": "none"
+            }
+          },
+          "targets": [
+            {
+              "expr": "vmware_host_cpu_usage{host_name=\"$hostname\"} / vmware_host_cpu_max{host_name=\"$hostname\"} * 100",
+              "format": "time_series",
+              "intervalFactor": 2,
+              "legendFormat": "$hostname",
+              "metric": "",
+              "refId": "A",
+              "step": 2
+            }
+          ],
+          "title": "ESX Host CPU Usage",
+          "type": "timeseries"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "$datasource"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 10,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "insertNulls": false,
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "never",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "max": 100,
+              "min": 0,
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "percent"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 11,
+            "w": 12,
+            "x": 12,
+            "y": 7
+          },
+          "id": 2,
+          "options": {
+            "legend": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "displayMode": "list",
+              "placement": "right",
+              "showLegend": false
+            },
+            "tooltip": {
+              "mode": "multi",
+              "sort": "none"
+            }
+          },
+          "targets": [
+            {
+              "expr": "vmware_host_memory_usage{host_name=\"$hostname\"} / vmware_host_memory_max{host_name=\"$hostname\"} * 100",
+              "format": "time_series",
+              "intervalFactor": 2,
+              "legendFormat": "$hostname",
+              "metric": "",
+              "refId": "A",
+              "step": 2
+            }
+          ],
+          "title": "ESX Host RAM Usage",
+          "type": "timeseries"
+        }
+      ],
+      "refresh": "10s",
+      "schemaVersion": 39,
+      "tags": [
+        "vmware",
+        "esx"
+      ],
+      "templating": {
+        "list": [
+          {
+            "current": {
+              "selected": false,
+              "text": "Prometheus",
+              "value": "Prometheus"
+            },
+            "hide": 0,
+            "includeAll": false,
+            "label": "Datasource",
+            "multi": false,
+            "name": "datasource",
+            "options": [],
+            "query": "prometheus",
+            "refresh": 1,
+            "regex": "",
+            "skipUrlSync": false,
+            "type": "datasource"
+          },
+          {
+            "current": {},
+            "datasource": {
+              "uid": "$datasource"
+            },
+            "definition": "",
+            "hide": 0,
+            "includeAll": false,
+            "label": "Host:",
+            "multi": false,
+            "name": "hostname",
+            "options": [],
+            "query": "label_values(vmware_host_boot_timestamp_seconds,host_name)",
+            "refresh": 1,
+            "regex": "/([^:]+)/",
+            "skipUrlSync": false,
+            "sort": 1,
+            "tagValuesQuery": "",
+            "tagsQuery": "",
+            "type": "query",
+            "useTags": false
+          }
+        ]
+      },
+      "time": {
+        "from": "now-5m",
+        "to": "now"
+      },
+      "timepicker": {
+        "refresh_intervals": [
+          "5s",
+          "10s",
+          "30s",
+          "1m",
+          "5m",
+          "15m",
+          "30m",
+          "1h",
+          "2h",
+          "1d"
+        ],
+        "time_options": [
+          "5m",
+          "15m",
+          "1h",
+          "6h",
+          "12h",
+          "24h",
+          "2d",
+          "7d",
+          "30d"
+        ]
+      },
+      "timezone": "browser",
+      "title": "VMware ESX Hosts Information",
+      "uid": "ed9d4bbf8801a8f79194b2ce6ead0ffcb8f9952a",
+      "version": 1
+    }
+  vsphere-esxi.json: |
+    {
+      "annotations": {
+        "list": [
+          {
+            "builtIn": 1,
+            "datasource": {
+              "type": "datasource",
+              "uid": "grafana"
+            },
+            "enable": true,
+            "hide": true,
+            "iconColor": "rgba(0, 211, 255, 1)",
+            "limit": 100,
+            "name": "Annotations & Alerts",
+            "showIn": 0,
+            "type": "dashboard"
+          }
+        ]
+      },
+      "description": "VMware ESXi single instance graphs.",
+      "editable": true,
+      "fiscalYearStartMonth": 0,
+      "gnetId": 10076,
+      "graphTooltip": 1,
+      "links": [],
+      "panels": [
+        {
+          "datasource": {
+            "uid": "$datasource"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "mappings": [
+                {
+                  "options": {
+                    "match": "null",
+                    "result": {
+                      "text": "N/A"
+                    }
+                  },
+                  "type": "special"
+                }
+              ],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "#299c46",
+                    "value": null
+                  },
+                  {
+                    "color": "rgba(237, 129, 40, 0.89)",
+                    "value": 50
+                  },
+                  {
+                    "color": "#d44a3a",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "short"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 4,
+            "w": 4,
+            "x": 0,
+            "y": 0
+          },
+          "id": 32,
+          "maxDataPoints": 100,
+          "options": {
+            "colorMode": "none",
+            "graphMode": "none",
+            "justifyMode": "auto",
+            "orientation": "horizontal",
+            "reduceOptions": {
+              "calcs": [
+                "mean"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "showPercentChange": false,
+            "textMode": "name",
+            "wideLayout": true
+          },
+          "targets": [
+            {
+              "expr": "(vmware_host_product_info{host_name=~\"$esxhost\"})",
+              "format": "time_series",
+              "instant": false,
+              "intervalFactor": 1,
+              "legendFormat": "{{ version }}",
+              "refId": "A"
+            }
+          ],
+          "title": "Version",
+          "type": "stat"
+        },
+        {
+          "datasource": {
+            "uid": "$datasource"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "mappings": [
+                {
+                  "options": {
+                    "match": "null",
+                    "result": {
+                      "text": "N/A"
+                    }
+                  },
+                  "type": "special"
+                }
+              ],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "#299c46",
+                    "value": null
+                  },
+                  {
+                    "color": "rgba(237, 129, 40, 0.89)",
+                    "value": 50
+                  },
+                  {
+                    "color": "#d44a3a",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "none"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 4,
+            "w": 4,
+            "x": 4,
+            "y": 0
+          },
+          "id": 33,
+          "maxDataPoints": 100,
+          "options": {
+            "colorMode": "none",
+            "graphMode": "none",
+            "justifyMode": "auto",
+            "orientation": "horizontal",
+            "reduceOptions": {
+              "calcs": [
+                "mean"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "showPercentChange": false,
+            "textMode": "name",
+            "wideLayout": true
+          },
+          "targets": [
+            {
+              "expr": "(vmware_host_product_info{host_name=~\"$esxhost\"})",
+              "format": "time_series",
+              "instant": false,
+              "intervalFactor": 1,
+              "legendFormat": "{{ build }}",
+              "refId": "A"
+            }
+          ],
+          "title": "Build",
+          "type": "stat"
+        },
+        {
+          "datasource": {
+            "uid": "$datasource"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "mappings": [
+                {
+                  "options": {
+                    "match": "null",
+                    "result": {
+                      "text": "N/A"
+                    }
+                  },
+                  "type": "special"
+                }
+              ],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "#299c46",
+                    "value": null
+                  },
+                  {
+                    "color": "rgba(237, 129, 40, 0.89)",
+                    "value": 50
+                  },
+                  {
+                    "color": "#d44a3a",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "none"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 4,
+            "w": 4,
+            "x": 8,
+            "y": 0
+          },
+          "id": 36,
+          "maxDataPoints": 100,
+          "options": {
+            "colorMode": "none",
+            "graphMode": "none",
+            "justifyMode": "auto",
+            "orientation": "horizontal",
+            "reduceOptions": {
+              "calcs": [
+                "mean"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "showPercentChange": false,
+            "textMode": "name",
+            "wideLayout": true
+          },
+          "targets": [
+            {
+              "expr": "(vmware_host_hardware_info{host_name=~\"$esxhost\"}) ",
+              "format": "time_series",
+              "instant": false,
+              "intervalFactor": 1,
+              "legendFormat": "{{ hardware_model }}",
+              "refId": "A"
+            }
+          ],
+          "title": "Model",
+          "type": "stat"
+        },
+        {
+          "datasource": {
+            "uid": "$datasource"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "mappings": [
+                {
+                  "options": {
+                    "match": "null",
+                    "result": {
+                      "text": "N/A"
+                    }
+                  },
+                  "type": "special"
+                }
+              ],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "#299c46",
+                    "value": null
+                  },
+                  {
+                    "color": "rgba(237, 129, 40, 0.89)",
+                    "value": 50
+                  },
+                  {
+                    "color": "#d44a3a",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "none"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 4,
+            "w": 4,
+            "x": 12,
+            "y": 0
+          },
+          "id": 34,
+          "maxDataPoints": 100,
+          "options": {
+            "colorMode": "none",
+            "graphMode": "none",
+            "justifyMode": "auto",
+            "orientation": "horizontal",
+            "reduceOptions": {
+              "calcs": [
+                "mean"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "showPercentChange": false,
+            "textMode": "name",
+            "wideLayout": true
+          },
+          "targets": [
+            {
+              "expr": "(vmware_host_product_info{host_name=~\"$esxhost\"})",
+              "format": "time_series",
+              "instant": false,
+              "intervalFactor": 1,
+              "legendFormat": "{{ cluster_name }}",
+              "refId": "A"
+            }
+          ],
+          "title": "Cluster",
+          "type": "stat"
+        },
+        {
+          "datasource": {
+            "uid": "$datasource"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "mappings": [
+                {
+                  "options": {
+                    "match": "null",
+                    "result": {
+                      "text": "N/A"
+                    }
+                  },
+                  "type": "special"
+                }
+              ],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "#299c46",
+                    "value": null
+                  },
+                  {
+                    "color": "rgba(237, 129, 40, 0.89)",
+                    "value": 50
+                  },
+                  {
+                    "color": "#d44a3a",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "none"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 4,
+            "w": 4,
+            "x": 16,
+            "y": 0
+          },
+          "id": 37,
+          "maxDataPoints": 100,
+          "options": {
+            "colorMode": "none",
+            "graphMode": "none",
+            "justifyMode": "auto",
+            "orientation": "horizontal",
+            "reduceOptions": {
+              "calcs": [
+                "mean"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "showPercentChange": false,
+            "textMode": "name",
+            "wideLayout": true
+          },
+          "targets": [
+            {
+              "expr": "(vmware_host_hardware_info{host_name=~\"$esxhost\"}) ",
+              "format": "time_series",
+              "instant": false,
+              "intervalFactor": 1,
+              "legendFormat": "{{ hardware_cpu_model }}",
+              "refId": "A"
+            }
+          ],
+          "title": "Cpu Model",
+          "type": "stat"
+        },
+        {
+          "datasource": {
+            "uid": "$datasource"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "mappings": [
+                {
+                  "options": {
+                    "match": "null",
+                    "result": {
+                      "text": "N/A"
+                    }
+                  },
+                  "type": "special"
+                }
+              ],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "#299c46",
+                    "value": null
+                  },
+                  {
+                    "color": "rgba(237, 129, 40, 0.89)",
+                    "value": 7776000
+                  },
+                  {
+                    "color": "#d44a3a",
+                    "value": 15552000
+                  }
+                ]
+              },
+              "unit": "s"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 4,
+            "w": 4,
+            "x": 20,
+            "y": 0
+          },
+          "id": 6,
+          "maxDataPoints": 100,
+          "options": {
+            "colorMode": "value",
+            "graphMode": "none",
+            "justifyMode": "auto",
+            "orientation": "horizontal",
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "showPercentChange": false,
+            "textMode": "auto",
+            "wideLayout": true
+          },
+          "targets": [
+            {
+              "expr": "time()-vmware_host_boot_timestamp_seconds{host_name=~\"$esxhost\"} ",
+              "format": "time_series",
+              "instant": false,
+              "intervalFactor": 1,
+              "refId": "A"
+            }
+          ],
+          "title": "ESXi host uptime",
+          "type": "stat"
+        },
+        {
+          "datasource": {
+            "uid": "$datasource"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "mappings": [
+                {
+                  "options": {
+                    "match": "null",
+                    "result": {
+                      "text": "N/A"
+                    }
+                  },
+                  "type": "special"
+                }
+              ],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "#299c46",
+                    "value": null
+                  },
+                  {
+                    "color": "rgba(237, 129, 40, 0.89)",
+                    "value": 50
+                  },
+                  {
+                    "color": "#d44a3a",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "short"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 4,
+            "w": 4,
+            "x": 0,
+            "y": 4
+          },
+          "id": 14,
+          "maxDataPoints": 100,
+          "options": {
+            "colorMode": "none",
+            "graphMode": "none",
+            "justifyMode": "auto",
+            "orientation": "horizontal",
+            "reduceOptions": {
+              "calcs": [
+                "mean"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "showPercentChange": false,
+            "textMode": "auto",
+            "wideLayout": true
+          },
+          "targets": [
+            {
+              "expr": "(vmware_host_num_cpu{host_name=~\"$esxhost\"})",
+              "format": "time_series",
+              "instant": false,
+              "intervalFactor": 1,
+              "refId": "A"
+            }
+          ],
+          "title": "Cpu Number",
+          "type": "stat"
+        },
+        {
+          "datasource": {
+            "uid": "$datasource"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "mappings": [
+                {
+                  "options": {
+                    "match": "null",
+                    "result": {
+                      "text": "N/A"
+                    }
+                  },
+                  "type": "special"
+                }
+              ],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "#299c46",
+                    "value": null
+                  },
+                  {
+                    "color": "rgba(237, 129, 40, 0.89)",
+                    "value": 50
+                  },
+                  {
+                    "color": "#d44a3a",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "decmbytes"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 4,
+            "w": 4,
+            "x": 4,
+            "y": 4
+          },
+          "id": 15,
+          "maxDataPoints": 100,
+          "options": {
+            "colorMode": "none",
+            "graphMode": "none",
+            "justifyMode": "auto",
+            "orientation": "horizontal",
+            "reduceOptions": {
+              "calcs": [
+                "mean"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "showPercentChange": false,
+            "textMode": "auto",
+            "wideLayout": true
+          },
+          "targets": [
+            {
+              "expr": "(vmware_host_memory_max{host_name=~\"$esxhost\"})",
+              "format": "time_series",
+              "instant": false,
+              "intervalFactor": 1,
+              "refId": "A"
+            }
+          ],
+          "title": "Memory Capaciy",
+          "type": "stat"
+        },
+        {
+          "datasource": {
+            "uid": "$datasource"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "mappings": [
+                {
+                  "id": 0,
+                  "op": "=",
+                  "text": "N/A",
+                  "type": 1,
+                  "value": "null"
+                }
+              ],
+              "max": 100,
+              "min": 0,
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "#299c46",
+                    "value": null
+                  },
+                  {
+                    "color": "rgba(237, 129, 40, 0.89)",
+                    "value": 50
+                  },
+                  {
+                    "color": "#d44a3a",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "percent"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 4,
+            "w": 4,
+            "x": 8,
+            "y": 4
+          },
+          "id": 12,
+          "options": {
+            "minVizHeight": 75,
+            "minVizWidth": 75,
+            "orientation": "horizontal",
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "showThresholdLabels": false,
+            "showThresholdMarkers": true,
+            "sizing": "auto"
+          },
+          "targets": [
+            {
+              "expr": "(vmware_host_cpu_usagemhz_average{host_name=~\"$esxhost\"}) * 100 / on() group_right() (vmware_host_cpu_max{host_name=~\"$esxhost\"})",
+              "format": "time_series",
+              "instant": false,
+              "intervalFactor": 1,
+              "refId": "A"
+            }
+          ],
+          "title": "Host CPU Usage",
+          "type": "gauge"
+        },
+        {
+          "datasource": {
+            "uid": "$datasource"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "mappings": [
+                {
+                  "id": 0,
+                  "op": "=",
+                  "text": "N/A",
+                  "type": 1,
+                  "value": "null"
+                }
+              ],
+              "max": 20,
+              "min": 0,
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "#299c46",
+                    "value": null
+                  },
+                  {
+                    "color": "rgba(237, 129, 40, 0.89)",
+                    "value": 5
+                  },
+                  {
+                    "color": "#d44a3a",
+                    "value": 10
+                  }
+                ]
+              },
+              "unit": "percent"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 4,
+            "w": 4,
+            "x": 12,
+            "y": 4
+          },
+          "id": 25,
+          "options": {
+            "minVizHeight": 75,
+            "minVizWidth": 75,
+            "orientation": "horizontal",
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "showThresholdLabels": false,
+            "showThresholdMarkers": true,
+            "sizing": "auto"
+          },
+          "targets": [
+            {
+              "expr": "vmware_host_cpu_ready_summation{host_name=~\"$esxhost\"}/200",
+              "legendFormat": "Cpu Ready",
+              "refId": "B"
+            }
+          ],
+          "title": "Current Cpu Ready",
+          "type": "gauge"
+        },
+        {
+          "datasource": {
+            "uid": "$datasource"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "mappings": [
+                {
+                  "id": 0,
+                  "op": "=",
+                  "text": "N/A",
+                  "type": 1,
+                  "value": "null"
+                }
+              ],
+              "max": 10,
+              "min": 0,
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "#299c46",
+                    "value": null
+                  },
+                  {
+                    "color": "rgba(237, 129, 40, 0.89)",
+                    "value": 1
+                  },
+                  {
+                    "color": "#d44a3a",
+                    "value": 3
+                  }
+                ]
+              },
+              "unit": "percent"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 4,
+            "w": 4,
+            "x": 16,
+            "y": 4
+          },
+          "id": 26,
+          "options": {
+            "minVizHeight": 75,
+            "minVizWidth": 75,
+            "orientation": "horizontal",
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "showThresholdLabels": false,
+            "showThresholdMarkers": true,
+            "sizing": "auto"
+          },
+          "targets": [
+            {
+              "expr": "vmware_host_cpu_costop_summation{host_name=~\"$esxhost\"}/200",
+              "format": "time_series",
+              "instant": false,
+              "intervalFactor": 1,
+              "refId": "A"
+            }
+          ],
+          "title": "Current Cpu Co-Stop",
+          "type": "gauge"
+        },
+        {
+          "datasource": {
+            "uid": "$datasource"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "mappings": [
+                {
+                  "options": {
+                    "match": "null",
+                    "result": {
+                      "text": "N/A"
+                    }
+                  },
+                  "type": "special"
+                }
+              ],
+              "max": 100,
+              "min": 0,
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "#299c46",
+                    "value": null
+                  },
+                  {
+                    "color": "rgba(237, 129, 40, 0.89)",
+                    "value": 50
+                  },
+                  {
+                    "color": "#d44a3a",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "percent"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 4,
+            "w": 4,
+            "x": 20,
+            "y": 4
+          },
+          "id": 13,
+          "maxDataPoints": 100,
+          "options": {
+            "minVizHeight": 75,
+            "minVizWidth": 75,
+            "orientation": "horizontal",
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "showThresholdLabels": false,
+            "showThresholdMarkers": true,
+            "sizing": "auto"
+          },
+          "targets": [
+            {
+              "expr": "(vmware_host_memory_usage{host_name=~\"$esxhost\"}) * 100 / (vmware_host_memory_max{host_name=~\"$esxhost\"})",
+              "format": "time_series",
+              "instant": true,
+              "intervalFactor": 1,
+              "refId": "A"
+            }
+          ],
+          "title": "Host Memory usage",
+          "type": "gauge"
+        },
+        {
+          "datasource": {
+            "uid": "$datasource"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 10,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "insertNulls": false,
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "never",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "decimals": 1,
+              "links": [],
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "percent"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 6,
+            "w": 24,
+            "x": 0,
+            "y": 8
+          },
+          "id": 17,
+          "options": {
+            "legend": {
+              "calcs": [
+                "mean",
+                "max",
+                "min"
+              ],
+              "displayMode": "table",
+              "placement": "right",
+              "showLegend": true
+            },
+            "tooltip": {
+              "mode": "multi",
+              "sort": "none"
+            }
+          },
+          "targets": [
+            {
+              "expr": "(vmware_host_cpu_usagemhz_average{host_name=~\"$esxhost\"}) * 100 / on() group_right() (vmware_host_cpu_max{host_name=~\"$esxhost\"})",
+              "legendFormat": "Cpu Usage",
+              "refId": "B"
+            },
+            {
+              "expr": "(vmware_host_cpu_demand_average{host_name=~\"$esxhost\"}) * 100 / on() group_right() (vmware_host_cpu_max{host_name=~\"$esxhost\"})",
+              "legendFormat": "CPU Demand",
+              "refId": "A"
+            }
+          ],
+          "title": "Host CPU usage",
+          "type": "timeseries"
+        },
+        {
+          "datasource": {
+            "uid": "$datasource"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 10,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "insertNulls": false,
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "never",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "decimals": 1,
+              "links": [],
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "percent"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 6,
+            "w": 24,
+            "x": 0,
+            "y": 14
+          },
+          "id": 39,
+          "options": {
+            "legend": {
+              "calcs": [
+                "mean",
+                "max",
+                "min"
+              ],
+              "displayMode": "table",
+              "placement": "right",
+              "showLegend": true
+            },
+            "tooltip": {
+              "mode": "multi",
+              "sort": "none"
+            }
+          },
+          "targets": [
+            {
+              "expr": "vmware_host_cpu_ready_summation{host_name=~\"$esxhost\"}/200",
+              "format": "time_series",
+              "intervalFactor": 1,
+              "legendFormat": "Cpu Ready",
+              "refId": "A"
+            },
+            {
+              "expr": "vmware_host_cpu_costop_summation{host_name=~\"$esxhost\"}/200",
+              "legendFormat": "Cpu Co-Stop",
+              "refId": "B"
+            },
+            {
+              "expr": "vmware_host_cpu_swapwait_summation{host_name=~\"$esxhost\"}/200",
+              "legendFormat": "Cpu Swap Wait",
+              "refId": "C"
+            }
+          ],
+          "title": "Host Cpu Contention",
+          "type": "timeseries"
+        },
+        {
+          "datasource": {
+            "uid": "$datasource"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 10,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "insertNulls": false,
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "never",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "decimals": 1,
+              "links": [],
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "percent"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 6,
+            "w": 24,
+            "x": 0,
+            "y": 20
+          },
+          "id": 18,
+          "options": {
+            "legend": {
+              "calcs": [
+                "mean",
+                "max",
+                "min"
+              ],
+              "displayMode": "table",
+              "placement": "right",
+              "showLegend": true
+            },
+            "tooltip": {
+              "mode": "multi",
+              "sort": "none"
+            }
+          },
+          "targets": [
+            {
+              "expr": "(vmware_host_mem_usage_average{host_name=~\"$esxhost\"}) * 100 / (vmware_host_memory_max{host_name=~\"$esxhost\"})",
+              "format": "time_series",
+              "intervalFactor": 1,
+              "legendFormat": "Memory Consumed",
+              "refId": "A"
+            },
+            {
+              "expr": "(vmware_host_mem_active_average{host_name=~\"$esxhost\"})/1024 * 100 / on() group_right() (vmware_host_memory_max{host_name=~\"$esxhost\"})",
+              "legendFormat": "Memory Active",
+              "refId": "B"
+            }
+          ],
+          "title": "Host Memory usage",
+          "type": "timeseries"
+        },
+        {
+          "datasource": {
+            "uid": "$datasource"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 10,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "insertNulls": false,
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "never",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "decimals": 1,
+              "links": [],
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "percent"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 6,
+            "w": 24,
+            "x": 0,
+            "y": 26
+          },
+          "id": 40,
+          "options": {
+            "legend": {
+              "calcs": [
+                "mean",
+                "max",
+                "min"
+              ],
+              "displayMode": "table",
+              "placement": "right",
+              "showLegend": true
+            },
+            "tooltip": {
+              "mode": "multi",
+              "sort": "none"
+            }
+          },
+          "targets": [
+            {
+              "expr": "vmware_host_mem_vmmemctl_average{host_name=~\"$esxhost\"}",
+              "legendFormat": "Memory Balloon",
+              "refId": "B"
+            },
+            {
+              "expr": "vmware_host_mem_latency_average{host_name=~\"$esxhost\"}",
+              "legendFormat": "Memory Latency",
+              "refId": "C"
+            },
+            {
+              "expr": "vmware_host_mem_swapinRate_average{host_name=~\"$esxhost\"}",
+              "legendFormat": "Memory SwapInRate",
+              "refId": "D"
+            },
+            {
+              "expr": "vmware_host_mem_swapoutRate_average{host_name=~\"$esxhost\"}",
+              "legendFormat": "Memory SwapOutRate",
+              "refId": "A"
+            }
+          ],
+          "title": "Host Memory usage",
+          "type": "timeseries"
+        },
+        {
+          "datasource": {
+            "uid": "$datasource"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 10,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "insertNulls": false,
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "never",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "decimals": 1,
+              "links": [],
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "KBs"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 6,
+            "w": 24,
+            "x": 0,
+            "y": 32
+          },
+          "id": 19,
+          "options": {
+            "legend": {
+              "calcs": [
+                "mean",
+                "max",
+                "min"
+              ],
+              "displayMode": "table",
+              "placement": "right",
+              "showLegend": true
+            },
+            "tooltip": {
+              "mode": "multi",
+              "sort": "none"
+            }
+          },
+          "targets": [
+            {
+              "expr": "vmware_host_net_usage_average{host_name=~\"$esxhost\"}",
+              "format": "time_series",
+              "intervalFactor": 1,
+              "legendFormat": "Total Usage",
+              "refId": "A"
+            },
+            {
+              "expr": "vmware_host_net_bytesRX_average{host_name=~\"$esxhost\"}",
+              "legendFormat": "Usage RX",
+              "refId": "B"
+            },
+            {
+              "expr": "vmware_host_net_bytesTX_average{host_name=~\"$esxhost\"}",
+              "legendFormat": "Usage TX",
+              "refId": "C"
+            },
+            {
+              "expr": "sum(vmware_vm_net_broadcastRx_summation{host_name=~\"$esxhost\"})",
+              "legendFormat": "Broadcast RX",
+              "refId": "D"
+            },
+            {
+              "expr": "sum(vmware_vm_net_broadcastTx_summation{host_name=~\"$esxhost\"})",
+              "legendFormat": "Broadcast TX",
+              "refId": "E"
+            },
+            {
+              "expr": "sum(vmware_vm_net_multicastRx_summation{host_name=~\"$esxhost\"})",
+              "legendFormat": "Multicast RX",
+              "refId": "F"
+            },
+            {
+              "expr": "sum(vmware_vm_net_multicastTx_summation{host_name=~\"$esxhost\"})",
+              "legendFormat": "Multicast TX",
+              "refId": "G"
+            }
+          ],
+          "title": "Host Network Usage",
+          "type": "timeseries"
+        },
+        {
+          "datasource": {
+            "uid": "$datasource"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 10,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "insertNulls": false,
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "never",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "decimals": 1,
+              "links": [],
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "short"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 6,
+            "w": 24,
+            "x": 0,
+            "y": 38
+          },
+          "id": 38,
+          "options": {
+            "legend": {
+              "calcs": [
+                "mean",
+                "max",
+                "min"
+              ],
+              "displayMode": "table",
+              "placement": "right",
+              "showLegend": true
+            },
+            "tooltip": {
+              "mode": "multi",
+              "sort": "none"
+            }
+          },
+          "targets": [
+            {
+              "expr": "vmware_host_net_errorRX_summation{host_name=~\"$esxhost\"} OR vector(0)",
+              "format": "time_series",
+              "intervalFactor": 1,
+              "legendFormat": "Error RX",
+              "refId": "A"
+            },
+            {
+              "expr": "vmware_host_net_errorTX_summation{host_name=~\"$esxhost\"} OR vector(0) ",
+              "legendFormat": "Error TX",
+              "refId": "B"
+            },
+            {
+              "expr": "vmware_host_net_droppedTX_summation{host_name=~\"$esxhost\"} OR vector(0)",
+              "legendFormat": "Dropped TX",
+              "refId": "C"
+            },
+            {
+              "expr": "vmware_host_net_droppedRX_summation{host_name=~\"$esxhost\"} OR vector(0)",
+              "legendFormat": "Dropped RX",
+              "refId": "D"
+            }
+          ],
+          "title": "Host Network Contention",
+          "type": "timeseries"
+        },
+        {
+          "datasource": {
+            "uid": "$datasource"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 10,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "insertNulls": false,
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "never",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "decimals": 1,
+              "links": [],
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "KBs"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 6,
+            "w": 24,
+            "x": 0,
+            "y": 44
+          },
+          "id": 20,
+          "options": {
+            "legend": {
+              "calcs": [
+                "mean",
+                "max",
+                "min"
+              ],
+              "displayMode": "table",
+              "placement": "right",
+              "showLegend": true
+            },
+            "tooltip": {
+              "mode": "multi",
+              "sort": "none"
+            }
+          },
+          "targets": [
+            {
+              "expr": "vmware_host_disk_read_average{host_name=~\"$esxhost\"}+vmware_host_disk_write_average{host_name=~\"$esxhost\"}",
+              "format": "time_series",
+              "intervalFactor": 1,
+              "legendFormat": "Disk Read and Write",
+              "refId": "A"
+            },
+            {
+              "expr": "vmware_host_disk_read_average{host_name=~\"$esxhost\"}",
+              "legendFormat": "Disk Read",
+              "refId": "B"
+            },
+            {
+              "expr": "vmware_host_disk_write_average{host_name=~\"$esxhost\"}",
+              "legendFormat": "Disk Write",
+              "refId": "C"
+            }
+          ],
+          "title": "Disk R/W Rate",
+          "type": "timeseries"
+        }
+      ],
+      "schemaVersion": 39,
+      "tags": [
+        "vmware",
+        "esxi"
+      ],
+      "templating": {
+        "list": [
+          {
+            "current": {
+              "selected": false,
+              "text": "prometheus",
+              "value": "Prometheus"
+            },
+            "hide": 0,
+            "includeAll": false,
+            "label": "Datasource",
+            "multi": false,
+            "name": "datasource",
+            "options": [],
+            "query": "prometheus",
+            "refresh": 1,
+            "regex": "",
+            "skipUrlSync": false,
+            "type": "datasource"
+          },
+          {
+            "current": {},
+            "datasource": {
+              "uid": "$datasource"
+            },
+            "definition": "",
+            "hide": 0,
+            "includeAll": false,
+            "label": "esxhost",
+            "multi": true,
+            "name": "esxhost",
+            "options": [],
+            "query": "label_values(vmware_host_boot_timestamp_seconds,host_name)",
+            "refresh": 1,
+            "regex": "",
+            "skipUrlSync": false,
+            "sort": 0,
+            "tagValuesQuery": "",
+            "tagsQuery": "",
+            "type": "query",
+            "useTags": false
+          }
+        ]
+      },
+      "time": {
+        "from": "now-15m",
+        "to": "now"
+      },
+      "timepicker": {
+        "hidden": false,
+        "refresh_intervals": [
+          "5s",
+          "10s",
+          "30s",
+          "1m",
+          "5m",
+          "15m",
+          "30m",
+          "1h",
+          "2h",
+          "1d"
+        ],
+        "time_options": [
+          "5m",
+          "15m",
+          "1h",
+          "6h",
+          "12h",
+          "24h",
+          "2d",
+          "7d",
+          "30d"
+        ]
+      },
+      "timezone": "browser",
+      "title": "VMware ESXi Import",
+      "uid": "_gg9LEqmk",
+      "version": 1
+    }
+  vsphere-vritualmachine.json: |
+    {
+      "annotations": {
+        "list": [
+          {
+            "builtIn": 1,
+            "datasource": {
+              "type": "datasource",
+              "uid": "grafana"
+            },
+            "enable": true,
+            "hide": true,
+            "iconColor": "rgba(0, 211, 255, 1)",
+            "limit": 100,
+            "name": "Annotations & Alerts",
+            "showIn": 0,
+            "type": "dashboard"
+          }
+        ]
+      },
+      "description": "VMware ESXi single instance graphs.",
+      "editable": true,
+      "fiscalYearStartMonth": 0,
+      "gnetId": 10076,
+      "graphTooltip": 1,
+      "links": [],
+      "panels": [
+        {
+          "datasource": {
+            "uid": "$datasource"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "mappings": [
+                {
+                  "options": {
+                    "match": "null",
+                    "result": {
+                      "text": "N/A"
+                    }
+                  },
+                  "type": "special"
+                }
+              ],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "#299c46",
+                    "value": null
+                  },
+                  {
+                    "color": "rgba(237, 129, 40, 0.89)",
+                    "value": 50
+                  },
+                  {
+                    "color": "#d44a3a",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "none"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 3,
+            "w": 4,
+            "x": 0,
+            "y": 0
+          },
+          "id": 34,
+          "maxDataPoints": 100,
+          "options": {
+            "colorMode": "none",
+            "graphMode": "none",
+            "justifyMode": "auto",
+            "orientation": "horizontal",
+            "reduceOptions": {
+              "calcs": [
+                "mean"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "showPercentChange": false,
+            "textMode": "name",
+            "wideLayout": true
+          },
+          "targets": [
+            {
+              "expr": "(vmware_vm_boot_timestamp_seconds{vm_name=~\"$vm\"}) ",
+              "format": "time_series",
+              "instant": false,
+              "intervalFactor": 1,
+              "legendFormat": "{{ cluster_name }}",
+              "refId": "A"
+            }
+          ],
+          "title": "Cluster",
+          "type": "stat"
+        },
+        {
+          "datasource": {
+            "uid": "$datasource"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "mappings": [
+                {
+                  "options": {
+                    "match": "null",
+                    "result": {
+                      "text": "N/A"
+                    }
+                  },
+                  "type": "special"
+                }
+              ],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "#299c46",
+                    "value": null
+                  },
+                  {
+                    "color": "rgba(237, 129, 40, 0.89)",
+                    "value": 50
+                  },
+                  {
+                    "color": "#d44a3a",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "none"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 3,
+            "w": 4,
+            "x": 4,
+            "y": 0
+          },
+          "id": 36,
+          "maxDataPoints": 100,
+          "options": {
+            "colorMode": "none",
+            "graphMode": "none",
+            "justifyMode": "auto",
+            "orientation": "horizontal",
+            "reduceOptions": {
+              "calcs": [
+                "mean"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "showPercentChange": false,
+            "textMode": "name",
+            "wideLayout": true
+          },
+          "targets": [
+            {
+              "expr": "(vmware_vm_boot_timestamp_seconds{vm_name=~\"$vm\"}) ",
+              "format": "time_series",
+              "instant": false,
+              "intervalFactor": 1,
+              "legendFormat": "{{ host_name }}",
+              "refId": "A"
+            }
+          ],
+          "title": "Host",
+          "type": "stat"
+        },
+        {
+          "datasource": {
+            "uid": "$datasource"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "mappings": [
+                {
+                  "options": {
+                    "0": {
+                      "text": "VM"
+                    },
+                    "1": {
+                      "text": "Template"
+                    }
+                  },
+                  "type": "value"
+                }
+              ],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "#299c46",
+                    "value": null
+                  },
+                  {
+                    "color": "rgba(237, 129, 40, 0.89)",
+                    "value": null
+                  },
+                  {
+                    "color": "#d44a3a",
+                    "value": null
+                  }
+                ]
+              },
+              "unit": "none"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 3,
+            "w": 4,
+            "x": 8,
+            "y": 0
+          },
+          "id": 6,
+          "maxDataPoints": 100,
+          "options": {
+            "colorMode": "value",
+            "graphMode": "none",
+            "justifyMode": "auto",
+            "orientation": "horizontal",
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "showPercentChange": false,
+            "textMode": "auto",
+            "wideLayout": true
+          },
+          "targets": [
+            {
+              "expr": "vmware_vm_template{vm_name=~\"$vm\"}",
+              "format": "time_series",
+              "instant": false,
+              "intervalFactor": 1,
+              "refId": "A"
+            }
+          ],
+          "title": "VM Type",
+          "type": "stat"
+        },
+        {
+          "datasource": {
+            "uid": "$datasource"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "mappings": [
+                {
+                  "options": {
+                    "0": {
+                      "text": "PoweredOff"
+                    },
+                    "1": {
+                      "text": "PoweredOn"
+                    }
+                  },
+                  "type": "value"
+                }
+              ],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "#d44a3a",
+                    "value": null
+                  },
+                  {
+                    "color": "rgba(237, 129, 40, 0.89)",
+                    "value": 0.1
+                  },
+                  {
+                    "color": "#299c46",
+                    "value": 0.2
+                  }
+                ]
+              },
+              "unit": "none"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 3,
+            "w": 4,
+            "x": 12,
+            "y": 0
+          },
+          "id": 38,
+          "maxDataPoints": 100,
+          "options": {
+            "colorMode": "value",
+            "graphMode": "none",
+            "justifyMode": "auto",
+            "orientation": "horizontal",
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "showPercentChange": false,
+            "textMode": "auto",
+            "wideLayout": true
+          },
+          "targets": [
+            {
+              "expr": "vmware_vm_power_state{vm_name=~\"$vm\"}==1",
+              "format": "time_series",
+              "instant": false,
+              "intervalFactor": 1,
+              "refId": "A"
+            }
+          ],
+          "title": "VM State",
+          "type": "stat"
+        },
+        {
+          "datasource": {
+            "uid": "$datasource"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "mappings": [
+                {
+                  "options": {
+                    "0": {
+                      "text": "NOK"
+                    },
+                    "1": {
+                      "text": "OK"
+                    }
+                  },
+                  "type": "value"
+                }
+              ],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "#d44a3a",
+                    "value": null
+                  },
+                  {
+                    "color": "rgba(237, 129, 40, 0.89)",
+                    "value": 0.1
+                  },
+                  {
+                    "color": "#299c46",
+                    "value": 0.2
+                  }
+                ]
+              },
+              "unit": "short"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 3,
+            "w": 4,
+            "x": 16,
+            "y": 0
+          },
+          "id": 32,
+          "maxDataPoints": 100,
+          "options": {
+            "colorMode": "value",
+            "graphMode": "none",
+            "justifyMode": "auto",
+            "orientation": "horizontal",
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "showPercentChange": false,
+            "textMode": "auto",
+            "wideLayout": true
+          },
+          "targets": [
+            {
+              "expr": "(vmware_vm_guest_tools_running_status{vm_name=~\"$vm\"})",
+              "format": "time_series",
+              "instant": false,
+              "intervalFactor": 1,
+              "legendFormat": "{{ tools_status }}",
+              "refId": "A"
+            }
+          ],
+          "title": "Tools Status",
+          "type": "stat"
+        },
+        {
+          "datasource": {
+            "uid": "$datasource"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "mappings": [
+                {
+                  "options": {
+                    "match": "null",
+                    "result": {
+                      "text": "N/A"
+                    }
+                  },
+                  "type": "special"
+                }
+              ],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "#299c46",
+                    "value": null
+                  },
+                  {
+                    "color": "rgba(237, 129, 40, 0.89)",
+                    "value": 50
+                  },
+                  {
+                    "color": "#d44a3a",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "none"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 3,
+            "w": 4,
+            "x": 20,
+            "y": 0
+          },
+          "id": 37,
+          "maxDataPoints": 100,
+          "options": {
+            "colorMode": "none",
+            "graphMode": "none",
+            "justifyMode": "auto",
+            "orientation": "horizontal",
+            "reduceOptions": {
+              "calcs": [
+                "mean"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "showPercentChange": false,
+            "textMode": "name",
+            "wideLayout": true
+          },
+          "targets": [
+            {
+              "expr": "(vmware_vm_guest_tools_version{vm_name=~\"$vm\"})",
+              "format": "time_series",
+              "instant": false,
+              "intervalFactor": 1,
+              "legendFormat": "{{ tools_version}}",
+              "refId": "A"
+            }
+          ],
+          "title": "Tools Version",
+          "type": "stat"
+        },
+        {
+          "datasource": {
+            "uid": "$datasource"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "mappings": [
+                {
+                  "options": {
+                    "match": "null",
+                    "result": {
+                      "text": "N/A"
+                    }
+                  },
+                  "type": "special"
+                }
+              ],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "#299c46",
+                    "value": null
+                  },
+                  {
+                    "color": "rgba(237, 129, 40, 0.89)",
+                    "value": 50
+                  },
+                  {
+                    "color": "#d44a3a",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "short"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 5,
+            "w": 3,
+            "x": 0,
+            "y": 3
+          },
+          "id": 14,
+          "maxDataPoints": 100,
+          "options": {
+            "colorMode": "none",
+            "graphMode": "none",
+            "justifyMode": "auto",
+            "orientation": "horizontal",
+            "reduceOptions": {
+              "calcs": [
+                "mean"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "showPercentChange": false,
+            "textMode": "auto",
+            "wideLayout": true
+          },
+          "targets": [
+            {
+              "expr": "(vmware_vm_num_cpu{vm_name=~\"$vm\"}) ",
+              "format": "time_series",
+              "instant": false,
+              "intervalFactor": 1,
+              "refId": "A"
+            }
+          ],
+          "title": "Cpu Number",
+          "type": "stat"
+        },
+        {
+          "datasource": {
+            "uid": "$datasource"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "mappings": [
+                {
+                  "id": 0,
+                  "op": "=",
+                  "text": "N/A",
+                  "type": 1,
+                  "value": "null"
+                }
+              ],
+              "max": 100,
+              "min": 0,
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "#299c46",
+                    "value": null
+                  },
+                  {
+                    "color": "rgba(237, 129, 40, 0.89)",
+                    "value": 90
+                  },
+                  {
+                    "color": "#d44a3a",
+                    "value": 95
+                  }
+                ]
+              },
+              "unit": "percent"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 5,
+            "w": 3,
+            "x": 3,
+            "y": 3
+          },
+          "id": 12,
+          "options": {
+            "minVizHeight": 75,
+            "minVizWidth": 75,
+            "orientation": "horizontal",
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "showThresholdLabels": false,
+            "showThresholdMarkers": true,
+            "sizing": "auto"
+          },
+          "targets": [
+            {
+              "expr": "vmware_vm_cpu_usagemhz_average{vm_name=~\"$vm\"}/on() group_right() vmware_vm_max_cpu_usage{vm_name=~\"$vm\"}*100",
+              "format": "time_series",
+              "instant": false,
+              "intervalFactor": 1,
+              "refId": "A"
+            }
+          ],
+          "title": "VM CPU Usage",
+          "type": "gauge"
+        },
+        {
+          "datasource": {
+            "uid": "$datasource"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "mappings": [
+                {
+                  "id": 0,
+                  "op": "=",
+                  "text": "N/A",
+                  "type": 1,
+                  "value": "null"
+                }
+              ],
+              "max": 20,
+              "min": 0,
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "#299c46",
+                    "value": null
+                  },
+                  {
+                    "color": "rgba(237, 129, 40, 0.89)",
+                    "value": 5
+                  },
+                  {
+                    "color": "#d44a3a",
+                    "value": 10
+                  }
+                ]
+              },
+              "unit": "percent"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 5,
+            "w": 3,
+            "x": 6,
+            "y": 3
+          },
+          "id": 25,
+          "options": {
+            "minVizHeight": 75,
+            "minVizWidth": 75,
+            "orientation": "horizontal",
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "showThresholdLabels": false,
+            "showThresholdMarkers": true,
+            "sizing": "auto"
+          },
+          "targets": [
+            {
+              "expr": "(vmware_vm_cpu_ready_summation{vm_name=~\"$vm\"})/200",
+              "format": "time_series",
+              "instant": false,
+              "intervalFactor": 1,
+              "refId": "A"
+            }
+          ],
+          "title": "VM Cpu Ready",
+          "type": "gauge"
+        },
+        {
+          "datasource": {
+            "uid": "$datasource"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "mappings": [
+                {
+                  "id": 0,
+                  "op": "=",
+                  "text": "N/A",
+                  "type": 1,
+                  "value": "null"
+                }
+              ],
+              "max": 10,
+              "min": 0,
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "#299c46",
+                    "value": null
+                  },
+                  {
+                    "color": "rgba(237, 129, 40, 0.89)",
+                    "value": 1
+                  },
+                  {
+                    "color": "#d44a3a",
+                    "value": 3
+                  }
+                ]
+              },
+              "unit": "percent"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 5,
+            "w": 3,
+            "x": 9,
+            "y": 3
+          },
+          "id": 26,
+          "options": {
+            "minVizHeight": 75,
+            "minVizWidth": 75,
+            "orientation": "horizontal",
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "showThresholdLabels": false,
+            "showThresholdMarkers": true,
+            "sizing": "auto"
+          },
+          "targets": [
+            {
+              "expr": "vmware_vm_cpu_costop_summation{vm_name=~\"$vm\"}/200",
+              "format": "time_series",
+              "instant": false,
+              "intervalFactor": 1,
+              "refId": "A"
+            }
+          ],
+          "title": "VM Cpu Co-Stop",
+          "type": "gauge"
+        },
+        {
+          "datasource": {
+            "uid": "$datasource"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "mappings": [
+                {
+                  "options": {
+                    "match": "null",
+                    "result": {
+                      "text": "N/A"
+                    }
+                  },
+                  "type": "special"
+                }
+              ],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "#299c46",
+                    "value": null
+                  },
+                  {
+                    "color": "rgba(237, 129, 40, 0.89)",
+                    "value": 50
+                  },
+                  {
+                    "color": "#d44a3a",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "decmbytes"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 5,
+            "w": 3,
+            "x": 12,
+            "y": 3
+          },
+          "id": 15,
+          "maxDataPoints": 100,
+          "options": {
+            "colorMode": "none",
+            "graphMode": "none",
+            "justifyMode": "auto",
+            "orientation": "horizontal",
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "showPercentChange": false,
+            "textMode": "auto",
+            "wideLayout": true
+          },
+          "targets": [
+            {
+              "expr": "(vmware_vm_memory_max{vm_name=~\"$vm\"})  ",
+              "format": "time_series",
+              "instant": false,
+              "intervalFactor": 1,
+              "refId": "A"
+            }
+          ],
+          "title": "Memory Capacity",
+          "type": "stat"
+        },
+        {
+          "datasource": {
+            "uid": "$datasource"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "mappings": [
+                {
+                  "options": {
+                    "match": "null",
+                    "result": {
+                      "text": "N/A"
+                    }
+                  },
+                  "type": "special"
+                }
+              ],
+              "max": 100,
+              "min": 0,
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "#299c46",
+                    "value": null
+                  },
+                  {
+                    "color": "rgba(237, 129, 40, 0.89)",
+                    "value": 90
+                  },
+                  {
+                    "color": "#d44a3a",
+                    "value": 95
+                  }
+                ]
+              },
+              "unit": "percent"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 5,
+            "w": 3,
+            "x": 15,
+            "y": 3
+          },
+          "id": 13,
+          "maxDataPoints": 100,
+          "options": {
+            "minVizHeight": 75,
+            "minVizWidth": 75,
+            "orientation": "horizontal",
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "showThresholdLabels": false,
+            "showThresholdMarkers": true,
+            "sizing": "auto"
+          },
+          "targets": [
+            {
+              "expr": "(vmware_vm_mem_usage_average{vm_name=~\"$vm\"}) * 100 / on() group_right() (vmware_vm_memory_max{vm_name=~\"$vm\"})",
+              "format": "time_series",
+              "instant": false,
+              "intervalFactor": 1,
+              "refId": "A"
+            }
+          ],
+          "title": "VM Memory usage",
+          "type": "gauge"
+        },
+        {
+          "datasource": {
+            "uid": "$datasource"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "decimals": 1,
+              "mappings": [
+                {
+                  "id": 0,
+                  "op": "=",
+                  "text": "N/A",
+                  "type": 1,
+                  "value": "null"
+                }
+              ],
+              "max": 100,
+              "min": 0,
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "#299c46",
+                    "value": null
+                  },
+                  {
+                    "color": "rgba(237, 129, 40, 0.89)",
+                    "value": 1024
+                  },
+                  {
+                    "color": "#d44a3a",
+                    "value": 2048
+                  }
+                ]
+              },
+              "unit": "deckbytes"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 5,
+            "w": 3,
+            "x": 18,
+            "y": 3
+          },
+          "id": 31,
+          "options": {
+            "minVizHeight": 75,
+            "minVizWidth": 75,
+            "orientation": "horizontal",
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "showThresholdLabels": false,
+            "showThresholdMarkers": true,
+            "sizing": "auto"
+          },
+          "targets": [
+            {
+              "expr": "vmware_vm_mem_vmmemctl_average{vm_name=~\"$vm\"}",
+              "format": "time_series",
+              "instant": false,
+              "intervalFactor": 1,
+              "refId": "A"
+            }
+          ],
+          "title": "VM Ballooning",
+          "type": "gauge"
+        },
+        {
+          "datasource": {
+            "uid": "$datasource"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "decimals": 2,
+              "mappings": [
+                {
+                  "id": 0,
+                  "op": "=",
+                  "text": "N/A",
+                  "type": 1,
+                  "value": "null"
+                }
+              ],
+              "max": 100,
+              "min": 0,
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "#299c46",
+                    "value": null
+                  },
+                  {
+                    "color": "rgba(237, 129, 40, 0.89)",
+                    "value": 0.01
+                  },
+                  {
+                    "color": "#d44a3a",
+                    "value": 0.1
+                  }
+                ]
+              },
+              "unit": "deckbytes"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 5,
+            "w": 3,
+            "x": 21,
+            "y": 3
+          },
+          "id": 35,
+          "options": {
+            "minVizHeight": 75,
+            "minVizWidth": 75,
+            "orientation": "horizontal",
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "showThresholdLabels": false,
+            "showThresholdMarkers": true,
+            "sizing": "auto"
+          },
+          "targets": [
+            {
+              "expr": "vmware_vm_mem_swapped_average{vm_name=~\"$vm\"}",
+              "format": "time_series",
+              "instant": false,
+              "intervalFactor": 1,
+              "refId": "A"
+            }
+          ],
+          "title": "VM Swapped",
+          "type": "gauge"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "$datasource"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 10,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "insertNulls": false,
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "never",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "decimals": 1,
+              "links": [],
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "percent"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 5,
+            "w": 12,
+            "x": 0,
+            "y": 8
+          },
+          "id": 17,
+          "options": {
+            "legend": {
+              "calcs": [
+                "mean",
+                "max",
+                "min"
+              ],
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "tooltip": {
+              "mode": "multi",
+              "sort": "none"
+            }
+          },
+          "targets": [
+            {
+              "editorMode": "code",
+              "expr": "vmware_vm_cpu_usagemhz_average{vm_name=~\"$vm\"}/on() group_right() vmware_vm_max_cpu_usage{vm_name=~\"$vm\"}*100",
+              "format": "time_series",
+              "intervalFactor": 1,
+              "legendFormat": "Cpu Usage",
+              "range": true,
+              "refId": "A"
+            },
+            {
+              "datasource": {
+                "uid": "$datasource"
+              },
+              "expr": "vmware_vm_cpu_demand_average{vm_name=~\"$vm\"}/vmware_vm_max_cpu_usage{vm_name=~\"$vm\"}*100",
+              "legendFormat": "Cpu Demand",
+              "refId": "B"
+            }
+          ],
+          "title": "VM CPU Usage",
+          "type": "timeseries"
+        },
+        {
+          "datasource": {
+            "uid": "$datasource"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 10,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "insertNulls": false,
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "never",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "decimals": 1,
+              "links": [],
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "percent"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 5,
+            "w": 12,
+            "x": 12,
+            "y": 8
+          },
+          "id": 39,
+          "options": {
+            "legend": {
+              "calcs": [
+                "mean",
+                "max",
+                "min"
+              ],
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "tooltip": {
+              "mode": "multi",
+              "sort": "none"
+            }
+          },
+          "targets": [
+            {
+              "expr": "(vmware_vm_cpu_ready_summation{vm_name=~\"$vm\"})/200",
+              "format": "time_series",
+              "intervalFactor": 1,
+              "legendFormat": "Cpu Ready",
+              "refId": "A"
+            },
+            {
+              "datasource": {
+                "uid": "$datasource"
+              },
+              "expr": "vmware_vm_cpu_costop_summation{vm_name=~\"$vm\"}/200",
+              "legendFormat": "Co-Stop",
+              "refId": "B"
+            }
+          ],
+          "title": "VM CPU Contention",
+          "type": "timeseries"
+        },
+        {
+          "datasource": {
+            "uid": "$datasource"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 10,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "insertNulls": false,
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "never",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "decimals": 1,
+              "links": [],
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "percent"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 5,
+            "w": 12,
+            "x": 0,
+            "y": 13
+          },
+          "id": 18,
+          "options": {
+            "legend": {
+              "calcs": [
+                "mean",
+                "max",
+                "min"
+              ],
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "tooltip": {
+              "mode": "multi",
+              "sort": "none"
+            }
+          },
+          "targets": [
+            {
+              "expr": "(vmware_vm_mem_usage_average{vm_name=~\"$vm\"}) * 100 / on() group_right() (vmware_vm_memory_max{vm_name=~\"$vm\"})",
+              "format": "time_series",
+              "intervalFactor": 1,
+              "legendFormat": "Memory Usage",
+              "refId": "A"
+            }
+          ],
+          "title": "VM Memory usage",
+          "type": "timeseries"
+        },
+        {
+          "datasource": {
+            "uid": "$datasource"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 10,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "insertNulls": false,
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "never",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "decimals": 1,
+              "links": [],
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "percent"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 5,
+            "w": 12,
+            "x": 12,
+            "y": 13
+          },
+          "id": 41,
+          "options": {
+            "legend": {
+              "calcs": [
+                "mean",
+                "max",
+                "min"
+              ],
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "tooltip": {
+              "mode": "multi",
+              "sort": "none"
+            }
+          },
+          "targets": [
+            {
+              "expr": "vmware_vm_mem_vmmemctl_average{vm_name=~\"$vm\"}",
+              "format": "time_series",
+              "intervalFactor": 1,
+              "legendFormat": "Ballooning",
+              "refId": "A"
+            },
+            {
+              "datasource": {
+                "uid": "$datasource"
+              },
+              "expr": "vmware_vm_mem_swapped_average{vm_name=~\"$vm\"}",
+              "legendFormat": "Swap",
+              "refId": "B"
+            }
+          ],
+          "title": "VM Memory Contention",
+          "type": "timeseries"
+        },
+        {
+          "datasource": {
+            "uid": "$datasource"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 10,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "insertNulls": false,
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "never",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "decimals": 1,
+              "links": [],
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "KBs"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 5,
+            "w": 24,
+            "x": 0,
+            "y": 18
+          },
+          "id": 19,
+          "options": {
+            "legend": {
+              "calcs": [
+                "mean",
+                "max",
+                "min"
+              ],
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "tooltip": {
+              "mode": "multi",
+              "sort": "none"
+            }
+          },
+          "targets": [
+            {
+              "expr": "vmware_vm_net_received_average{vm_name=~\"$vm\"}+vmware_vm_net_transmitted_average{vm_name=~\"$vm\"}",
+              "format": "time_series",
+              "intervalFactor": 1,
+              "legendFormat": "Total Usage",
+              "refId": "A"
+            },
+            {
+              "expr": "vmware_vm_net_received_average{vm_name=~\"$vm\"}",
+              "legendFormat": "Read Usage",
+              "refId": "B"
+            },
+            {
+              "expr": "vmware_vm_net_transmitted_average{vm_name=~\"$vm\"}",
+              "legendFormat": "Transmit Usage",
+              "refId": "C"
+            },
+            {
+              "expr": "vmware_vm_net_broadcastTx_summation{vm_name=~\"$vm\"}",
+              "legendFormat": "Broadcast TX",
+              "refId": "D"
+            },
+            {
+              "expr": "vmware_vm_net_broadcastRx_summation{vm_name=~\"$vm\"}",
+              "legendFormat": "Broadcast RX",
+              "refId": "E"
+            },
+            {
+              "expr": "vmware_vm_net_multicastTx_summation{vm_name=~\"$vm\"}",
+              "legendFormat": "Multicast TX",
+              "refId": "F"
+            },
+            {
+              "expr": "vmware_vm_net_multicastRx_summation{vm_name=~\"$vm\"}",
+              "legendFormat": "Multicast RX",
+              "refId": "G"
+            }
+          ],
+          "title": "VM Network Usage",
+          "type": "timeseries"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "$datasource"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 10,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "insertNulls": false,
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "never",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "decimals": 1,
+              "links": [],
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "KBs"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 5,
+            "w": 24,
+            "x": 0,
+            "y": 23
+          },
+          "id": 42,
+          "options": {
+            "legend": {
+              "calcs": [
+                "mean",
+                "max",
+                "min"
+              ],
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "tooltip": {
+              "mode": "multi",
+              "sort": "none"
+            }
+          },
+          "targets": [
+            {
+              "editorMode": "code",
+              "expr": "vmware_vm_net_droppedTx_summation{vm_name=~\"$vm\"}",
+              "format": "time_series",
+              "intervalFactor": 1,
+              "legendFormat": "Packet Dropped TX",
+              "range": true,
+              "refId": "A"
+            },
+            {
+              "expr": "vmware_vm_net_droppedRx_summation{vm_name=~\"$vm\"}",
+              "legendFormat": "Packet Dropped RX",
+              "refId": "B"
+            }
+          ],
+          "title": "VM Network Packet Dropped",
+          "type": "timeseries"
+        },
+        {
+          "datasource": {
+            "uid": "$datasource"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 10,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "insertNulls": false,
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "never",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "decimals": 1,
+              "links": [],
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "KBs"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 5,
+            "w": 24,
+            "x": 0,
+            "y": 28
+          },
+          "id": 20,
+          "options": {
+            "legend": {
+              "calcs": [
+                "mean",
+                "max",
+                "min"
+              ],
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "tooltip": {
+              "mode": "multi",
+              "sort": "none"
+            }
+          },
+          "targets": [
+            {
+              "expr": "vmware_vm_disk_read_average{vm_name=~\"$vm\"}+vmware_vm_disk_write_average{vm_name=~\"$vm\"}",
+              "format": "time_series",
+              "intervalFactor": 1,
+              "legendFormat": "Total Usage",
+              "refId": "A"
+            },
+            {
+              "expr": "vmware_vm_disk_read_average{vm_name=~\"$vm\"}",
+              "legendFormat": "Read Usage",
+              "refId": "B"
+            },
+            {
+              "expr": "vmware_vm_disk_write_average{vm_name=~\"$vm\"}",
+              "legendFormat": "Write Usage",
+              "refId": "C"
+            }
+          ],
+          "title": "VM Disk Read And Write",
+          "type": "timeseries"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "$datasource"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 10,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "insertNulls": false,
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "never",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "decimals": 0,
+              "links": [],
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "dtdurationms"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 5,
+            "w": 24,
+            "x": 0,
+            "y": 33
+          },
+          "id": 43,
+          "options": {
+            "legend": {
+              "calcs": [
+                "mean",
+                "max",
+                "min"
+              ],
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "tooltip": {
+              "mode": "multi",
+              "sort": "none"
+            }
+          },
+          "targets": [
+            {
+              "editorMode": "code",
+              "expr": "vmware_vm_disk_maxTotalLatency_latest{vm_name=~\"$vm\"}",
+              "format": "time_series",
+              "intervalFactor": 1,
+              "legendFormat": "Disk Latency",
+              "range": true,
+              "refId": "A"
+            }
+          ],
+          "title": "VM Disk Latency",
+          "type": "timeseries"
+        }
+      ],
+      "schemaVersion": 39,
+      "tags": [
+        "vmware"
+      ],
+      "templating": {
+        "list": [
+          {
+            "current": {
+              "selected": false,
+              "text": "prometheus",
+              "value": "Prometheus"
+            },
+            "hide": 0,
+            "includeAll": false,
+            "label": "Datasource",
+            "multi": false,
+            "name": "datasource",
+            "options": [],
+            "query": "prometheus",
+            "refresh": 1,
+            "regex": "",
+            "skipUrlSync": false,
+            "type": "datasource"
+          },
+          {
+            "current": {},
+            "datasource": {
+              "uid": "$datasource"
+            },
+            "definition": "label_values(vm_name)",
+            "hide": 0,
+            "includeAll": false,
+            "label": "vm",
+            "multi": true,
+            "name": "vm",
+            "options": [],
+            "query": "label_values(vm_name)",
+            "refresh": 1,
+            "regex": "",
+            "skipUrlSync": false,
+            "sort": 0,
+            "tagValuesQuery": "",
+            "tagsQuery": "",
+            "type": "query",
+            "useTags": false
+          }
+        ]
+      },
+      "time": {
+        "from": "now-15m",
+        "to": "now"
+      },
+      "timepicker": {
+        "hidden": false,
+        "refresh_intervals": [
+          "5s",
+          "10s",
+          "30s",
+          "1m",
+          "5m",
+          "15m",
+          "30m",
+          "1h",
+          "2h",
+          "1d"
+        ],
+        "time_options": [
+          "5m",
+          "15m",
+          "1h",
+          "6h",
+          "12h",
+          "24h",
+          "2d",
+          "7d",
+          "30d"
+        ]
+      },
+      "timezone": "browser",
+      "title": "VMware VM",
+      "uid": "Sl3uaY2Zk",
+      "version": 1
+    }
+`}}

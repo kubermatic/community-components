@@ -1,0 +1,18 @@
+apiVersion: kubevirt.io/v1
+kind: KubeVirt
+metadata:
+  annotations:
+    kubevirt.io/latest-observed-api-version: v1
+    kubevirt.io/storage-observed-api-version: v1
+  name: kubevirt
+  namespace: kubevirt
+spec:
+  configuration:
+    developerConfiguration:
+      featureGates:
+      - VMExport
+      - HotplugVolumes
+      - BlockVolume
+      - VMPersistentState
+      # added for https://kubevirt.io/user-guide/storage/snapshot_restore_api/
+      - Snapshot

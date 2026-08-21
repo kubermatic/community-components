@@ -2,6 +2,8 @@
         editor = vim
         autocrlf = input
         excludesfile = ~/.gitignore
+        preloadindex = true
+        untrackedCache = true
 [alias]
         co = checkout
         ci = commit
@@ -28,3 +30,5 @@
         prune = true
 [pull]
         rebase = false
+[safe]
+        directory = /home/kubermatic/mnt

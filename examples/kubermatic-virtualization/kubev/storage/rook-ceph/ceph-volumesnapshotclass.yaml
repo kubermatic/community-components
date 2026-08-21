@@ -1,0 +1,19 @@
+# VolumeSnapshotClass for Ceph RBD
+# Required for KubeVirt VM snapshots (resolves "No VolumeSnapshotClass" warning)
+# Prerequisites:
+#   - snapshot CRDs installed: kubectl get crd volumesnapshots.snapshot.storage.k8s.io
+#   - snapshot-controller running: kubectl get pods -A | grep snapshot-controller
+apiVersion: snapshot.storage.k8s.io/v1
+kind: VolumeSnapshotClass
+metadata:
+  name: csi-rbdplugin-snapclass
+  annotations:
+    snapshot.storage.kubernetes.io/is-default-class: "true"
+  labels:
+    velero.io/csi-volumesnapshot-class: "true"
+driver: rook-ceph.rbd.csi.ceph.com
+parameters:
+  clusterID: rook-ceph
+  csi.storage.k8s.io/snapshotter-secret-name: rook-csi-rbd-provisioner
+  csi.storage.k8s.io/snapshotter-secret-namespace: rook-ceph
+deletionPolicy: Delete

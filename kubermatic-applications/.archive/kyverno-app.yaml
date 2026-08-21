@@ -1,0 +1,25 @@
+apiVersion: apps.kubermatic.k8c.io/v1
+kind: ApplicationDefinition
+metadata:
+  name: kyverno
+spec:
+  description: Kyverno (Greek for “govern”) is a policy engine designed specifically for Kubernetes. Kyverno allows cluster administrators to manage environment specific configurations independently of workload configurations and enforce configuration best practices for their clusters. Kyverno can be used to scan existing workloads for best practices, or can be used to enforce best practices by blocking or mutating API requests.
+  method: helm
+  versions:
+  - template:
+      source:
+        helm:
+          chartName: kyverno
+          chartVersion: 3.0.5
+          url: https://kyverno.github.io/kyverno/
+    version: 1.10.3
+
+  defaultValues:
+    admissionController:
+      replicas: 3
+    backgroundController:
+      replicas: 2
+    cleanupController:
+      replicas: 2
+    reportsController:
+      replicas: 2

@@ -1,0 +1,6 @@
+dependencies:
+- name: vmware-exporter
+  repository: https://kremers.github.io
+  version: 2.2.0
+digest: sha256:a33e8859092bfa1481fbca760b7c3367d52832d39c0d0fe032a1780b48e792e7
+generated: "2021-10-25T12:57:37.394937992+02:00"

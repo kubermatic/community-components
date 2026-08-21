@@ -1,0 +1,158 @@
+# Helmfile for Kubernetes Storage (Rook Ceph v1.19)
+#
+# Usage:
+#   helmfile sync                    # Install/upgrade all releases
+#   helmfile diff                    # Show changes before applying
+#   helmfile destroy                 # Uninstall all releases
+#
+# Prerequisites:
+#   - helm 3.13+ installed
+#   - helmfile installed (https://github.com/helmfile/helmfile)
+#   - kubectl configured with cluster access
+#   - Block devices available on nodes (e.g., /dev/sdb)
+#   - Linux kernel 4.17+ (for full CephFS support)
+#
+# After helmfile sync, apply the CephCluster:
+#   kubectl apply -f storage/rook-ceph/ceph-cluster.yaml
+#   kubectl apply -f storage/rook-ceph/ceph-storageclass.yaml
+#
+# Reference: https://rook.io/docs/rook/v1.19
+
+helmDefaults:
+  wait: true
+  timeout: 900
+  createNamespace: true
+
+repositories:
+  - name: rook-release
+    url: https://charts.rook.io/release
+  - name: piraeus-charts
+    url: https://piraeus.io/helm-charts/
+
+releases:
+  # Rook Ceph Operator v1.19 - manages Ceph cluster lifecycle
+  - name: rook-ceph
+    namespace: rook-ceph
+    chart: rook-release/rook-ceph
+    version: "v1.19.0"
+    values:
+      - crds:
+          enabled: true
+      - enableDiscoveryDaemon: true
+      # CSI Configuration for v1.19
+      # Disable CSI Operator mode to use built-in CSI driver management
+      # This avoids requiring the separate ceph-csi-operator deployment
+      - csi:
+          enableCSIOperator: false
+          enableRbdDriver: true
+          enableCephfsDriver: true
+          enableCSIHostNetwork: true
+          provisionerTolerations:
+            - key: "node-role.kubernetes.io/control-plane"
+              operator: "Exists"
+              effect: "NoSchedule"
+            - key: "node-role.kubernetes.io/master"
+              operator: "Exists"
+              effect: "NoSchedule"
+          pluginTolerations:
+            - key: "node-role.kubernetes.io/control-plane"
+              operator: "Exists"
+              effect: "NoSchedule"
+            - key: "node-role.kubernetes.io/master"
+              operator: "Exists"
+              effect: "NoSchedule"
+      - tolerations:
+          - key: "node-role.kubernetes.io/control-plane"
+            operator: "Exists"
+            effect: "NoSchedule"
+          - key: "node-role.kubernetes.io/master"
+            operator: "Exists"
+            effect: "NoSchedule"
+    hooks:
+      - events: ["postsync"]
+        showlogs: true
+        command: "sh"
+        args:
+          - "-c"
+          - |
+            echo "Waiting for Rook operator to be ready..."
+            kubectl -n rook-ceph wait --for=condition=available deployment/rook-ceph-operator --timeout=300s
+            echo "Applying CephCluster configuration..."
+            kubectl apply -f storage/rook-ceph/ceph-cluster.yaml
+            echo "Waiting for CephCluster to initialize..."
+            sleep 60
+            kubectl apply -f storage/rook-ceph/ceph-storageclass.yaml
+            sleep 60
+            kubectl apply -f storage/cdi-config.yaml
+
+  # Snapshot Controller + CRDs - required for KubeVirt VM snapshots
+  # Deploys the external-snapshotter snapshot-controller and VolumeSnapshot CRDs
+  # Source: https://github.com/kubernetes-csi/external-snapshotter
+  # VolumeSnapshotClass is configured separately in storage/rook-ceph/ceph-volumesnapshotclass.yaml
+  - name: snapshot-controller
+    namespace: kube-system
+    chart: piraeus-charts/snapshot-controller
+    version: "5.0.2"
+    values:
+      - image:
+          tag: "v8.2.0"
+      - args:
+          leaderElection: true
+          leaderElectionNamespace: "kube-system"
+    hooks:
+      - events: ["postsync"]
+        showlogs: true
+        command: "sh"
+        args:
+          - "-c"
+          - |
+            echo "Waiting for snapshot-controller to be ready..."
+            kubectl -n kube-system wait --for=condition=available deployment/snapshot-controller --timeout=300s
+            echo "Applying VolumeSnapshotClass for Ceph RBD..."
+            kubectl apply -f storage/rook-ceph/ceph-volumesnapshotclass.yaml
+
+
+# Commented out Portworx configuration (did not work at GCE)
+#repositories:
+#  - name: portworx
+#    url: https://raw.githubusercontent.com/portworx/helm/master/stable
+#
+#releases:
+#  # Portworx Operator - manages Portworx lifecycle
+#  - name: portworx
+#    namespace: portworx
+#    chart: portworx/portworx
+#    version: "8.0.2"
+#    values:
+#      - deployCluster: false                     # Deploy the Portworx cluster
+#      - tolerations:
+#          - key: "node-role.kubernetes.io/control-plane"
+#            operator: "Exists"
+#            effect: "NoSchedule"
+#          - key: "node-role.kubernetes.io/master"
+#            operator: "Exists"
+#            effect: "NoSchedule"
+#    hooks:
+#      - events: ["postsync"]
+#        showlogs: true
+#        command: "kubectl"
+#        args:
+#          - "apply"
+#          - "-f"
+#          - "storage/portworx/kubev-storage-cluster.yaml"
+
+#  # PX-Central - Portworx Management Dashboard
+#  - name: px-central
+#    namespace: portworx-ui
+#    chart: portworx/px-central
+#    version: "2.7.0"
+#    values:
+#      - oidc:
+#          enabled: false
+#      - persistentStorage:
+#          enabled: false
+##          storageClassName: "px-csi-db"
+#      - pxbackup:
+#          enabled: false
+#      - pxlicenseserver:
+#          enabled: false

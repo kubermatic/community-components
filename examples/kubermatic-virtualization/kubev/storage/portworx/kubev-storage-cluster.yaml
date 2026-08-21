@@ -1,0 +1,92 @@
+# SOURCE: https://install.portworx.com/3.5?operator=true&mc=false&kbver=1.34.0&ns=portworx&b=true&dmthin=true&md=%2Fdev%2Fsdb&iop=6&c=px-kubev-storage-639f4a02-5f98-4868-90c3-35e467d684a9&stork=true&csi=true&mon=true&aut=true&tel=true&st=k8s&promop=true
+kind: StorageCluster
+apiVersion: core.libopenstorage.org/v1
+metadata:
+  name: px-kubev-storage-639f4a02-5f98-4868-90c3-35e467d684a9
+  namespace: portworx
+  annotations:
+    portworx.io/install-source: "https://install.portworx.com/3.5?operator=true&mc=false&kbver=1.34.0&ns=portworx&b=true&dmthin=true&md=%2Fdev%2Fsdb&iop=6&c=px-kubev-storage-639f4a02-5f98-4868-90c3-35e467d684a9&stork=true&csi=true&mon=true&aut=true&tel=true&st=k8s&promop=true"
+    portworx.io/misc-args: " -T px-storev2 -f "
+    ### RUN ON CP Nodes
+    portworx.io/run-on-master: "true"
+    portworx.io/pvc-controller-port: "10261"
+    portworx.io/pvc-controller-secure-port: "10262"
+spec:
+  ### RUN ON CP Nodes
+  placement:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+        - matchExpressions:
+          - key: px/enabled
+            operator: NotIn
+            values:
+            - "false"
+    tolerations:
+    - effect: NoSchedule
+      key: node-role.kubernetes.io/master
+      operator: Exists
+    - effect: NoSchedule
+      key: node-role.kubernetes.io/control-plane
+      operator: Exists
+  image: portworx/oci-monitor:3.5.2
+  imagePullPolicy: Always
+
+  # Internal KVDB (etcd) - suitable for testing
+  # For production, use external etcd
+  kvdb:
+    internal: true
+
+  # Storage configuration
+  storage:
+#    useAll: true
+    # Use /dev/sdb for both storage and metadata
+    # - devices: explicitly list storage devices (required when not using useAll)
+    # - systemMetadataDevice: required for internal KVDB configuration
+    # Both can point to the same device - Portworx will partition it appropriately
+    devices:
+      - /dev/sdb
+    systemMetadataDevice: /dev/sdb
+  secretsProvider: k8s
+
+  # Stork - Storage Orchestration Runtime for Kubernetes
+  stork:
+    enabled: true
+    args:
+      webhook-controller: "true"
+  autopilot:
+    enabled: true
+  runtimeOptions:
+    default-io-profile: "6"
+  csi:
+    enabled: true
+
+  # Monitoring
+  monitoring:
+    prometheus:
+      enabled: true
+      exportMetrics: true
+
+---
+# Error: spec.containers{retain-px-daemonset}: Back-off pulling image "alpine/kubectl:1.34.3"
+# Image is not available
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: replace-kubectl-image
+spec:
+  rules:
+    - name: replace-alpine-kubectl-image
+      match:
+        any:
+          - resources:
+              kinds:
+                - Pod
+              namespaces:
+                - portworx
+      mutate:
+        patchStrategicMerge:
+          spec:
+            containers:
+              - (image): "alpine/kubectl:1.34.3"
+                image: "alpine/kubectl:1.34.2"

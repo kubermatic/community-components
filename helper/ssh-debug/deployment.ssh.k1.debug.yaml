@@ -1,0 +1,64 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/name: ssh-debug-k1-admin
+  name: ssh-debug-k1-admin
+spec:
+  strategy:
+    type: Recreate
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: ssh-debug-k1-admin
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: ssh-debug-k1-admin
+    spec:
+      terminationGracePeriodSeconds: 0
+      containers:
+      - args:
+        - /bin/bash
+        - -c
+        - |
+          mkdir -p /root/.ssh
+          ls -lah /tmp/.ssh
+          cp /tmp/.ssh/* /root/.ssh/
+          chmod 0600 /root/.ssh/*
+          ls -lah /root/.ssh
+          service ssh restart
+          
+          tail -f /etc/os-release
+          #Optional: your ngrok command to join
+          ## TODO remove tail if needed
+          #ngrok config add-authtoken xxxx-YOUR-TOKEN-xxxx
+          #ngrok tunnel --log stdout --label edge=xxxx-your-edge-label 22
+        image: quay.io/kubermatic-labs/kubeone-tooling:1.7.2-2024-02-14
+        name: k1-admin
+        stdin: true
+        stdinOnce: true
+        tty: true
+        readinessProbe:
+          tcpSocket:
+            port: 22
+        securityContext:
+          runAsNonRoot: false
+          runAsUser: 0
+        volumeMounts:
+          - mountPath: /tmp/.ssh
+            name: ssh-files
+      tolerations:
+      - effect: NoExecute
+        key: node.kubernetes.io/not-ready
+        operator: Exists
+        tolerationSeconds: 300
+      - effect: NoExecute
+        key: node.kubernetes.io/unreachable
+        operator: Exists
+        tolerationSeconds: 300
+      volumes:
+      - name: ssh-files
+        secret:
+          secretName: ssh-files
+

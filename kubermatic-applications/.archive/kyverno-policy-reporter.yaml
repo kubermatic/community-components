@@ -1,0 +1,24 @@
+apiVersion: apps.kubermatic.k8c.io/v1
+kind: ApplicationDefinition
+metadata:
+  name: kyverno-policy-reporter
+spec:
+  description: Policy Reporter was created to make the results of your Kyverno validation policies more visible and observable.
+  method: helm
+  versions:
+  - template:
+      source:
+        helm:
+          chartName: policy-reporter
+          chartVersion: 2.20.1
+          url: https://kyverno.github.io/policy-reporter/
+    version: 2.16.1
+
+  defaultValues:
+    ui:
+      enabled: true
+      displayMode: dark
+      plugins:
+        kyverno: true
+    kyvernoPlugin:
+      enabled: true

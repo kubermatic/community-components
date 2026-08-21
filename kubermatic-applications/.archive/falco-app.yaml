@@ -1,0 +1,26 @@
+apiVersion: apps.kubermatic.k8c.io/v1
+kind: ApplicationDefinition
+metadata:
+  name: falco
+spec:
+  description: Real-time threat detection solution for containers, hosts, Kubernetes and the cloud.
+  method: helm
+  versions:
+  - template:
+      source:
+        helm:
+          chartName: falco
+          chartVersion: 3.7.1
+          url: https://falcosecurity.github.io/charts
+    version: 0.36.0
+  defaultValues:
+    driver:
+      kind: ebpf
+    tty: true
+    falcosidekick:
+      enabled: true
+      config:
+        slack:
+          webhookurl: https://hooks.slack.com/services/xxxxx___TODO-ADD-KEY___xxxx
+          minimumpriority: notice
+        customfields: "user:changeme"

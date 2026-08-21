@@ -10,7 +10,8 @@ TAG ?= ${KKP_VERSION}-${TAG_POST_FIX}
 .PHONY: docker-release docker-build
 
 docker-build:
-	docker build --build-arg KKP_VERSION=${KKP_VERSION} -t ${KKP_ADDON_CUSTOM_REPO}:${TAG} .
+	docker buildx build --push --platform linux/amd64 --build-arg KKP_VERSION=${KKP_VERSION} -t ${KKP_ADDON_CUSTOM_REPO}:${TAG} .
+	docker buildx imagetools inspect ${KKP_ADDON_CUSTOM_REPO}:${TAG}
 
 docker-release: docker-build
 	docker push ${KKP_ADDON_CUSTOM_REPO}:${TAG}
