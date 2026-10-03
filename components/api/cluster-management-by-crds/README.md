@@ -15,7 +15,7 @@ Using the given example inside of any GitOps Tooling, the following workflow is 
 ![KKP Cluster Apply via CRD Architecture Overview](../.assets/kkp-cluster-apply-via-crd-arch.png)
 > Image Source: local [kkp-rest-API-Terraform-Cluster-CRD-Architecture-Drawing.drawio.xml](../.assets/kkp-rest-API-Terraform-Cluster-CRD-Architecture-Drawing.drawio.xml) or [Google Drive](https://drive.google.com/file/d/1G8-AerEndAkR17ON4DOIrOAb_-OxEVnH/view?usp=sharing)
 
-1) Use `kubectl` with a generated service account authentication token (or personalized account) within a regular `kubeconfig`. The service account should at least have access to the target seed and the required `Cluster` or `ClusterTemplate` objects you want to manage.
+1) Use `kubectl` with a generated service account authentication token (or personalized account) within a regular `kubeconfig`. The service account should at least have access to the target seed and the required `Cluster` or `ClusterTemplate` objects you want to manage, plus `patch` on `clusters/status` to [set the cluster owner](#set-the-cluster-owner).
 2) The applied [Cluster](https://docs.kubermatic.com/kubermatic/main/references/crds/#cluster) object get verified and persistently stored within the matching Seed Cluster Kubernetes API endpoint.
 3) Seed Controller Managers use the [ClusterSpec](https://docs.kubermatic.com/kubermatic/main/references/crds/#clusterspec) and create the necessary specs for the Control Plan creation of a [KP user cluster](https://docs.kubermatic.com/kubermatic/main/architecture/#user-cluster)
 4) Containerized Control Plane objects spins up (Deployments & StatefulSets) and seed controller manager creates necessary external cloud provider resources (e.g., a security group at the external cloud).
@@ -40,6 +40,10 @@ kubectl apply -f cluster/00_secret.credentials.example.yaml
 
 # create cluster with initial machine deployment
 kubectl apply -f cluster/10_cluster.spec.vsphere.example.yaml
+
+# set the cluster owner - status can't be part of the apply above, see "Set the cluster owner" below
+kubectl patch cluster xxx-crd-cluster-id --subresource=status --type=merge \
+  -p '{"status":{"userEmail":"owner@example.com"}}'
 
 #... check status of cluster creation
 kubectl get cluster xxx-crd-cluster-id
@@ -69,6 +73,39 @@ kubectl delete cluster xxx-crd-cluster-id
 kubectl delete -f cluster/10_cluster.spec.vsphere.example.yaml
 ```
 
+### Set the cluster owner
+
+KKP reads the cluster owner from `status.userEmail`. The KKP UI/API sets it when it creates a cluster, a `kubectl apply` of a `Cluster` object does not. Without an owner, the user cluster controller manager skips its owner binding controller (log: `No -owner-email given, skipping owner-binding-creator controller`), so:
+* the owner doesn't get `cluster-admin` in the user cluster
+* the KKP-managed cluster role bindings are never created, so adding or removing a cluster-wide binding in the dashboard (cluster details > RBAC) fails with `the cluster role binding not found`. Namespace-scoped bindings still work.
+
+Upstream issue: [kubermatic/kubermatic#16615](https://github.com/kubermatic/kubermatic/issues/16615) - until it's fixed, set the owner yourself.
+
+The owner can't be part of the cluster YAML: the `Cluster` CRD has a status subresource, so the API server drops `status` on create and ignores it on every later apply. A `user` annotation on the `Cluster` doesn't help either, KKP only reads it on a `ClusterTemplate` (see [Clustertemplate Management](#clustertemplate-management)).
+
+Set it with a second call against the status subresource, right after the apply:
+```bash
+kubectl patch cluster xxx-crd-cluster-id --subresource=status --type=merge \
+  -p '{"status":{"userEmail":"owner@example.com"}}'
+```
+Or declaratively, with a status-only manifest (needs kubectl >= 1.32):
+```bash
+cat <<EOF | kubectl apply --server-side --subresource=status -f -
+apiVersion: kubermatic.k8c.io/v1
+kind: Cluster
+metadata:
+  name: xxx-crd-cluster-id
+status:
+  userEmail: owner@example.com
+EOF
+```
+Pick one of the two: a server-side apply conflicts with a field an earlier `kubectl patch` already set. Later applies of the cluster YAML keep the owner.
+
+This also repairs an existing cluster without owner: KKP restarts the user cluster controller manager with the owner, which then creates the missing bindings with the owner as `cluster-admin`.
+
+* **Permissions:** the account running the patch needs `patch` on `clusters/status` in the seed, access to `clusters` alone is not enough.
+* **GitOps:** Argo CD or Flux apply to the main resource, so a `status` in the manifest gets dropped there as well. Run the patch as a post-sync step (e.g. a hook Job), or use the [ClusterTemplate](#clustertemplate-management) way, which sets the owner by itself.
+
 ### Workflow to create `cluster.yaml`
 1. Create Cluster via UI
 2. Extract Cluster values and remove the metadata:
@@ -90,11 +127,14 @@ diff cluster/10_cluster.spec.vsphere.example.yaml my-cluster/mycluster.spec.yaml
    * Project ID ``: Secrets, Labels, MachineDeployments
    * Cloud Provider Credentials and Specs
      * vsphere: folder path
+   * Cluster owner: not taken from the YAML, set it after the apply, see [Set the cluster owner](#set-the-cluster-owner)
 
 
 ## Clustertemplate Management
 
 Another option is to manage the [`ClusterTemplate`](https://docs.kubermatic.com/kubermatic/main/references/crds/#clustertemplate) object. Therefore, a non initialized template get created and separate instance object creates a copy of it. **BUT** any change to the clustertemplate will **NOT** get applied to the instance.
+
+The cluster owner comes from the `owner` annotation of the `ClusterTemplateInstance` (or the `user` annotation of the template), and KKP sets `status.userEmail` on the created clusters itself - no extra patch needed here.
 ```bash
 # connect to target seed
 export KUBECONFIG=seed-cluster-kubeconfig
