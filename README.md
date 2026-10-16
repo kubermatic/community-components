@@ -89,6 +89,7 @@ customization.
 | [external-dns-app](kubermatic-applications/external-dns-app.yaml)   | Using externalDNS to manage DNS Entries in an automated way in scope of an KKP user cluster |
 | [flux2-app](kubermatic-applications/flux2-app.yaml)                 | Flux GitOps sync tool for application deployment                                            |
 | [harbor-app](kubermatic-applications/harbor-app.yaml)               | Harbor App for user Clusters                                                                |
+| [swytch-operator-app](kubermatic-applications/swytch-operator-app.yaml) | Swytch operator for Redis-compatible sidecar caches and shared servers                     |
 | [sysdig-secure-app](kubermatic-applications/sysdig-secure-app.yaml) | [Sysdig Secure](https://sysdig.com/products/secure/) Integration for KKP User Clusters      |
 | [hivemq-app](kubermatic-applications/hivemq-app.yaml)               | HiveMQ Operator App to manage HiveMQ clusters in KKP user clusters                          |
 
