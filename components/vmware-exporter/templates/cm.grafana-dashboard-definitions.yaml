@@ -4003,7 +4003,7 @@ data:
           },
           "targets": [
             {
-              "expr": "(vmware_host_mem_usage_average{host_name=~\"$esxhost\"}) * 100 / (vmware_host_memory_max{host_name=~\"$esxhost\"})",
+              "expr": "(vmware_host_memory_usage{host_name=~\"$esxhost\"}) * 100 / (vmware_host_memory_max{host_name=~\"$esxhost\"})",
               "format": "time_series",
               "intervalFactor": 1,
               "legendFormat": "Memory Consumed",
